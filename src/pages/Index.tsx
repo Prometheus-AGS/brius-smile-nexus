@@ -37,7 +37,7 @@ const Index: React.FC = () => {
       {/* Footer */}
       <footer className="bg-brius-black text-white py-12">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <div className="mb-4">
                 <img 
@@ -67,6 +67,23 @@ const Index: React.FC = () => {
                 <p>Patient Analytics</p>
                 <p>Reporting Dashboard</p>
               </div>
+            </div>
+            <div>
+              <h3 className="text-lg font-display font-medium mb-4">Powered by</h3>
+              <div className="flex items-center space-x-3">
+                <img 
+                  src="/lovable-uploads/55562fc3-e2ae-416c-81af-f576c73a551b.png"
+                  alt="Prometheus AI Platform"
+                  className="h-10 w-10"
+                />
+                <div>
+                  <p className="text-white font-body font-semibold">Prometheus</p>
+                  <p className="text-gray-300 font-body text-sm">AI Platform</p>
+                </div>
+              </div>
+              <p className="text-gray-400 font-body text-sm mt-3">
+                Agent2Agent protocol and AI functionality powered by Whiterock Capital's Prometheus platform.
+              </p>
             </div>
           </div>
           <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400 font-body">
