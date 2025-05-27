@@ -8,6 +8,7 @@ export interface User {
   name: string;
   role: string;
   permissions: string[];
+  avatar?: string; // Add avatar field
 }
 
 interface AuthState {
@@ -37,7 +38,8 @@ export const useAuthStore = create<AuthState>()(
             email,
             name: 'John Smith',
             role: 'Operations Manager',
-            permissions: ['home', 'assistant', 'library', 'orders', 'reports']
+            permissions: ['home', 'assistant', 'library', 'orders', 'reports'],
+            avatar: undefined // No avatar URL for now, will show initials
           };
           
           set({ 

@@ -10,6 +10,8 @@ import { AssistantApp } from '@/components/apps/assistant-app';
 import { LibraryApp } from '@/components/apps/library-app';
 import { OrdersApp } from '@/components/apps/orders-app';
 import { ReportsApp } from '@/components/apps/reports-app';
+import { ProfileApp } from '@/components/apps/profile-app';
+import { SettingsApp } from '@/components/apps/settings-app';
 
 const appComponents = {
   home: HomeApp,
@@ -17,6 +19,8 @@ const appComponents = {
   library: LibraryApp,
   orders: OrdersApp,
   reports: ReportsApp,
+  profile: ProfileApp,
+  settings: SettingsApp,
 };
 
 export const PortalLayout: React.FC = () => {
