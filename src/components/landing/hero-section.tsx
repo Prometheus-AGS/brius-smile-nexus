@@ -38,7 +38,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onGetStartedClick }) =
             <Button 
               variant="outline"
               size="lg"
-              className="border-white text-white hover:bg-white hover:text-brius-primary rounded-full px-8 py-4 text-lg font-body font-semibold"
+              className="border-2 border-white text-white bg-transparent hover:bg-white hover:text-brius-primary rounded-full px-8 py-4 text-lg font-body font-semibold transition-all duration-300"
             >
               Learn More
             </Button>
