@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Home, MessageSquare, BookOpen, Package, BarChart3, Menu } from 'lucide-react';
+import { Home, MessageSquare, BookOpen, Package, BarChart3, Menu, User, Settings } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -17,6 +17,13 @@ import { Logo } from '@/components/ui/logo';
 import { useNavigation } from '@/hooks/use-navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const menuItems = [
   {
@@ -59,6 +66,23 @@ export const AppSidebar: React.FC = () => {
     setCurrentApp(appId);
   };
 
+  const handleNavigate = (path: string) => {
+    if (path === '/profile') {
+      setCurrentApp('profile');
+    } else if (path === '/settings') {
+      setCurrentApp('settings');
+    }
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   return (
     <Sidebar className="border-r border-brius-gray/20">
       <SidebarHeader className="border-b border-brius-gray/20 p-4">
@@ -93,10 +117,42 @@ export const AppSidebar: React.FC = () => {
 
       <SidebarFooter className="border-t border-brius-gray/20 p-4">
         <div className="space-y-2">
-          <div className="text-sm font-body">
-            <div className="font-semibold text-brius-black">{user?.name}</div>
-            <div className="text-brius-gray">{user?.role}</div>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <div className="flex items-center gap-3 cursor-pointer hover:bg-brius-gray/10 rounded-lg p-2 transition-colors w-full">
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src={user?.avatar} alt={user?.name} />
+                  <AvatarFallback className="bg-brius-primary text-white font-display">
+                    {user?.name ? getInitials(user.name) : 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 text-left">
+                  <div className="text-sm font-display font-semibold text-brius-black">
+                    {user?.name}
+                  </div>
+                  <div className="text-xs text-brius-gray font-body">
+                    {user?.role}
+                  </div>
+                </div>
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem 
+                onClick={() => handleNavigate('/profile')}
+                className="cursor-pointer"
+              >
+                <User className="mr-2 h-4 w-4" />
+                <span>Profile</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => handleNavigate('/settings')}
+                className="cursor-pointer"
+              >
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Settings</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button
             variant="outline"
             size="sm"
