@@ -22,23 +22,21 @@ COPY . .
 # This is the key fix: we're telling Docker not to overwrite node_modules
 RUN yarn build
 
-# Production image
-FROM node:20-alpine AS runner
-WORKDIR /app
+# Production image using nginx to serve static files
+FROM nginx:alpine AS runner
+WORKDIR /usr/share/nginx/html
 
-# Copy necessary files from builder
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/yarn.lock ./yarn.lock
-COPY --from=builder /app/.yarnrc.yml ./.yarnrc.yml
-COPY --from=builder /app/.yarn ./.yarn
+# Remove default nginx static assets
+RUN rm -rf ./*
 
-# Install ALL dependencies, including dev dependencies since we need vite for preview
-RUN corepack enable && corepack prepare yarn@4.9.0 --activate && \
-    yarn install --immutable
+# Copy static assets from builder stage
+COPY --from=builder /app/dist ./
+
+# Copy custom nginx config if needed
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Expose the port the app runs on
-EXPOSE 4173
+EXPOSE 80
 
-# Command to run the app
-CMD ["yarn", "preview", "--host"]
+# Command to run nginx in foreground
+CMD ["nginx", "-g", "daemon off;"]
