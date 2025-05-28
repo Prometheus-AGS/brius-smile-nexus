@@ -18,7 +18,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   preview: {
-    allowedHosts: ["ai.brius.com"],
+    allowedHosts: true,
     host: "::",
     port: 4173,
     cors: {
