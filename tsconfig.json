@@ -5,15 +5,23 @@
     { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": {
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@components/*": ["./src/components/*"],
+      "@hooks/*": ["./src/hooks/*"],
+      "@lib/*": ["./src/lib/*"],
+      "@stores/*": ["./src/stores/*"],
+      "@utils/*": ["./src/utils/*"]
     },
     "noImplicitAny": false,
     "noUnusedParameters": false,
     "skipLibCheck": true,
     "allowJs": true,
     "noUnusedLocals": false,
-    "strictNullChecks": false
+    "strictNullChecks": false,
+    "noFallthroughCasesInSwitch": true
   }
 }
