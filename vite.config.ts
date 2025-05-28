@@ -4,7 +4,7 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
+export default defineConfig(({ mode, command }) => ({
   server: {
     host: "::",
     port: 8080,
@@ -15,6 +15,10 @@ export default defineConfig(({ mode }) => ({
       optionsSuccessStatus: 204,
       credentials: true,
       allowedHeaders: "*"
+    },
+    allowedHosts: true,
+    hmr: {
+      host: 'localhost'
     },
   },
   preview: {
@@ -28,6 +32,9 @@ export default defineConfig(({ mode }) => ({
       optionsSuccessStatus: 204,
       credentials: true,
       allowedHeaders: "*"
+    },
+    hmr: {
+      host: 'localhost'
     },
   },
   plugins: [
