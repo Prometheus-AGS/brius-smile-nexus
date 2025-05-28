@@ -9,9 +9,14 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
+  preview: {
+    allowedHosts: ["ai.brius.com"],
+    host: "::",
+    port: 4173,
+  },
   plugins: [
     react(),
-    mode === 'development' &&
+    mode === "development" &&
     componentTagger(),
   ].filter(Boolean),
   resolve: {
