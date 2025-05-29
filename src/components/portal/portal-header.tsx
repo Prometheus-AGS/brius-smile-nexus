@@ -8,7 +8,6 @@ const appTitles = {
   home: 'Dashboard',
   assistant: 'AI Assistant',
   library: 'Knowledge Library',
-  orders: 'Order Management',
   reports: 'Reports & Analytics',
   profile: 'Profile',
   settings: 'Settings',

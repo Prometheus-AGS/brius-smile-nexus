@@ -8,7 +8,6 @@ import { useNavigation } from '@/hooks/use-navigation';
 import { HomeApp } from '@/components/apps/home-app';
 import { AssistantApp } from '@/components/apps/assistant-app';
 import { LibraryApp } from '@/components/apps/library-app';
-import { OrdersApp } from '@/components/apps/orders-app';
 import { ReportsApp } from '@/components/apps/reports-app';
 import { ProfileApp } from '@/components/apps/profile-app';
 import { SettingsApp } from '@/components/apps/settings-app';
@@ -17,7 +16,6 @@ const appComponents = {
   home: HomeApp,
   assistant: AssistantApp,
   library: LibraryApp,
-  orders: OrdersApp,
   reports: ReportsApp,
   profile: ProfileApp,
   settings: SettingsApp,
