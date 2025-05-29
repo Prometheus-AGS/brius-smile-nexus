@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Home, MessageSquare, BookOpen, Package, BarChart3, Menu, User, Settings } from 'lucide-react';
+import { Home, MessageSquare, BookOpen, BarChart3, Menu, User, Settings } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -43,12 +42,6 @@ const menuItems = [
     title: 'Library',
     icon: BookOpen,
     url: '/portal/library',
-  },
-  {
-    id: 'orders',
-    title: 'Orders',
-    icon: Package,
-    url: '/portal/orders',
   },
   {
     id: 'reports',
