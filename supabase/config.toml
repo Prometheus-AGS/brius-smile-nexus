@@ -1,1 +1,16 @@
 project_id = "vbcdbpkztpdrxpikzwbj"
+
+
+
+# Experimental features may be deprecated any time
+[experimental]
+# Configures Postgres storage engine to use OrioleDB (S3)
+orioledb_version = ""
+# Configures S3 bucket URL, eg. <bucket_name>.s3-<region>.amazonaws.com
+s3_host = "vbcdbpkztpdrxpikzwbj.supabase.co"
+# Configures S3 bucket region, eg. us-east-1
+s3_region = "us-east-2"
+# Configures AWS_ACCESS_KEY_ID for S3 bucket
+s3_access_key = "d6dad6a8da75fb3a0159c8d15b6d76ed"
+# Configures AWS_SECRET_ACCESS_KEY for S3 bucket
+s3_secret_key = "f189decc4fe7c51b21e237f19ba2d02ab5bee63aa8f2b04a948866923b655f7e"
