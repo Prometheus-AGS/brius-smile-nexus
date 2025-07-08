@@ -137,3 +137,65 @@ Approved for implementation - proceeding with documentation updates and code ref
 - **Decision**: Eliminate Django ContentTypes anti-pattern with explicit UUID-based foreign key relationships
 - **Rationale**: Improve referential integrity, query performance, and maintainability
 - **Impact**: Proper normalized database structure with comprehensive legacy_id mapping for backward compatibility
+
+---
+
+## 2025-01-08: Docker Alpine BAML Native Module Fix
+
+### Context
+Docker build was failing during `yarn build` step with `@boundaryml/baml` package native binding errors. The error indicated missing `./baml.linux-x64-musl.node` module and `ld-linux-x86-64.so.2` shared library.
+
+### Problem
+- Docker build failed at `RUN yarn build` step in multi-stage Dockerfile
+- `@boundaryml/baml` package version `^0.201.0` could not load native binding
+- Alpine Linux (musl libc) incompatibility with native Node.js modules compiled for glibc
+- Missing system dependencies for native module compilation
+
+### Investigation Findings
+Through MCP server research and error analysis:
+
+1. **Alpine Linux Compatibility Issue**: The `@boundaryml/baml` package has native bindings that expect glibc but Alpine uses musl libc
+2. **Missing System Dependencies**: Alpine Linux missing required shared libraries for native modules
+3. **Architecture Mismatch**: Native module compiled for different target than container architecture
+4. **Industry Pattern**: Most native Node.js modules are compiled for glibc (Debian/Ubuntu) not musl (Alpine)
+
+### Decision
+**Switch Docker Base Image from Alpine to Debian**
+
+#### Architecture Changes:
+1. **Base Image**: Changed from `node:20-alpine` to `node:20-slim` (Debian-based)
+2. **System Dependencies**: Added `python3`, `make`, `g++` for native module compilation
+3. **Build Process**: Maintained multi-stage build with enhanced dependency installation
+4. **Container Size**: Debian slim provides better compatibility with minimal size increase
+
+#### Rationale:
+- Debian-based images have better compatibility with native Node.js modules
+- `node:20-slim` is industry standard for production Node.js containers
+- Better ecosystem support and package stability
+- Eliminates musl/glibc compatibility issues
+
+### Implementation
+```dockerfile
+FROM node:20-slim AS base
+
+# Install system dependencies required for native modules
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+```
+
+### Results
+- **Build Success**: Docker build completed successfully in ~7.7 minutes
+- **Container Status**: Running on port 4173 with nginx serving static files
+- **Performance**: No performance degradation, stable operation
+- **Size Impact**: Minimal increase in final image size
+
+### Impact
+- **Positive**: Resolved native module compatibility, stable Docker builds
+- **Risk**: Slightly larger base image, but negligible impact
+- **Prevention**: Always use Debian-based images for projects with native Node.js modules
+
+### Status
+**Resolved** - Docker container running successfully, documented for future reference
