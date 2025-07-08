@@ -1,0 +1,196 @@
+# Roo Code Code Mode Rules for brius-smile-nexus
+# Specific rules for code implementation and development
+# Includes database migration CLI tool and web application implementation
+
+## Code Mode Focus
+- Implement features based on architectural plans for both CLI tool and web application
+- Write clean, maintainable, and testable TypeScript code with strict type safety
+- Follow established patterns and conventions for both Node.js CLI and React applications
+- Ensure proper error handling and edge cases for database operations and UI interactions
+- Maintain code quality and consistency across dual-purpose codebase
+- Implement comprehensive data validation using Zod schemas
+- Integrate MCP server validations throughout development process
+
+## Implementation Standards
+
+### Web Application Standards
+- Always implement TypeScript interfaces before components
+- Create custom hooks for all Zustand store interactions
+- Implement proper loading and error states for async operations
+- Use shadcn/ui components consistently
+- Follow established file naming conventions (kebab-case)
+
+### Database Migration CLI Tool Standards
+- **Package Manager**: MANDATORY use of Yarn for all package management operations
+- **MANDATORY MCP Server Integration**: Use brius_postgres, Context7, and Tavily for validation
+- Implement strict TypeScript with zero `any` usage - use proper interfaces and generics
+- Create comprehensive Zod schemas for all data validation before implementation
+- Use Commander.js patterns with proper error handling and exit codes
+- Implement structured logging with Winston and correlation IDs
+- Create custom error classes extending base Error with proper type categorization
+- Use parameterized queries exclusively - never string concatenation
+- Implement connection pooling and batch processing for performance
+- Create rollback mechanisms for all migration phases
+- Validate environment variables with Zod schemas at startup
+- Implement retry logic with exponential backoff for transient failures
+
+### Migration Implementation Requirements (Documentation-Derived)
+- **5-Phase Migration Strategy**: Implement exact phases from `MIGRATION_IMPLEMENTATION_PLAN.md`
+  - Phase 1: Core Data (profiles, offices, orders consolidation)
+  - Phase 2: Workflow Enhancement (order types, states, templates)
+  - Phase 3: Communication System (messages, types, threading)
+  - Phase 4: File Management (projects with versioning)
+  - Phase 5: AI Preparation (embedding generation for AWS Bedrock Titan v2)
+- **ContentTypes Normalization**: Replace all Django generic relationships with explicit foreign keys
+- **Legacy ID Preservation**: Maintain backward compatibility with `legacy_*_id` fields
+- **Data Transformation Validation**: Comprehensive field-level mapping validation
+- **Performance Optimization**: UUID primary keys, optimized indexes, connection pooling
+- **AI Embedding Preparation**: Content identification and vector field preparation
+
+## Code Organization
+- Group related functionality in feature-based modules
+- Create barrel exports for clean imports
+- Separate business logic from UI components
+- Use proper TypeScript types and interfaces
+- Implement proper component composition patterns
+
+## React 19 Implementation
+- Use modern React patterns (hooks, functional components)
+- Implement proper component lifecycle management
+- Use React.memo() for performance optimization
+- Implement proper event handling patterns
+- Use proper form handling with controlled components
+
+## Zustand Integration
+- Never access stores directly from components
+- Always create custom hooks for store interactions
+- Implement proper store slicing for large stores
+- Use proper TypeScript typing for store state
+- Implement proper store persistence when needed
+
+## Supabase Implementation
+- Implement proper authentication flows
+- Use proper error handling for database operations
+- Implement proper RLS policy compliance
+- Use proper TypeScript types for database schemas
+- Implement proper real-time subscriptions when needed
+
+## Testing Implementation
+- Write unit tests for utility functions
+- Implement component tests for complex logic
+- Mock external dependencies properly
+- Test error scenarios and edge cases
+- Maintain good test coverage
+
+### Database Migration CLI Tool Testing
+- **MANDATORY**: Achieve >90% code coverage for all migration logic
+- Create comprehensive test suites for each migration phase
+- Implement integration tests with test databases (legacy and Supabase)
+- Test rollback scenarios and error recovery mechanisms
+- Performance test with large datasets (>100k records)
+- Test concurrent migration scenarios and connection pooling
+- Mock MCP server responses for consistent testing
+- Test environment variable validation and error scenarios
+- Validate Zod schema enforcement in all data transformation paths
+- Test CLI command parsing and error handling with Commander.js
+
+## Database Migration Code Organization
+
+### Required Directory Structure
+```
+migration/
+├── src/
+│   ├── commands/          # Commander.js command definitions
+│   ├── config/            # Environment and configuration management
+│   ├── database/          # Database connection and query utilities
+│   ├── errors/            # Custom error classes and handling
+│   ├── logging/           # Winston logging configuration
+│   ├── migration/         # Core migration logic and phases
+│   ├── schemas/           # Zod validation schemas
+│   ├── types/             # TypeScript type definitions
+│   └── utils/             # Shared utilities and helpers
+├── tests/                 # Comprehensive test suites
+├── docs/                  # Migration-specific documentation
+└── scripts/               # Development and deployment scripts
+```
+
+### Implementation Patterns
+- Create barrel exports (`index.ts`) in each directory for clean imports
+- Separate database connection logic from business logic
+- Use dependency injection for testability
+- Implement proper error boundaries and graceful degradation
+- Create reusable validation and transformation utilities
+- Use factory patterns for database connections and MCP clients
+
+## Memory Bank Updates
+- Update activeContext.md with current implementation progress
+- Log any implementation decisions in decisionLog.md
+- Update progress.md with completed features and next steps
+
+## Additional Development Rules
+
+### Bug Fix Memory Management
+- After fixing any bugs where there are no errors detected, create a memory in the memory MCP server related to the bug fix, so we do not repeat bugs
+- Document the root cause, solution, and prevention strategy for future reference
+- Include relevant code patterns and anti-patterns in the memory
+
+### Documentation Compliance
+- The `docs` subdirectory in this project contains markdown files that describe architectural, design and other decisions related to the project
+- Always check for files in the `docs` directory and subdirectories when generating code to make sure those rules and standards are followed
+- Reference existing documentation before making architectural decisions
+- Update documentation when making significant changes
+
+### TypeScript Type Management
+- Always check to see if new TypeScript types are generated already before creating new ones, so we prevent duplicate types from being created
+- Use the `src/types/*` directory structure to create new types that should be shared across stores and components
+- Check existing type definitions in `src/types/` before creating new interfaces or types
+- Organize types by domain/feature within the types directory
+- Use proper barrel exports from type files for clean imports
+
+Remember: These rules are mandatory for all code implementation work.
+- Reference architectural decisions from previous sessions
+
+## Memory MCP Server Update Rules (Post Bug Fix Learning)
+### MANDATORY Memory Updates After Bug Fixes
+- **Automatic Update Requirement**: MUST update memory MCP server after every successful bug fix
+- **Update Timing**: Immediately after bug resolution and testing validation
+- **Memory Content Requirements**:
+  - Bug description and symptoms
+  - Root cause analysis
+  - Solution implementation details
+  - Code changes made
+  - Testing validation performed
+  - Prevention measures implemented
+  - Learning insights and patterns
+
+### Memory Update Conditions
+- **All Bug Categories**: Logic errors, performance issues, security vulnerabilities, UI/UX problems
+- **Migration-Specific Bugs**: Data transformation errors, schema mismatches, performance bottlenecks
+- **CLI Tool Bugs**: Command parsing errors, validation failures, connection issues
+- **Integration Bugs**: MCP server communication failures, external API issues
+
+### Memory Update Structure (TypeScript)
+```typescript
+interface BugFixMemory {
+  bugId: string;
+  title: string;
+  description: string;
+  rootCause: string;
+  solution: string;
+  codeChanges: string[];
+  testingValidation: string;
+  preventionMeasures: string[];
+  learningInsights: string[];
+  relatedPatterns: string[];
+  timestamp: Date;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  category: 'logic' | 'performance' | 'security' | 'ui' | 'migration' | 'cli' | 'integration';
+}
+```
+
+### Learning Enhancement Rules
+- **Pattern Recognition**: Document recurring bug patterns for proactive prevention
+- **Knowledge Accumulation**: Build comprehensive bug fix knowledge base
+- **Best Practices**: Extract and document best practices from successful fixes
+- **Process Improvement**: Identify and implement process improvements
+- **Team Learning**: Share insights across development team through memory system

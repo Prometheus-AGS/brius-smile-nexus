@@ -1,28 +1,43 @@
-
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { LandingHeader } from '@/components/landing/landing-header';
 import { HeroSection } from '@/components/landing/hero-section';
 import { FeaturesSection } from '@/components/landing/features-section';
-import { LoginForm } from '@/components/auth/login-form';
-import { PortalLayout } from '@/components/portal/portal-layout';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuthState } from '@/hooks/use-auth';
 
+/**
+ * Landing Page Component
+ * 
+ * The main landing page for the application.
+ * Displays marketing content and navigation to login/portal.
+ * Automatically redirects authenticated users to the portal.
+ */
 const Index: React.FC = () => {
-  const [showLogin, setShowLogin] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const { isAuthenticated, isInitialized } = useAuthState();
 
-  // If user is authenticated, show the portal
-  if (isAuthenticated) {
-    return <PortalLayout />;
-  }
+  // Redirect authenticated users to portal
+  useEffect(() => {
+    if (isInitialized && isAuthenticated) {
+      navigate('/portal', { replace: true });
+    }
+  }, [isAuthenticated, isInitialized, navigate]);
 
-  // If login form is requested, show it
-  if (showLogin) {
-    return <LoginForm onCancel={() => setShowLogin(false)} />;
-  }
+  /**
+   * Handles navigation to login page
+   */
+  const handleLoginClick = () => {
+    navigate('/login');
+  };
 
-  // Show landing page
+  /**
+   * Handles get started button click
+   */
+  const handleGetStartedClick = () => {
+    navigate('/login');
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -30,8 +45,8 @@ const Index: React.FC = () => {
       transition={{ duration: 0.5 }}
       className="min-h-screen bg-white"
     >
-      <LandingHeader onLoginClick={() => setShowLogin(true)} />
-      <HeroSection onGetStartedClick={() => setShowLogin(true)} />
+      <LandingHeader onLoginClick={handleLoginClick} />
+      <HeroSection onGetStartedClick={handleGetStartedClick} />
       <FeaturesSection />
       
       {/* Footer */}

@@ -1,0 +1,101 @@
+# Roo Code Architect Mode Rules for brius-smile-nexus
+# Specialized rules for architectural planning and high-level design
+# Includes database migration CLI tool and web application architecture
+
+## Architect Mode Focus
+- High-level system design and architecture decisions for both CLI tool and web application
+- Database migration strategy and phased approach planning
+- Technology stack selection and integration patterns
+- Project structure and organization for dual-purpose codebase
+- Performance and scalability considerations for large-scale data migration
+- Security architecture and best practices for database operations
+- MCP server integration patterns for validation and research
+
+## Architecture Documentation
+- Always update decisionLog.md with architectural choices and reasoning
+- Maintain system patterns in systemPatterns.md for reusable solutions
+- Update productContext.md with high-level system understanding
+- Plan feature implementation in progress.md with clear milestones
+
+## Design Principles
+- Follow SOLID principles for component and service design
+- Implement proper separation of concerns
+- Design for testability and maintainability
+- Consider future extensibility in architectural decisions
+- Plan for proper error handling and edge cases
+
+## Database Migration Architecture
+
+### Migration Strategy Planning
+- Design 5-phase migration approach as specified in documentation:
+  1. Core Data Migration (users, organizations, basic entities)
+  2. Relationship Migration (foreign keys, associations)
+  3. Communication Migration (messages, notifications)
+  4. Workflow Migration (processes, states, transitions)
+  5. AI Processing (embeddings, vector data preparation)
+- Plan rollback strategies for each phase
+- Design data validation checkpoints between phases
+- Plan incremental migration with progress tracking
+
+### CLI Tool Architecture
+- Design Commander.js command structure with proper subcommands
+- Plan configuration management for database connections
+- Design logging architecture with structured output
+- Plan error handling hierarchy with custom error types
+- Design progress reporting and status tracking systems
+
+### Data Transformation Architecture
+- Plan ContentTypes normalization to explicit foreign keys
+- Design legacy ID preservation strategy
+- Plan data validation pipeline with Zod schemas
+- Design batch processing for large datasets
+- Plan memory management for large-scale operations
+
+### MCP Server Integration Architecture
+- Plan brius_postgres integration for legacy data analysis
+- Design Context7 integration for API validation workflows
+- Plan Tavily integration for best practices research
+- Design validation checkpoints using MCP servers
+- Plan automated research and validation pipelines
+
+## Technology Integration Planning
+- Plan React 19 component architecture with proper hooks usage
+- Design Zustand store structure with clear data flow
+- Plan Supabase schema with proper RLS policies
+- Design shadcn/ui component composition patterns
+- Plan Vite build optimization strategies
+
+## System Boundaries
+- Define clear module boundaries and interfaces
+- Plan proper abstraction layers
+- Design consistent API patterns
+- Plan proper dependency injection patterns
+- Consider cross-cutting concerns (logging, error handling, etc.)
+
+## Memory Bank Updates
+- Document all architectural decisions in decisionLog.md
+- Update systemPatterns.md with reusable architectural patterns
+- Maintain productContext.md with system overview
+- Plan implementation phases in progress.md
+
+## Additional Development Rules
+
+### Bug Fix Memory Management
+- After fixing any bugs where there are no errors detected, create a memory in the memory MCP server related to the bug fix, so we do not repeat bugs
+- Document the root cause, solution, and prevention strategy for future reference
+- Include relevant code patterns and anti-patterns in the memory
+
+### Documentation Compliance
+- The `docs` subdirectory in this project contains markdown files that describe architectural, design and other decisions related to the project
+- Always check for files in the `docs` directory and subdirectories when generating code to make sure those rules and standards are followed
+- Reference existing documentation before making architectural decisions
+- Update documentation when making significant changes
+
+### TypeScript Type Management
+- Always check to see if new TypeScript types are generated already before creating new ones, so we prevent duplicate types from being created
+- Use the `src/types/*` directory structure to create new types that should be shared across stores and components
+- Check existing type definitions in `src/types/` before creating new interfaces or types
+- Organize types by domain/feature within the types directory
+- Use proper barrel exports from type files for clean imports
+
+Remember: These rules are mandatory for all architectural planning and system design work.

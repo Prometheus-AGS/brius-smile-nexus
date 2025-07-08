@@ -1,0 +1,132 @@
+# Cline AI Code Generation Rules
+# This file defines the coding standards and practices for this project
+
+## Technology Stack
+- **Frontend Framework**: React 19
+- **Build Tool**: Vite 7
+- **Package Manager**: Yarn
+- **Styling**: Tailwind CSS
+- **UI Components**: shadcn/ui
+- **Routing**: React Router
+- **State Management**: Zustand
+- **Backend/Database**: Supabase (auth, authorization, database)
+
+## TypeScript Standards
+- **NEVER** use the `any` type explicitly or implicitly
+- Always provide proper type definitions
+- Use strict TypeScript configuration
+- Prefer type inference where appropriate but be explicit when needed
+- Use generic types and utility types when applicable
+
+## State Management Rules
+- Use Zustand stores for all global state management
+- Components must NEVER communicate directly with stores
+- Always create custom hooks to interface with Zustand stores
+- Example pattern:
+  ```typescript
+  // ❌ Wrong - Direct store access
+  const Component = () => {
+    const store = useStore();
+    return <div>{store.data}</div>;
+  };
+  
+  // ✅ Correct - Hook-based access
+  const useData = () => {
+    const data = useStore(state => state.data);
+    return data;
+  };
+  
+  const Component = () => {
+    const data = useData();
+    return <div>{data}</div>;
+  };
+  ```
+
+## UI Component Standards
+- **ALWAYS** prefer shadcn/ui components over raw HTML elements
+- Use shadcn components for: buttons, inputs, forms, dialogs, cards, etc.
+- Only use raw HTML for semantic elements like `<main>`, `<section>`, `<article>`
+- Maintain consistent styling through Tailwind CSS classes
+- Follow shadcn/ui theming and customization patterns
+
+## File Naming Conventions
+- Use kebab-case (lowercase with dashes) for ALL file names
+- Examples:
+  - `user-profile.tsx`
+  - `auth-service.ts`
+  - `login-form.tsx`
+  - `api-client.ts`
+- Apply this to components, utilities, services, and all other files
+
+## Supabase Integration
+- Use Supabase for authentication, authorization, and database operations
+- Implement proper error handling for Supabase operations
+- Use Supabase's built-in security features (RLS, policies)
+- Follow Supabase best practices for client-side operations
+- Always handle loading and error states for async operations
+
+## Code Generation Validation Requirements
+- **MANDATORY**: Before generating any code, validate using:
+  1. **Tavily MCP Server**: Search for current best practices and API changes
+  2. **Context7 MCP Server**: Verify correct API versions and implementation patterns
+- Ensure all dependencies are compatible with the specified stack versions
+- Verify that generated code follows current framework conventions
+- Check for any breaking changes or deprecated patterns
+
+## Code Quality Standards
+- Write self-documenting code with clear variable and function names
+- Add JSDoc comments for complex functions and components
+- Implement proper error boundaries and error handling
+- Use consistent code formatting (Prettier configuration)
+- Follow React 19 best practices and patterns
+- Implement proper accessibility (a11y) standards
+
+## Project Structure Guidelines
+- Organize components by feature/domain
+- Keep utility functions in dedicated utility files
+- Separate business logic from UI components
+- Use barrel exports (index.ts files) for clean imports
+- Maintain clear separation of concerns
+
+## Performance Considerations
+- Use React.memo() for expensive components
+- Implement proper code splitting with React.lazy()
+- Optimize Zustand store subscriptions
+- Follow Vite optimization guidelines
+- Minimize bundle size and optimize for production
+
+## Security Guidelines
+- Never expose sensitive data in client-side code
+- Use environment variables for configuration
+- Implement proper input validation and sanitization
+- Follow Supabase security best practices
+- Use HTTPS for all external API calls
+
+## Testing Requirements
+- Write unit tests for utility functions
+- Implement component tests for complex UI logic
+- Test Zustand store operations
+- Mock Supabase operations in tests
+- Maintain good test coverage
+
+## Additional Development Rules
+
+### Bug Fix Memory Management
+- After fixing any bugs where there are no errors detected, create a memory in the memory MCP server related to the bug fix, so we do not repeat bugs
+- Document the root cause, solution, and prevention strategy for future reference
+- Include relevant code patterns and anti-patterns in the memory
+
+### Documentation Compliance
+- The `docs` subdirectory in this project contains markdown files that describe architectural, design and other decisions related to the project
+- Always check for files in the `docs` directory and subdirectories when generating code to make sure those rules and standards are followed
+- Reference existing documentation before making architectural decisions
+- Update documentation when making significant changes
+
+### TypeScript Type Management
+- Always check to see if new TypeScript types are generated already before creating new ones, so we prevent duplicate types from being created
+- Use the `src/types/*` directory structure to create new types that should be shared across stores and components
+- Check existing type definitions in `src/types/` before creating new interfaces or types
+- Organize types by domain/feature within the types directory
+- Use proper barrel exports from type files for clean imports
+
+Remember: These rules are mandatory for all code generation. Always validate implementations using the specified MCP servers before finalizing any code.

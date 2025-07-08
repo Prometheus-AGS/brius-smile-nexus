@@ -1,0 +1,147 @@
+# Roo Code Debug Mode Rules for brius-smile-nexus
+# Specific rules for debugging and troubleshooting
+# Includes database migration CLI tool and web application debugging
+
+## Debug Mode Focus
+- Identify root causes of issues, not just symptoms for both CLI and web applications
+- Add comprehensive logging and error tracking with correlation IDs
+- Implement proper error boundaries and fallbacks for database operations
+- Test edge cases and error scenarios including database connection failures
+- Document debugging findings and solutions in Memory Bank
+- **MANDATORY**: Use MCP servers for validation and best practices research during debugging
+
+## Debugging Approach
+
+### Web Application Debugging
+- Start with understanding the expected vs actual behavior
+- Add strategic console.log statements for state tracking
+- Use browser dev tools effectively for React debugging
+- Implement proper error boundaries for component failures
+- Test with different data scenarios and edge cases
+
+### Database Migration CLI Tool Debugging
+- **MANDATORY MCP Server Integration**: Use brius_postgres for database analysis and Context7 for API validation
+- Start debugging with connection validation and environment variable verification
+- Implement structured logging with Winston and correlation IDs for request tracing
+- Use database query logging to track SQL execution and performance
+- Test migration phases individually with rollback capabilities
+- Validate data transformations with Zod schemas at each step
+- Monitor memory usage during large dataset processing
+- Test connection pooling behavior under load
+- Implement debug modes with verbose logging for troubleshooting
+- Use Commander.js error handling patterns with proper exit codes
+- Test retry logic and exponential backoff mechanisms
+- Validate legacy ID preservation and ContentTypes normalization
+
+## Error Handling Implementation
+- Implement comprehensive try-catch blocks for async operations
+- Add proper error messages with context
+- Implement user-friendly error displays
+- Log errors with sufficient context for debugging
+- Implement proper fallback UI states
+
+## React Debugging
+- Use React Developer Tools for component state inspection
+- Implement proper key props for list rendering
+- Debug re-rendering issues with React.memo and useMemo
+- Check for proper cleanup in useEffect hooks
+- Verify proper dependency arrays in hooks
+
+## Zustand Debugging
+- Add logging to store actions for state change tracking
+- Implement proper store devtools integration
+- Debug store subscription issues
+- Verify proper store state updates
+- Check for store state mutations
+
+## Supabase Debugging
+- Implement proper error handling for database operations
+- Add logging for authentication state changes
+- Debug RLS policy issues with proper error messages
+- Verify proper database schema and relationships
+- Test with different user permission scenarios
+
+### Database Migration Error Handling
+- Implement custom MigrationError classes with proper type categorization
+- Use structured error logging with correlation IDs for request tracing
+- Implement comprehensive try-catch blocks around all database operations
+- Create rollback mechanisms for failed migration phases
+- Validate environment variables and connection strings before operations
+- Implement retry logic with exponential backoff for transient failures
+- Log SQL query execution times and performance metrics
+- Handle connection pool exhaustion and timeout scenarios
+- Validate Zod schema errors with detailed field-level feedback
+- Test error scenarios: network failures, permission issues, data corruption
+
+## Performance Debugging
+
+### Web Application Performance
+- Use React Profiler for performance bottleneck identification
+- Debug unnecessary re-renders with proper memoization
+- Optimize bundle size with proper code splitting
+- Debug network requests and API performance
+- Implement proper loading states for better UX
+
+### Database Migration Performance
+- Monitor memory usage during large dataset processing (>100k records)
+- Profile SQL query execution times and identify slow queries
+- Test connection pooling behavior under concurrent load
+- Monitor batch processing performance and optimize batch sizes
+- Track data transformation performance with timing metrics
+- Test migration performance with realistic dataset sizes
+- Monitor database connection utilization and pool efficiency
+- Profile ContentTypes normalization and legacy ID preservation
+- Test rollback performance and recovery time objectives
+- Validate AI embedding preparation performance with AWS Bedrock
+
+## Testing Approaches
+
+### Database Migration CLI Tool Testing
+- **MANDATORY**: >90% code coverage for all migration CLI tool components
+- Unit test all migration phases individually with mocked database connections
+- Integration test complete migration workflows with test databases
+- Test rollback mechanisms for each migration phase
+- Performance test with large datasets (>100k records) to validate scalability
+- Concurrency test multiple migration processes running simultaneously
+- Error scenario testing: network failures, permission issues, data corruption
+- Mock MCP server responses for consistent testing environments
+- Validate Zod schema parsing with valid and invalid data samples
+- Test CLI command parsing and error handling with Commander.js
+- Test environment variable validation and configuration loading
+- Validate structured logging output and correlation ID generation
+- Test retry logic and exponential backoff mechanisms
+- Test ContentTypes normalization and legacy ID preservation
+- Validate AI embedding preparation with AWS Bedrock integration
+- Test connection pooling behavior under various load conditions
+- Validate batch processing with different batch sizes and data types
+- Test migration progress tracking and status reporting
+- Validate security measures: SSL/TLS, parameterized queries, audit logging
+- Test cross-platform compatibility (macOS, Linux, Windows)
+
+## Memory Bank Updates
+- Document debugging findings in decisionLog.md
+- Update activeContext.md with current debugging focus
+- Log resolved issues and solutions in progress.md
+- Update systemPatterns.md with debugging patterns
+
+## Additional Development Rules
+
+### Bug Fix Memory Management
+- After fixing any bugs where there are no errors detected, create a memory in the memory MCP server related to the bug fix, so we do not repeat bugs
+- Document the root cause, solution, and prevention strategy for future reference
+- Include relevant code patterns and anti-patterns in the memory
+
+### Documentation Compliance
+- The `docs` subdirectory in this project contains markdown files that describe architectural, design and other decisions related to the project
+- Always check for files in the `docs` directory and subdirectories when generating code to make sure those rules and standards are followed
+- Reference existing documentation before making architectural decisions
+- Update documentation when making significant changes
+
+### TypeScript Type Management
+- Always check to see if new TypeScript types are generated already before creating new ones, so we prevent duplicate types from being created
+- Use the `src/types/*` directory structure to create new types that should be shared across stores and components
+- Check existing type definitions in `src/types/` before creating new interfaces or types
+- Organize types by domain/feature within the types directory
+- Use proper barrel exports from type files for clean imports
+
+Remember: These rules are mandatory for all debugging and troubleshooting work.

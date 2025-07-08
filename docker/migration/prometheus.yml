@@ -1,0 +1,105 @@
+# Prometheus Configuration for Healthcare Data Migration System
+# Monitors migration services, databases, and system metrics
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    monitor: 'migration-monitor'
+    environment: '${NODE_ENV:-production}'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+    scrape_interval: 30s
+    metrics_path: /metrics
+
+  # Migration application metrics
+  - job_name: 'migration-app'
+    static_configs:
+      - targets: ['migration-app:9090']
+    scrape_interval: 15s
+    metrics_path: /metrics
+    honor_labels: true
+    params:
+      format: ['prometheus']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: migration-app:9090
+
+  # Redis metrics (if redis_exporter is available)
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+    scrape_interval: 30s
+    metrics_path: /metrics
+    honor_labels: true
+
+  # Node exporter for system metrics (if available)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['migration-app:9100']
+    scrape_interval: 30s
+    metrics_path: /metrics
+    honor_labels: true
+
+  # PostgreSQL metrics (if postgres_exporter is available)
+  - job_name: 'postgres-legacy'
+    static_configs:
+      - targets: ['${LEGACY_DB_HOST:-localhost}:9187']
+    scrape_interval: 30s
+    metrics_path: /metrics
+    honor_labels: true
+    params:
+      collect[]:
+        - 'pg_stat_database'
+        - 'pg_stat_user_tables'
+        - 'pg_stat_activity'
+        - 'pg_locks'
+        - 'pg_replication'
+
+  # Custom migration metrics
+  - job_name: 'migration-metrics'
+    static_configs:
+      - targets: ['migration-app:9090']
+    scrape_interval: 10s
+    metrics_path: /api/metrics
+    honor_labels: true
+    params:
+      format: ['prometheus']
+
+# Storage configuration is handled via command line arguments in docker-compose.yml
+# --storage.tsdb.path=/prometheus
+# --storage.tsdb.retention.time=30d
+
+# Remote write configuration (for external monitoring systems)
+# remote_write:
+#   - url: "https://your-remote-prometheus-endpoint/api/v1/write"
+#     basic_auth:
+#       username: "your-username"
+#       password: "your-password"
+
+# Remote read configuration
+# remote_read:
+#   - url: "https://your-remote-prometheus-endpoint/api/v1/read"
+#     basic_auth:
+#       username: "your-username"
+#       password: "your-password"

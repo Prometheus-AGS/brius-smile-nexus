@@ -20,13 +20,14 @@ export default defineConfig({
     allowedHosts: true, // Allow all hosts
     proxy: {}, // Empty proxy to ensure Vite doesn't interfere with nginx
     hmr: {
-      clientPort: 4173 // Match the exposed port
+      port: 8080, // Use same port as dev server
+      host: 'localhost',
     },
   },
   preview: {
     allowedHosts: true, // Allow all hosts
     host: true, // Listen on all addresses
-    port: 4173,
+    port: 8080,
     strictPort: true,
     cors: {
       origin: "*",

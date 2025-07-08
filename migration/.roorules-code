@@ -1,0 +1,172 @@
+# Roo Code Code Mode Rules for brius-smile-nexus
+# Specific rules for code implementation and development
+# Includes database migration CLI tool and web application implementation
+
+## Code Mode Focus
+- Implement features based on architectural plans for both CLI tool and web application
+- Write clean, maintainable, and testable TypeScript code with strict type safety
+- Follow established patterns and conventions for both Node.js CLI and React applications
+- Ensure proper error handling and edge cases for database operations and UI interactions
+- Maintain code quality and consistency across dual-purpose codebase
+- Implement comprehensive data validation using Zod schemas
+- Integrate MCP server validations throughout development process
+
+## Implementation Standards
+
+### Web Application Standards
+- Always implement TypeScript interfaces before components
+- Create custom hooks for all Zustand store interactions
+- Implement proper loading and error states for async operations
+- Use shadcn/ui components consistently
+- Follow established file naming conventions (kebab-case)
+
+### Database Migration CLI Tool Standards
+- **Package Manager**: MANDATORY use of Yarn for all package management operations
+- **MANDATORY MCP Server Integration**: Use brius_postgres, Context7, and Tavily for validation
+- Implement strict TypeScript with zero `any` usage - use proper interfaces and generics
+- Create comprehensive Zod schemas for all data validation before implementation
+- Use Commander.js patterns with proper error handling and exit codes
+- Implement structured logging with Winston and correlation IDs
+- Create custom error classes extending base Error with proper type categorization
+- Use parameterized queries exclusively - never string concatenation
+- Implement connection pooling and batch processing for performance
+- Create rollback mechanisms for all migration phases
+- Validate environment variables with Zod schemas at startup
+- Implement retry logic with exponential backoff for transient failures
+
+### Migration Implementation Requirements (Documentation-Derived)
+- **5-Phase Migration Strategy**: Implement exact phases from `MIGRATION_IMPLEMENTATION_PLAN.md`
+  - Phase 1: Core Data (profiles, offices, orders consolidation)
+  - Phase 2: Workflow Enhancement (order types, states, templates)
+  - Phase 3: Communication System (messages, types, threading)
+  - Phase 4: File Management (projects with versioning)
+  - Phase 5: AI Preparation (embedding generation for AWS Bedrock Titan v2)
+- **ContentTypes Normalization**: Replace all Django generic relationships with explicit foreign keys
+- **Legacy ID Preservation**: Maintain backward compatibility with `legacy_*_id` fields
+- **Data Transformation Validation**: Comprehensive field-level mapping validation
+- **Performance Optimization**: UUID primary keys, optimized indexes, connection pooling
+- **AI Embedding Preparation**: Content identification and vector field preparation
+
+## Code Organization
+- Group related functionality in feature-based modules
+- Create barrel exports for clean imports
+- Separate concerns between data access, business logic, and presentation
+- Use consistent naming conventions across all files and functions
+- Implement proper dependency injection patterns
+
+## Database Migration Code Organization
+
+### Required Directory Structure
+```
+migration/
+├── src/
+│   ├── migrators/           # Individual migration classes
+│   ├── validators/          # Zod schema validators
+│   ├── utils/              # Utility functions
+│   ├── types/              # TypeScript type definitions
+│   ├── errors/             # Custom error classes
+│   ├── config/             # Configuration management
+│   └── cli/                # CLI command implementations
+├── sql/                    # SQL scripts and queries
+├── tests/                  # Test files
+└── docs/                   # Documentation
+```
+
+### Error Handling Patterns
+- Create custom error classes for different error types
+- Implement proper error boundaries and recovery mechanisms
+- Use structured logging for debugging and monitoring
+- Provide meaningful error messages to users
+- Implement retry logic for transient failures
+
+### Testing Standards
+- Write comprehensive unit tests with >90% coverage
+- Create integration tests for all major workflows
+- Implement E2E tests for critical user paths
+- Use proper mocking for external dependencies
+- Test error scenarios and edge cases
+- Validate performance under load
+- Test accessibility compliance
+- Implement visual regression testing for UI changes
+
+## Performance Optimization
+- Implement lazy loading where appropriate
+- Use proper caching strategies
+- Optimize database queries and connections
+- Monitor and profile application performance
+- Implement proper pagination for large datasets
+- Use connection pooling for database operations
+- Implement batch processing for bulk operations
+
+## Security Standards
+- Validate all inputs using Zod schemas
+- Use parameterized queries to prevent SQL injection
+- Implement proper authentication and authorization
+- Sanitize all user inputs
+- Use HTTPS for all external communications
+- Implement proper session management
+- Follow OWASP security guidelines
+
+## Documentation Standards
+- Document all public APIs and interfaces
+- Provide clear examples for complex functionality
+- Maintain up-to-date README files
+- Document architectural decisions and trade-offs
+- Create migration guides for breaking changes
+- Reference existing documentation before making architectural decisions
+- Update documentation when making significant changes
+
+### TypeScript Type Management
+- Always check to see if new TypeScript types are generated already before creating new ones, so we prevent duplicate types from being created
+- Use the `src/types/*` directory structure to create new types that should be shared across stores and components
+- Check existing type definitions in `src/types/` before creating new interfaces or types
+- Organize types by domain/feature within the types directory
+- Use proper barrel exports from type files for clean imports
+
+Remember: These rules are mandatory for all code implementation work.
+- Reference architectural decisions from previous sessions
+
+## Memory MCP Server Update Rules (Post Bug Fix Learning)
+### MANDATORY Memory Updates After Bug Fixes
+- **Automatic Update Requirement**: MUST update memory MCP server after every successful bug fix
+- **Update Timing**: Immediately after bug resolution and testing validation
+- **Memory Content Requirements**:
+  - Bug description and symptoms
+  - Root cause analysis
+  - Solution implementation details
+  - Code changes made
+  - Testing validation performed
+  - Prevention measures implemented
+  - Learning insights and patterns
+
+### Memory Update Conditions
+- **All Bug Categories**: Logic errors, performance issues, security vulnerabilities, UI/UX problems
+- **Migration-Specific Bugs**: Data transformation errors, schema mismatches, performance bottlenecks
+- **CLI Tool Bugs**: Command parsing errors, validation failures, connection issues
+- **Integration Bugs**: MCP server communication failures, external API issues
+
+### Memory Update Structure (TypeScript)
+```typescript
+interface BugFixMemory {
+  bugId: string;
+  title: string;
+  description: string;
+  rootCause: string;
+  solution: string;
+  codeChanges: string[];
+  testingValidation: string;
+  preventionMeasures: string[];
+  learningInsights: string[];
+  relatedPatterns: string[];
+  timestamp: Date;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  category: 'logic' | 'performance' | 'security' | 'ui' | 'migration' | 'cli' | 'integration';
+}
+```
+
+### Learning Enhancement Rules
+- **Pattern Recognition**: Document recurring bug patterns for proactive prevention
+- **Knowledge Accumulation**: Build comprehensive bug fix knowledge base
+- **Best Practices**: Extract and document best practices from successful fixes
+- **Process Improvement**: Identify and implement process improvements
+- **Team Learning**: Share insights across development team through memory system

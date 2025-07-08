@@ -29,7 +29,7 @@ const menuItems = [
     id: 'home',
     title: 'Home',
     icon: Home,
-    url: '/portal/home',
+    url: '/portal',
   },
   {
     id: 'assistant',
@@ -52,19 +52,15 @@ const menuItems = [
 ];
 
 export const AppSidebar: React.FC = () => {
-  const { currentApp, setCurrentApp } = useNavigation();
+  const { navigateTo, isActive } = useNavigation();
   const { user, logout } = useAuth();
 
-  const handleMenuClick = (appId: string) => {
-    setCurrentApp(appId);
+  const handleMenuClick = (url: string) => {
+    navigateTo(url);
   };
 
   const handleNavigate = (path: string) => {
-    if (path === '/profile') {
-      setCurrentApp('profile');
-    } else if (path === '/settings') {
-      setCurrentApp('settings');
-    }
+    navigateTo(path);
   };
 
   const getInitials = (name: string) => {
@@ -94,8 +90,8 @@ export const AppSidebar: React.FC = () => {
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton
-                    onClick={() => handleMenuClick(item.id)}
-                    isActive={currentApp === item.id}
+                    onClick={() => handleMenuClick(item.url)}
+                    isActive={isActive(item.url)}
                     className="font-body"
                   >
                     <item.icon className="h-5 w-5" />

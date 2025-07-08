@@ -1,0 +1,93 @@
+# Roo Code Test Mode Rules
+# Specific rules for testing and quality assurance
+
+## Test Mode Focus
+- Write comprehensive tests for all functionality
+- Implement proper test coverage for critical paths
+- Create maintainable and readable test suites
+- Test edge cases and error scenarios
+- Ensure tests are fast and reliable
+
+## Testing Strategy
+- Follow the testing pyramid: unit tests > integration tests > e2e tests
+- Test behavior, not implementation details
+- Use proper test data and mocking strategies
+- Implement proper test isolation and cleanup
+- Write descriptive test names and documentation
+
+## React Component Testing
+- Use React Testing Library for component tests
+- Test user interactions and component behavior
+- Mock external dependencies and API calls
+- Test accessibility features and keyboard navigation
+- Verify proper error states and loading states
+
+## Unit Testing Standards
+- Test utility functions with comprehensive input scenarios
+- Use proper test data generators for consistent testing
+- Implement proper assertion patterns
+- Test error conditions and edge cases
+- Maintain high test coverage for critical business logic
+
+## Zustand Store Testing
+- Test store actions and state updates
+- Mock store dependencies properly
+- Test store persistence and hydration
+- Verify proper store subscription behavior
+- Test store error handling and recovery
+
+## Supabase Testing
+- Mock Supabase client for unit tests
+- Test authentication flows and error scenarios
+- Test database operations with proper mocking
+- Verify RLS policy compliance in tests
+- Test real-time subscription behavior
+
+## Integration Testing
+- Test component integration with stores
+- Test API integration with proper mocking
+- Test routing and navigation flows
+- Test form submission and validation
+- Test error boundary behavior
+
+## E2E Testing Considerations
+- Test critical user journeys end-to-end
+- Test authentication and authorization flows
+- Test data persistence and retrieval
+- Test responsive design and cross-browser compatibility
+- Test performance under realistic conditions
+
+## Test Maintenance
+- Keep tests up-to-date with code changes
+- Refactor tests when implementation changes
+- Remove obsolete tests and update test data
+- Maintain test documentation and examples
+- Review test coverage regularly
+
+## Memory Bank Updates
+- Document testing strategies in systemPatterns.md
+- Update progress.md with testing milestones
+- Log testing decisions and rationale in decisionLog.md
+- Update activeContext.md with current testing focus
+
+## Additional Development Rules
+
+### Bug Fix Memory Management
+- After fixing any bugs where there are no errors detected, create a memory in the memory MCP server related to the bug fix, so we do not repeat bugs
+- Document the root cause, solution, and prevention strategy for future reference
+- Include relevant code patterns and anti-patterns in the memory
+
+### Documentation Compliance
+- The `docs` subdirectory in this project contains markdown files that describe architectural, design and other decisions related to the project
+- Always check for files in the `docs` directory and subdirectories when generating code to make sure those rules and standards are followed
+- Reference existing documentation before making architectural decisions
+- Update documentation when making significant changes
+
+### TypeScript Type Management
+- Always check to see if new TypeScript types are generated already before creating new ones, so we prevent duplicate types from being created
+- Use the `src/types/*` directory structure to create new types that should be shared across stores and components
+- Check existing type definitions in `src/types/` before creating new interfaces or types
+- Organize types by domain/feature within the types directory
+- Use proper barrel exports from type files for clean imports
+
+Remember: These rules are mandatory for all testing and quality assurance work.

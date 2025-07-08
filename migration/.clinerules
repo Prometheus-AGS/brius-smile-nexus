@@ -1,0 +1,616 @@
+# Database Migration CLI Tool Rules for brius-smile-nexus
+
+## Project Overview
+This project generates TypeScript code for a database migration CLI tool that migrates from a legacy PostgreSQL database (badly designed Django-based system) to a well-designed Supabase PostgreSQL data model optimized for AI applications. The migration involves complex data transformations, ContentTypes normalization, and AI embedding preparation.
+
+## Technology Stack Requirements
+
+### Core Technologies
+- **Runtime**: Node.js with TypeScript (strict mode)
+- **Package Manager**: Yarn (MANDATORY) - use `yarn` for all package management operations
+- **Legacy Database**: PostgreSQL via `pg` library
+- **Target Database**: Supabase via `@supabase/supabase-js`
+- **CLI Framework**: Commander.js for command-line interface
+- **Validation**: Zod for schema validation and type safety
+- **Logging**: Structured logging with Winston or similar
+- **Testing**: Jest with comprehensive test coverage
+- **Build Tool**: TypeScript compiler with strict configuration
+
+### Database Connection Standards
+- Use `pg.ClientConfig` interface for PostgreSQL connections (property is `user`, not `username`)
+- Implement connection pooling for performance
+- Always use parameterized queries to prevent SQL injection
+- Implement proper connection cleanup and error handling
+- Support both connection strings and object configurations
+
+## Documentation and Specification Requirements
+
+### Primary Documentation Sources
+1. **Migration Specifications**: Always refer to markdown files in `/docs` directory for:
+   - `MIGRATION_IMPLEMENTATION_PLAN.md` - Complete migration strategy
+   - `database-migration-analysis.md` - Performance analysis and mappings
+   - `FINALIZED_SUPABASE_MODEL.md` - Target schema definition
+   - `PROPOSED_MODEL.md` - Data model specifications
+
+2. **Legacy Codebase Analysis**: Consult `/Users/gqadonis/Projects/prometheus/brius/mdw-source` for:
+   - Django model definitions in `dispatch/models.py`
+   - Business logic patterns and data usage
+   - ContentTypes relationships and generic foreign keys
+   - Data validation rules and constraints
+
+### MCP Server Integration Requirements
+
+#### brius_postgres MCP Server (MANDATORY)
+- **ALWAYS** use `brius_postgres` MCP server to examine legacy data model
+- Use `mcp0_list_schemas` and `mcp0_list_objects` to understand database structure
+- Use `mcp0_get_object_details` for detailed table/column information
+- Use `mcp0_get_top_queries` to understand performance patterns
+- Use `mcp0_analyze_db_health` before and after migration
+- Use `mcp0_execute_sql` for data validation queries
+
+#### Context7 MCP Server (MANDATORY)
+- **ALWAYS** validate API usage with `mcp2_resolve-library-id` and `mcp2_get-library-docs`
+- Required for: `pg`, `@supabase/supabase-js`, `commander`, `zod`, `winston`
+- Verify latest API patterns and best practices
+- Check for deprecated methods and security considerations
+
+#### Tavily MCP Server (MANDATORY)
+- **ALWAYS** validate best practices using `mcp11_tavily-search`
+- Research current migration patterns and error handling strategies
+- Validate TypeScript patterns and CLI design approaches
+- Check for security vulnerabilities and performance optimizations
+
+## TypeScript Standards
+
+### Strict Type Safety (ZERO TOLERANCE)
+- **NEVER** use `any` type explicitly or implicitly
+- **NEVER** use `unknown` without proper type guards
+- Use strict TypeScript configuration with all strict flags enabled
+- Implement comprehensive interfaces for all data structures
+- Use generic types and utility types for better type safety
+- Prefer type inference where appropriate but be explicit when needed
+
+### Required Type Definitions
+```typescript
+// Database connection interfaces
+interface DatabaseConnection {
+  host: string;
+  port: number;
+  database: string;
+  user: string; // NOT username - pg library uses 'user'
+  password: string;
+  ssl?: boolean | object;
+}
+
+// Migration result types
+interface MigrationResult {
+  success: boolean;
+  recordsProcessed: number;
+  errors: MigrationError[];
+  duration: number;
+  phase: string;
+}
+
+// Error handling types
+interface MigrationError {
+  type: 'validation' | 'database' | 'transformation' | 'system';
+  message: string;
+  details?: Record<string, unknown>;
+  recoverable: boolean;
+  timestamp: Date;
+}
+```
+
+## CLI Design Patterns
+
+### Commander.js Implementation Standards
+- Use Commander.js for all CLI functionality
+- Implement proper error handling with `program.error()`
+- Support both interactive and batch modes
+- Provide comprehensive help and usage information
+- Implement progress reporting for long-running operations
+
+### Required CLI Structure
+```typescript
+// Main command structure
+program
+  .name('migration-tool')
+  .description('Legacy to Supabase database migration utility')
+  .version('1.0.0');
+
+// Migration commands
+program
+  .command('migrate')
+  .description('Execute database migration')
+  .option('-p, --phase <number>', 'specific migration phase')
+  .option('--dry-run', 'validate without executing')
+  .option('--rollback', 'rollback to previous state')
+  .action(async (options) => {
+    // Implementation with proper error handling
+  });
+
+// Validation commands
+program
+  .command('validate')
+  .description('Validate migration readiness')
+  .option('--legacy-db <connection>', 'legacy database connection')
+  .option('--target-db <connection>', 'target database connection')
+  .action(async (options) => {
+    // Implementation with comprehensive validation
+  });
+```
+
+## Data Validation and Transformation
+
+### Zod Schema Validation (MANDATORY)
+- Use Zod for all data validation and transformation
+- Define schemas for legacy and target data structures
+- Implement custom validation rules for business logic
+- Provide detailed error messages for validation failures
+
+### Required Validation Patterns
+```typescript
+// Legacy data validation
+const LegacyPatientSchema = z.object({
+  id: z.number().int().positive(),
+  user_id: z.number().int().positive(),
+  doctor_id: z.number().int().positive(),
+  birthdate: z.string().datetime().optional(),
+  status: z.number().int().min(0).max(10),
+  archived: z.boolean(),
+  // ... other fields
+});
+
+// Target data validation
+const SupabaseProfileSchema = z.object({
+  id: z.string().uuid(),
+  legacy_id: z.number().int().positive(),
+  email: z.string().email(),
+  full_name: z.string().min(1),
+  birth_date: z.string().datetime().optional(),
+  status: z.enum(['active', 'inactive', 'suspended']),
+  // ... other fields
+});
+
+// Transformation validation
+const validateTransformation = (legacy: unknown, target: unknown) => {
+  const legacyData = LegacyPatientSchema.parse(legacy);
+  const targetData = SupabaseProfileSchema.parse(target);
+  // Additional business logic validation
+};
+```
+
+## Error Handling and Logging
+
+### Comprehensive Error Handling
+- Implement structured error handling with custom error types
+- Distinguish between recoverable and non-recoverable errors
+- Provide detailed error context and recovery suggestions
+- Implement retry logic for transient failures
+- Log all errors with appropriate severity levels
+
+### Required Error Handling Patterns
+```typescript
+// Custom error classes
+class MigrationError extends Error {
+  constructor(
+    message: string,
+    public type: 'validation' | 'database' | 'transformation' | 'system',
+    public recoverable: boolean = false,
+    public details?: Record<string, unknown>
+  ) {
+    super(message);
+    this.name = 'MigrationError';
+  }
+}
+
+// Error handling wrapper
+const withErrorHandling = async <T>(
+  operation: () => Promise<T>,
+  context: string
+): Promise<T> => {
+  try {
+    return await operation();
+  } catch (error) {
+    logger.error(`Error in ${context}:`, error);
+    if (error instanceof MigrationError) {
+      throw error;
+    }
+    throw new MigrationError(
+      `Unexpected error in ${context}: ${error.message}`,
+      'system',
+      false,
+      { originalError: error }
+    );
+  }
+};
+```
+
+### Structured Logging Requirements
+- Use Winston or similar structured logging library
+- Log all database operations with timing information
+- Include correlation IDs for tracking related operations
+- Implement different log levels (debug, info, warn, error)
+- Support both console and file logging outputs
+
+## Database Migration Patterns
+
+### Phase-Based Migration Strategy
+- Implement 5-phase migration as specified in documentation
+- Each phase must be independently executable and rollbackable
+- Maintain legacy_id mappings for backward compatibility
+- Implement comprehensive data validation at each phase
+- Support incremental migration with progress tracking
+
+### Required Migration Phases
+1. **Phase 1**: Core Data Migration (profiles, practices, orders)
+2. **Phase 2**: Relationship Migration (explicit foreign keys)
+3. **Phase 3**: Communication Migration (messages, notifications)
+4. **Phase 4**: Workflow Migration (states, transitions)
+5. **Phase 5**: AI Processing (embeddings, vector search)
+
+### Data Transformation Patterns
+```typescript
+// ContentTypes normalization
+const normalizeContentTypes = async (
+  legacyRecord: any,
+  contentTypeMapping: Map<number, string>
+): Promise<NormalizedRecord> => {
+  // Convert generic foreign keys to explicit relationships
+  // Validate data integrity during transformation
+  // Maintain audit trail of changes
+};
+
+// Legacy ID preservation
+const preserveLegacyMapping = async (
+  legacyId: number,
+  newId: string,
+  tableName: string
+): Promise<void> => {
+  // Store mapping for backward compatibility
+  // Enable parallel system operation
+};
+```
+
+## Performance and Scalability
+
+### Database Performance Requirements
+- Use connection pooling for all database operations
+- Implement batch processing for large data sets
+- Use transactions for data consistency
+- Monitor query performance and optimize as needed
+- Implement proper indexing strategies
+
+### Memory Management
+- Process large datasets in chunks to avoid memory issues
+- Implement streaming for file operations
+- Clean up resources properly (connections, file handles)
+- Monitor memory usage during migration
+
+## Security Requirements
+
+### Database Security
+- Use parameterized queries exclusively
+- Implement proper authentication and authorization
+- Store sensitive configuration in environment variables
+- Use SSL/TLS for all database connections
+- Implement audit logging for all operations
+
+### Configuration Security
+```typescript
+// Environment variable validation
+const ConfigSchema = z.object({
+  LEGACY_DB_HOST: z.string().min(1),
+  LEGACY_DB_USER: z.string().min(1),
+  LEGACY_DB_PASSWORD: z.string().min(1),
+  SUPABASE_URL: z.string().url(),
+  SUPABASE_SERVICE_KEY: z.string().min(1),
+  LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
+});
+
+const config = ConfigSchema.parse(process.env);
+```
+
+## Testing Requirements
+
+### Comprehensive Test Coverage
+- Unit tests for all transformation functions
+- Integration tests for database operations
+- End-to-end tests for complete migration scenarios
+- Performance tests for large datasets
+- Error handling tests for failure scenarios
+
+### Required Test Patterns
+```typescript
+// Migration testing
+describe('PatientMigrator', () => {
+  beforeEach(async () => {
+    // Set up test databases
+    // Seed test data
+  });
+
+  it('should migrate patient data correctly', async () => {
+    // Test data transformation
+    // Validate results
+    // Check legacy ID preservation
+  });
+
+  it('should handle validation errors gracefully', async () => {
+    // Test error scenarios
+    // Verify error handling
+    // Check rollback functionality
+  });
+});
+```
+
+## Code Organization and Architecture
+
+### File Structure Requirements
+```
+migration/
+├── src/
+│   ├── cli/           # Commander.js CLI implementation
+│   ├── migrators/     # Phase-specific migration logic
+│   ├── validators/    # Zod schemas and validation
+│   ├── database/      # Database connection and utilities
+│   ├── transformers/  # Data transformation logic
+│   ├── utils/         # Shared utilities
+│   └── types/         # TypeScript type definitions
+├── tests/             # Comprehensive test suite
+├── docs/              # Documentation and specifications
+└── config/            # Configuration files
+```
+
+### Modular Design Principles
+- Single responsibility principle for all modules
+- Dependency injection for testability
+- Interface-based design for flexibility
+- Clear separation of concerns
+- Reusable utility functions
+
+## AI and Embedding Considerations
+
+### AWS Bedrock Integration
+- Implement AI processing as separate phase (Phase 5)
+- Use AWS Bedrock Titan v2 for embedding generation
+- Implement proper error handling for AI service failures
+- Support batch processing for embedding generation
+- Validate embedding quality and completeness
+
+### Vector Search Preparation
+- Implement proper vector storage in Supabase
+- Create appropriate indexes for vector search
+- Validate embedding dimensions and formats
+- Implement similarity search functions
+- Support real-time embedding updates
+
+## Monitoring and Observability
+
+### Progress Tracking
+- Implement detailed progress reporting
+- Support resumable migrations
+- Track performance metrics
+- Monitor resource usage
+- Provide ETA calculations
+
+### Health Checks
+- Implement database connectivity checks
+- Validate data integrity continuously
+- Monitor system resources
+- Check external service availability
+- Provide status dashboards
+
+## Documentation Requirements
+
+### Code Documentation
+- Comprehensive JSDoc comments for all functions
+- README with setup and usage instructions
+- API documentation for all interfaces
+- Migration guide with examples
+- Troubleshooting guide with common issues
+
+### Operational Documentation
+- Deployment procedures
+- Configuration management
+- Backup and recovery procedures
+- Performance tuning guidelines
+- Security best practices
+
+## Additional Best Practices
+
+### Development Workflow
+- Use Git for version control with meaningful commit messages
+- Implement pre-commit hooks for code quality
+- Use semantic versioning for releases
+- Maintain changelog for all changes
+- Implement continuous integration/deployment
+
+### Code Quality
+- Use ESLint with strict TypeScript rules
+- Implement Prettier for code formatting
+- Use Husky for Git hooks
+- Implement code coverage requirements (>90%)
+- Regular code reviews and refactoring
+
+### Deployment and Operations
+- Support multiple environments (dev, staging, prod)
+- Implement configuration management
+- Use Docker for containerization
+- Implement health checks and monitoring
+- Support blue-green deployments
+
+## Validation Checklist
+
+Before generating any code, ALWAYS:
+1. ✅ Consult project documentation in `/docs` directory
+2. ✅ Validate API usage with Context7 MCP server
+3. ✅ Research best practices with Tavily MCP server
+4. ✅ Examine legacy database with brius_postgres MCP server
+5. ✅ Review legacy codebase in `/Users/gqadonis/Projects/prometheus/brius/mdw-source`
+6. ✅ Ensure zero `any` type usage
+7. ✅ Implement comprehensive error handling
+8. ✅ Include proper validation with Zod
+9. ✅ Add structured logging
+10. ✅ Include comprehensive tests
+
+## Emergency Procedures
+
+### Rollback Procedures
+- Implement complete rollback for each migration phase
+- Maintain backup of all original data
+- Support point-in-time recovery
+- Validate rollback procedures regularly
+- Document rollback decision criteria
+
+### Disaster Recovery
+- Implement comprehensive backup strategies
+- Support cross-region data replication
+- Maintain offline backup copies
+- Test recovery procedures regularly
+- Document recovery time objectives
+
+## Migration Implementation Rules (Documentation-Derived)
+
+### 5-Phase Migration Strategy (MANDATORY)
+Implement the exact 5-phase migration strategy from `MIGRATION_IMPLEMENTATION_PLAN.md`:
+
+#### Phase 1: Core Data Migration
+- **Profiles Migration**: Consolidate `auth_user` + `dispatch_patient` → `profiles` table
+  - Preserve `legacy_user_id` and `legacy_patient_id` for backward compatibility
+  - Detect profile types: 'patient', 'doctor', 'technician', 'admin'
+  - Handle nullable email field (87% of users have no email)
+  - Map `birthdate` → `date_of_birth`, `sex` → `gender`
+- **Offices Migration**: `dispatch_office` → `offices` with UUID primary keys
+  - Preserve `legacy_office_id` for backward compatibility
+  - Map `apt` → `apartment`, `sq_customer_id` → `square_customer_id`
+  - Transform `emails` → `email_notifications` for clarity
+- **Orders Migration**: `dispatch_instruction` → `orders` with enhanced workflow
+  - Preserve `legacy_instruction_id` for backward compatibility
+  - Map `course_id` → `order_type_id` (references new `order_types` table)
+  - Transform `price` → `custom_price` for clarity
+  - Integrate `dispatch_order` data into unified `orders` structure
+
+#### Phase 2: Workflow Enhancement
+- **Order Types**: `dispatch_course` → `order_types` with enhanced categorization
+- **Order States**: Create new workflow state management system
+- **Workflow Templates**: Migrate `dispatch_template` → `workflow_templates` + `workflow_tasks`
+  - Map task functions and durations accurately
+  - Handle predefined vs custom template distinctions
+
+#### Phase 3: Communication System
+- **Messages Migration**: `dispatch_record` → `messages` with simplified content types
+- **Message Types**: Create new message categorization system
+- **Communication Enhancement**: Improve message threading and categorization
+
+#### Phase 4: File Management
+- **Projects Migration**: `dispatch_project` → `projects` with enhanced file management
+  - Add versioning support and improved metadata handling
+  - Implement proper file relationship management
+
+#### Phase 5: AI Preparation (Post-Migration)
+- **Embedding Generation**: Prepare content for AWS Bedrock Titan v2 embeddings
+  - Order descriptions and clinical notes
+  - Message content and communication history
+  - Project documentation and file metadata
+- **AI-Ready Schema**: Ensure all embedding fields are properly configured
+
+### ContentTypes Normalization Rules (MANDATORY)
+Replace all Django ContentTypes generic relationships with explicit foreign keys:
+
+- **Legacy Pattern**: `content_type_id` + `object_id` generic relationships
+- **Target Pattern**: Explicit foreign key relationships with proper constraints
+- **Validation**: Ensure no ContentTypes dependencies remain in migrated data
+- **Mapping**: Create explicit mapping tables for many-to-many relationships
+
+### Legacy ID Preservation (MANDATORY)
+Maintain backward compatibility through legacy ID preservation:
+
+- **User IDs**: `auth_user.id` → `profiles.legacy_user_id`
+- **Patient IDs**: `dispatch_patient.id` → `profiles.legacy_patient_id`
+- **Office IDs**: `dispatch_office.id` → `offices.legacy_office_id`
+- **Instruction IDs**: `dispatch_instruction.id` → `orders.legacy_instruction_id`
+- **All Legacy Tables**: Preserve original IDs for parallel system operation
+
+### Data Transformation Validation (MANDATORY)
+Implement comprehensive validation for all data transformations:
+
+- **Field Mappings**: Validate all field-level transformations match documentation
+- **Data Types**: Ensure proper type conversions (text, numeric, date, UUID)
+- **Constraints**: Validate all foreign key relationships and constraints
+- **Business Rules**: Ensure business logic consistency across transformation
+- **Data Quality**: Implement cleanup and validation during transformation
+
+### Performance Optimization Rules
+Implement performance improvements documented in analysis:
+
+- **UUID Primary Keys**: Replace integer sequences to eliminate bottlenecks
+- **Index Strategy**: Implement optimized indexes including partial and composite
+- **Data Consolidation**: Reduce query complexity through unified tables
+- **Connection Pooling**: Optimize database connection management
+- **Batch Processing**: Implement efficient batch processing for large datasets
+
+### AI Embedding Preparation Rules
+Prepare data for post-migration AI processing:
+
+- **Content Identification**: Identify all text content suitable for embeddings
+- **Embedding Fields**: Ensure all tables have proper embedding vector fields
+- **AWS Bedrock Integration**: Prepare for Titan v2 embedding generation
+- **Content Categorization**: Organize content by type for targeted embedding
+- **Performance Considerations**: Optimize for large-scale embedding processing
+
+## Memory MCP Server Update Rules (MANDATORY)
+
+### Post-Bug-Fix Memory Updates
+After every successful bug fix, AUTOMATICALLY update the memory MCP server:
+
+#### Required Memory Content
+- **Bug Description**: Clear description of the issue that was fixed
+- **Root Cause Analysis**: Technical explanation of why the bug occurred
+- **Solution Implemented**: Detailed description of the fix applied
+- **Code Changes**: Summary of specific code modifications made
+- **Testing Validation**: How the fix was validated and tested
+- **Prevention Measures**: Steps taken to prevent similar issues
+- **Learning Insights**: Key insights gained from the debugging process
+
+#### Memory Update Conditions
+- **Trigger**: Any successful resolution of a bug, error, or issue
+- **Timing**: Immediately after fix validation and testing
+- **Scope**: Include both technical and process improvements
+- **Context**: Link to related project components and dependencies
+
+#### Memory Categories for Bug Fixes
+- **Database Migration Bugs**: Issues specific to data migration processes
+- **TypeScript/Node.js Bugs**: Runtime and compilation issues
+- **CLI Tool Bugs**: Command-line interface and user interaction issues
+- **Performance Bugs**: Issues affecting system performance and scalability
+- **Integration Bugs**: Problems with MCP servers, APIs, or external services
+- **Testing Bugs**: Issues discovered during testing phases
+- **Configuration Bugs**: Environment, build, or deployment configuration issues
+
+#### Memory Update Format
+```typescript
+// Example memory update structure
+interface BugFixMemory {
+  title: string; // Concise bug description
+  category: 'database' | 'typescript' | 'cli' | 'performance' | 'integration' | 'testing' | 'configuration';
+  severity: 'critical' | 'high' | 'medium' | 'low';
+  rootCause: string; // Technical explanation
+  solution: string; // Implementation details
+  codeChanges: string[]; // List of modified files/functions
+  testingApproach: string; // How fix was validated
+  preventionMeasures: string[]; // Steps to prevent recurrence
+  relatedComponents: string[]; // Affected project areas
+  learningInsights: string[]; // Key takeaways
+  timestamp: Date; // When bug was fixed
+  correlationId?: string; // Link to related issues
+}
+```
+
+### Learning Enhancement Rules
+- **Pattern Recognition**: Identify recurring bug patterns for proactive prevention
+- **Knowledge Accumulation**: Build comprehensive debugging knowledge base
+- **Best Practices**: Document effective debugging and resolution strategies
+- **Process Improvement**: Continuously refine development and testing processes
+- **Team Learning**: Share insights across development team through memory system
+
+This comprehensive rule set ensures the generation of high-quality, production-ready database migration code that follows industry best practices while meeting the specific requirements of the brius-smile-nexus project.

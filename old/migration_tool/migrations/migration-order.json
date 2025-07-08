@@ -1,0 +1,49 @@
+{
+  "migrations": [
+    {
+      "order": 1,
+      "filename": "001_main_schema.sql",
+      "description": "Core application schema with all base tables, types, and RLS policies",
+      "dependencies": [],
+      "required_extensions": [],
+      "estimated_duration": "30-60 seconds",
+      "rollback_strategy": "Drop all created tables and types"
+    },
+    {
+      "order": 2,
+      "filename": "002_migration_tracking_schema.sql",
+      "description": "Migration tracking and monitoring infrastructure",
+      "dependencies": ["001_main_schema.sql"],
+      "required_extensions": [],
+      "estimated_duration": "10-30 seconds",
+      "rollback_strategy": "Drop migration tracking tables"
+    },
+    {
+      "order": 3,
+      "filename": "003_ai_embeddings_bedrock_schema.sql",
+      "description": "AI embeddings infrastructure for Amazon Bedrock Titan Text Embeddings v2",
+      "dependencies": ["001_main_schema.sql"],
+      "required_extensions": ["vector"],
+      "estimated_duration": "60-120 seconds",
+      "rollback_strategy": "Drop ai_embeddings table, indexes, and functions"
+    }
+  ],
+  "execution_notes": {
+    "prerequisites": [
+      "PostgreSQL 12+ with pgvector extension support",
+      "Supabase project with vector extension enabled",
+      "Admin privileges for schema modifications"
+    ],
+    "post_migration_tasks": [
+      "Verify pgvector extension is enabled",
+      "Test vector similarity search functions",
+      "Monitor index creation performance",
+      "Validate RLS policies are working correctly"
+    ],
+    "performance_considerations": [
+      "Vector indexes may take time to build on large datasets",
+      "HNSW index parameters may need tuning based on data size",
+      "Monitor memory usage during index creation"
+    ]
+  }
+}

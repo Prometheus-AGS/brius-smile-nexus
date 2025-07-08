@@ -1,0 +1,45 @@
+# Grafana Datasource Configuration for Prometheus
+# Automatically provisions Prometheus as a datasource
+
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: true
+    jsonData:
+      httpMethod: POST
+      manageAlerts: true
+      prometheusType: Prometheus
+      prometheusVersion: 2.40.0
+      cacheLevel: 'High'
+      disableRecordingRules: false
+      incrementalQueryOverlapWindow: 10m
+      queryTimeout: 60s
+      timeInterval: 15s
+    secureJsonData: {}
+    version: 1
+    uid: prometheus-uid
+
+  - name: Migration Metrics
+    type: prometheus
+    access: proxy
+    url: http://migration-app:9090
+    isDefault: false
+    editable: true
+    jsonData:
+      httpMethod: POST
+      manageAlerts: false
+      prometheusType: Prometheus
+      cacheLevel: 'Medium'
+      queryTimeout: 30s
+      timeInterval: 15s
+      exemplarTraceIdDestinations:
+        - name: trace_id
+          datasourceUid: jaeger-uid
+    secureJsonData: {}
+    version: 1
+    uid: migration-metrics-uid

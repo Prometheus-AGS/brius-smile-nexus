@@ -1,0 +1,214 @@
+# Healthcare Data Migration System Docker Compose Configuration
+version: '3.8'
+
+services:
+  migration-app:
+    build:
+      context: ../../
+      dockerfile: docker/migration/Dockerfile
+    container_name: migration-app
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - LEGACY_DB_HOST=${LEGACY_DB_HOST}
+      - LEGACY_DB_PORT=${LEGACY_DB_PORT}
+      - LEGACY_DB_NAME=${LEGACY_DB_NAME}
+      - LEGACY_DB_USER=${LEGACY_DB_USER}
+      - LEGACY_DB_PASSWORD=${LEGACY_DB_PASSWORD}
+      - LEGACY_DB_SSL=${LEGACY_DB_SSL:-false}
+      - MIGRATION_BATCH_SIZE=${MIGRATION_BATCH_SIZE:-1000}
+      - MIGRATION_MAX_RETRIES=${MIGRATION_MAX_RETRIES:-3}
+      - MIGRATION_TIMEOUT_MS=${MIGRATION_TIMEOUT_MS:-300000}
+      - MIGRATION_PARALLEL_WORKERS=${MIGRATION_PARALLEL_WORKERS:-1}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - ENABLE_METRICS=${ENABLE_METRICS:-true}
+      - METRICS_PORT=${METRICS_PORT:-9090}
+      - BACKUP_STORAGE_PATH=${BACKUP_STORAGE_PATH:-/app/backups}
+      - LOG_STORAGE_PATH=${LOG_STORAGE_PATH:-/app/logs}
+      - TEMP_STORAGE_PATH=${TEMP_STORAGE_PATH:-/app/temp}
+      - MAX_MEMORY_USAGE_MB=${MAX_MEMORY_USAGE_MB:-2048}
+      - CONNECTION_POOL_SIZE=${CONNECTION_POOL_SIZE:-10}
+      - QUERY_TIMEOUT_MS=${QUERY_TIMEOUT_MS:-30000}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - NOTIFICATION_EMAIL=${NOTIFICATION_EMAIL}
+    ports:
+      - "${APP_PORT:-3000}:3000"
+      - "${METRICS_PORT:-9090}:9090"
+    volumes:
+      - migration-logs:/app/logs
+      - migration-backups:/app/backups
+      - migration-temp:/app/temp
+    networks:
+      - migration-network
+    depends_on:
+      - redis
+      - prometheus
+    healthcheck:
+      test: ["CMD", "./healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: ${MAX_MEMORY_USAGE_MB:-2048}M
+          cpus: '${MAX_CPU_CORES:-2}'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+
+  redis:
+    image: redis:7-alpine
+    container_name: migration-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-data:/data
+    networks:
+      - migration-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: migration-prometheus
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-lifecycle'
+    ports:
+      - "${PROMETHEUS_PORT:-9091}:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    networks:
+      - migration-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: migration-grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin123}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+    ports:
+      - "${GRAFANA_PORT:-3001}:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources
+    networks:
+      - migration-network
+    depends_on:
+      - prometheus
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  nginx:
+    image: nginx:alpine
+    container_name: migration-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl
+      - migration-logs:/var/log/nginx
+    networks:
+      - migration-network
+    depends_on:
+      - migration-app
+      - grafana
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  migration-logs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${HOST_LOGS_PATH:-./logs}
+  
+  migration-backups:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${HOST_BACKUPS_PATH:-./backups}
+  
+  migration-temp:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${HOST_TEMP_PATH:-./temp}
+  
+  redis-data:
+    driver: local
+  
+  prometheus-data:
+    driver: local
+  
+  grafana-data:
+    driver: local
+
+networks:
+  migration-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# Development override
+# Use: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+---
+version: '3.8'
+
+# Development overrides
+x-development: &development
+  environment:
+    - NODE_ENV=development
+    - LOG_LEVEL=debug
+    - ENABLE_METRICS=true
+  volumes:
+    - ../../:/app
+    - /app/node_modules
+  command: ["development"]
+
+services:
+  migration-app:
+    <<: *development
+    ports:
+      - "3000:3000"
+      - "9090:9090"
+      - "9229:9229"  # Debug port

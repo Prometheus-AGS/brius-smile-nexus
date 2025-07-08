@@ -6,21 +6,27 @@ import { useNavigation } from '@/hooks/use-navigation';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 const primaryItems = [
-  { id: 'home', title: 'Home', icon: Home },
-  { id: 'assistant', title: 'Assistant', icon: MessageSquare },
-  { id: 'library', title: 'Library', icon: BookOpen },
-  { id: 'reports', title: 'Reports', icon: BarChart3 },
+  { id: 'home', title: 'Home', icon: Home, url: '/portal' },
+  { id: 'assistant', title: 'Assistant', icon: MessageSquare, url: '/portal/assistant' },
+  { id: 'library', title: 'Library', icon: BookOpen, url: '/portal/library' },
+  { id: 'reports', title: 'Reports', icon: BarChart3, url: '/portal/reports' },
 ];
 
 const secondaryItems = [
   // Empty for now - can be used for additional items later
 ];
 
+/**
+ * Mobile Navigation Component
+ *
+ * Bottom navigation bar for mobile devices.
+ * Uses React Router for navigation between portal sections.
+ */
 export const MobileNavigation: React.FC = () => {
-  const { currentApp, setCurrentApp } = useNavigation();
+  const { navigateTo, isActive } = useNavigation();
 
-  const handleItemClick = (appId: string) => {
-    setCurrentApp(appId);
+  const handleItemClick = (url: string) => {
+    navigateTo(url);
   };
 
   return (
@@ -29,9 +35,9 @@ export const MobileNavigation: React.FC = () => {
         {primaryItems.map((item) => (
           <Button
             key={item.id}
-            variant={currentApp === item.id ? 'default' : 'ghost'}
+            variant={isActive(item.url) ? 'default' : 'ghost'}
             size="sm"
-            onClick={() => handleItemClick(item.id)}
+            onClick={() => handleItemClick(item.url)}
             className="flex-col h-auto py-2 px-3"
           >
             <item.icon className="h-5 w-5 mb-1" />
@@ -52,8 +58,8 @@ export const MobileNavigation: React.FC = () => {
                 {secondaryItems.map((item) => (
                   <Button
                     key={item.id}
-                    variant={currentApp === item.id ? 'default' : 'outline'}
-                    onClick={() => handleItemClick(item.id)}
+                    variant={isActive(item.url) ? 'default' : 'outline'}
+                    onClick={() => handleItemClick(item.url)}
                     className="flex items-center gap-2 h-12 font-body"
                   >
                     <item.icon className="h-5 w-5" />

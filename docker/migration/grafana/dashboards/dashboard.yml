@@ -1,0 +1,15 @@
+# Grafana Dashboard Provisioning Configuration
+# Automatically provisions dashboards for the migration system
+
+apiVersion: 1
+
+providers:
+  - name: 'migration-dashboards'
+    orgId: 1
+    folder: 'Migration System'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/json

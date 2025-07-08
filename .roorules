@@ -1,0 +1,218 @@
+# Roo Code AI Development Rules for brius-smile-nexus
+# Global rules that apply to all modes in Roo Code
+# Includes database migration CLI tool and web application standards
+
+## Project Overview
+This project includes both a database migration CLI tool (TypeScript/Node.js) and a web application (React 19). The migration tool migrates from a legacy PostgreSQL database to a well-designed Supabase PostgreSQL data model optimized for AI applications.
+
+## Technology Stack
+
+### Web Application Stack
+- **Frontend Framework**: React 19
+- **Build Tool**: Vite 7
+- **Package Manager**: Yarn
+- **Styling**: Tailwind CSS
+- **UI Components**: shadcn/ui
+- **Routing**: React Router
+- **State Management**: Zustand
+- **Backend/Database**: Supabase (auth, authorization, database)
+
+### Migration CLI Tool Stack
+- **Runtime**: Node.js with TypeScript (strict mode)
+- **Legacy Database**: PostgreSQL via `pg` library
+- **Target Database**: Supabase via `@supabase/supabase-js`
+- **CLI Framework**: Commander.js for command-line interface
+- **Validation**: Zod for schema validation and type safety
+- **Logging**: Winston for structured logging
+- **Testing**: Jest with comprehensive test coverage
+
+## TypeScript Standards
+
+- **NEVER** use the `any` type explicitly or implicitly
+- **NEVER** use `unknown` without proper type guards
+- Always provide proper type definitions
+- Use strict TypeScript configuration with all strict flags enabled
+- Prefer type inference where appropriate but be explicit when needed
+- Use generic types and utility types for better type safety
+- Implement comprehensive interfaces for all data structures
+
+## MCP Server Integration Requirements (MANDATORY)
+
+### brius_postgres MCP Server
+- **ALWAYS** use `brius_postgres` MCP server to examine legacy data model
+- Use `mcp0_list_schemas` and `mcp0_list_objects` to understand database structure
+- Use `mcp0_get_object_details` for detailed table/column information
+- Use `mcp0_get_top_queries` to understand performance patterns
+- Use `mcp0_analyze_db_health` before and after migration
+- Use `mcp0_execute_sql` for data validation queries
+
+### Context7 MCP Server
+- **ALWAYS** validate API usage with `mcp2_resolve-library-id` and `mcp2_get-library-docs`
+- Required for: `pg`, `@supabase/supabase-js`, `commander`, `zod`, `winston`
+- Verify latest API patterns and best practices
+- Check for deprecated methods and security considerations
+
+### Tavily MCP Server
+- **ALWAYS** validate best practices using `mcp11_tavily-search`
+- Research current migration patterns and error handling strategies
+- Validate TypeScript patterns and CLI design approaches
+- Check for security vulnerabilities and performance optimizations
+
+## Database Migration Standards
+
+### Database Connection Standards
+- Use `pg.ClientConfig` interface for PostgreSQL connections (property is `user`, not `username`)
+- Implement connection pooling for performance
+- Always use parameterized queries to prevent SQL injection
+- Implement proper connection cleanup and error handling
+- Support both connection strings and object configurations
+
+### Migration Architecture
+- Implement 5-phase migration strategy as specified in documentation
+- Each phase must be independently executable and rollbackable
+- Maintain legacy_id mappings for backward compatibility
+- Implement comprehensive data validation at each phase
+- Support incremental migration with progress tracking
+
+### Required Type Definitions for Migration
+```typescript
+// Database connection interfaces
+interface DatabaseConnection {
+  host: string;
+  port: number;
+  database: string;
+  user: string; // NOT username - pg library uses 'user'
+  password: string;
+  ssl?: boolean | object;
+}
+
+// Migration result types
+interface MigrationResult {
+  success: boolean;
+  recordsProcessed: number;
+  errors: MigrationError[];
+  duration: number;
+  phase: string;
+}
+
+// Error handling types
+interface MigrationError {
+  type: 'validation' | 'database' | 'transformation' | 'system';
+  message: string;
+  details?: Record<string, unknown>;
+  recoverable: boolean;
+  timestamp: Date;
+}
+```
+
+## State Management Rules
+- Use Zustand stores for all global state management
+- Components must NEVER communicate directly with stores
+- Always create custom hooks to interface with Zustand stores
+- Example pattern:
+  ```typescript
+  // ❌ Wrong - Direct store access
+  const Component = () => {
+    const store = useStore();
+    return <div>{store.data}</div>;
+  };
+  
+  // ✅ Correct - Hook-based access
+  const useData = () => {
+    const data = useStore(state => state.data);
+    return data;
+  };
+  
+  const Component = () => {
+    const data = useData();
+    return <div>{data}</div>;
+  };
+  ```
+
+## UI Component Standards
+- **ALWAYS** prefer shadcn/ui components over raw HTML elements
+- Use shadcn components for: buttons, inputs, forms, dialogs, cards, etc.
+- Only use raw HTML for semantic elements like `<main>`, `<section>`, `<article>`
+- Maintain consistent styling through Tailwind CSS classes
+- Follow shadcn/ui theming and customization patterns
+
+## File Naming Conventions
+- Use kebab-case (lowercase with dashes) for ALL file names
+- Examples:
+  - `user-profile.tsx`
+  - `auth-service.ts`
+  - `login-form.tsx`
+  - `api-client.ts`
+- Apply this to components, utilities, services, and all other files
+
+## Supabase Integration
+- Use Supabase for authentication, authorization, and database operations
+- Implement proper error handling for Supabase operations
+- Use Supabase's built-in security features (RLS, policies)
+- Follow Supabase best practices for client-side operations
+- Always handle loading and error states for async operations
+
+## Code Quality Standards
+- Write self-documenting code with clear variable and function names
+- Add JSDoc comments for complex functions and components
+- Implement proper error boundaries and error handling
+- Use consistent code formatting (Prettier configuration)
+- Follow React 19 best practices and patterns
+- Implement proper accessibility (a11y) standards
+
+## Project Structure Guidelines
+- Organize components by feature/domain
+- Keep utility functions in dedicated utility files
+- Separate business logic from UI components
+- Use barrel exports (index.ts files) for clean imports
+- Maintain clear separation of concerns
+
+## Performance Considerations
+- Use React.memo() for expensive components
+- Implement proper code splitting with React.lazy()
+- Optimize Zustand store subscriptions
+- Follow Vite optimization guidelines
+- Minimize bundle size and optimize for production
+
+## Security Guidelines
+- Never expose sensitive data in client-side code
+- Use environment variables for configuration
+- Implement proper input validation and sanitization
+- Follow Supabase security best practices
+- Use HTTPS for all external API calls
+
+## Testing Requirements
+- Write unit tests for utility functions
+- Implement component tests for complex UI logic
+- Test Zustand store operations
+- Mock Supabase operations in tests
+- Maintain good test coverage
+
+## Memory Bank Integration
+- Update activeContext.md with current session goals and progress
+- Log architectural decisions in decisionLog.md with rationale
+- Maintain high-level project context in productContext.md
+- Track completed work and next steps in progress.md
+- Reference projectBrief.md for initial project requirements
+
+## Additional Development Rules
+
+### Bug Fix Memory Management
+- After fixing any bugs where there are no errors detected, create a memory in the memory MCP server related to the bug fix, so we do not repeat bugs
+- Document the root cause, solution, and prevention strategy for future reference
+- Include relevant code patterns and anti-patterns in the memory
+
+### Documentation Compliance
+- The `docs` subdirectory in this project contains markdown files that describe architectural, design and other decisions related to the project
+- Always check for files in the `docs` directory and subdirectories when generating code to make sure those rules and standards are followed
+- Reference existing documentation before making architectural decisions
+- Update documentation when making significant changes
+
+### TypeScript Type Management
+- Always check to see if new TypeScript types are generated already before creating new ones, so we prevent duplicate types from being created
+- Use the `src/types/*` directory structure to create new types that should be shared across stores and components
+- Check existing type definitions in `src/types/` before creating new interfaces or types
+- Organize types by domain/feature within the types directory
+- Use proper barrel exports from type files for clean imports
+
+Remember: These rules are mandatory for all code generation across all Roo Code modes.
