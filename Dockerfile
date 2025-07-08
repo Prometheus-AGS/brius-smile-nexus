@@ -1,4 +1,11 @@
-FROM node:20-alpine AS base
+FROM node:20-slim AS base
+
+# Install system dependencies required for native modules
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
