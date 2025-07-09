@@ -191,6 +191,16 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     const { error, errorInfo, errorId } = this.state;
     const { showErrorDetails = process.env.NODE_ENV === 'development' } = this.props;
 
+    // Debug logging for error boundary layout
+    console.log('🚨 ErrorBoundary: Rendering error fallback UI', {
+      errorId,
+      errorMessage: error?.message,
+      showErrorDetails,
+      timestamp: new Date().toISOString(),
+      parentElement: this.props.children ? 'has children' : 'no children',
+      layoutContext: 'full-screen overlay mode'
+    });
+
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-background">
         <Card className="w-full max-w-2xl">
@@ -274,7 +284,22 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     const { hasError } = this.state;
     const { children, fallback } = this.props;
 
+    // Debug logging for error boundary render state
+    console.log('🛡️ ErrorBoundary: Render state', {
+      hasError,
+      hasFallback: !!fallback,
+      hasChildren: !!children,
+      errorId: this.state.errorId,
+      timestamp: new Date().toISOString()
+    });
+
     if (hasError) {
+      console.log('🚨 ErrorBoundary: Rendering error state - LAYOUT TAKEOVER ACTIVE', {
+        errorId: this.state.errorId,
+        layoutImpact: 'Full screen overlay replacing normal layout',
+        potentialIssue: 'May interfere with parent container layout'
+      });
+      
       // Render custom fallback if provided, otherwise render default error UI
       return fallback || this.renderErrorFallback();
     }

@@ -15,10 +15,54 @@
 
 ### Web Application Standards
 - Always implement TypeScript interfaces before components
-- Create custom hooks for all Zustand store interactions
-- Implement proper loading and error states for async operations
+- **CRITICAL ARCHITECTURAL PRINCIPLE**: React components must **NEVER** directly access Zustand stores
+- **MANDATORY**: All store interactions must go through custom hooks that orchestrate data loading
+- Custom hooks handle data loading, transformations, error handling, and side effects
+- Components remain pure and focused solely on rendering
+- Implement proper loading and error states for async operations in hooks, not components
 - Use shadcn/ui components consistently
 - Follow established file naming conventions (kebab-case)
+
+#### State Management Architecture Pattern
+```typescript
+// ❌ FORBIDDEN - Direct store access in component
+const Component = () => {
+  const data = useStore(state => state.data);
+  const fetchData = useStore(state => state.fetchData);
+  
+  useEffect(() => {
+    fetchData(); // Data orchestration in component - WRONG!
+  }, []);
+  
+  return <div>{data}</div>;
+};
+
+// ✅ REQUIRED - Hook-based data orchestration
+const useComponentData = () => {
+  const data = useStore(state => state.data);
+  const isLoading = useStore(state => state.isLoading);
+  const error = useStore(state => state.error);
+  const fetchData = useStore(state => state.fetchData);
+  
+  // All data orchestration happens in the hook
+  useEffect(() => {
+    if (!data) {
+      fetchData();
+    }
+  }, [data, fetchData]);
+  
+  return { data, isLoading, error, refetch: fetchData };
+};
+
+// Component stays pure and focused on rendering
+const Component = () => {
+  const { data, isLoading, error } = useComponentData();
+  
+  if (isLoading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage error={error} />;
+  return <div>{data}</div>;
+};
+```
 
 ### Database Migration CLI Tool Standards
 - **Package Manager**: MANDATORY use of Yarn for all package management operations

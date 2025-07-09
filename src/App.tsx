@@ -6,6 +6,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
+import GlobalErrorBoundary from './components/ui/global-error-boundary';
+import { GlobalErrorManager } from './components/error/global-error-manager';
 
 // Lazy load pages for better performance
 const Index = React.lazy(() => import("./pages/Index"));
@@ -57,41 +59,47 @@ const RouteLoadingFallback: React.FC = () => (
  * - Proper route structure with authentication
  */
 const App: React.FC = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Suspense fallback={<RouteLoadingFallback />}>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/svg-test" element={<SVGTestPage />} />
-            
-            {/* Protected Portal Routes with Nested Routing */}
-            <Route path="/portal" element={<PortalLayout />}>
-              <Route index element={<HomePage />} />
-              <Route path="assistant" element={<AssistantPage />} />
-              <Route path="library" element={<LibraryPage />} />
-              <Route path="reports" element={<ReportsPage />} />
-            </Route>
-            
-            {/* Future auth routes (to be implemented in Phase 3) */}
-            {/* <Route path="/reset-password" element={<PasswordResetPage />} /> */}
-            {/* <Route path="/verify-email" element={<EmailVerificationPage />} /> */}
-            
-            {/* Redirect old routes for backward compatibility */}
-            <Route path="/dashboard" element={<Navigate to="/portal" replace />} />
-            <Route path="/app" element={<Navigate to="/portal" replace />} />
-            
-            {/* Catch-all route for 404 */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <GlobalErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Suspense fallback={<RouteLoadingFallback />}>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<Index />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/svg-test" element={<SVGTestPage />} />
+
+              {/* Protected Portal Routes with Nested Routing */}
+              <Route path="/portal" element={<PortalLayout />}>
+                <Route index element={<HomePage />} />
+                <Route path="assistant" element={<AssistantPage />} />
+                <Route path="library" element={<LibraryPage />} />
+                <Route path="reports" element={<ReportsPage />} />
+              </Route>
+
+              {/* Future auth routes (to be implemented in Phase 3) */}
+              {/* <Route path="/reset-password" element={<PasswordResetPage />} /> */}
+              {/* <Route path="/verify-email" element={<EmailVerificationPage />} /> */}
+
+              {/* Redirect old routes for backward compatibility */}
+              <Route
+                path="/dashboard"
+                element={<Navigate to="/portal" replace />}
+              />
+              <Route path="/app" element={<Navigate to="/portal" replace />} />
+
+              {/* Catch-all route for 404 */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
+        <GlobalErrorManager />
+      </TooltipProvider>
+    </QueryClientProvider>
+  </GlobalErrorBoundary>
 );
 
 export default App;

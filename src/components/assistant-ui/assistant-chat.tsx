@@ -28,6 +28,7 @@ import { useMastraChat } from '@/hooks/use-mastra-chat';
 import { useBIObservability } from '@/hooks/use-langfuse';
 import { getLangfuseConfig } from '@/lib/langfuse-config';
 import { EnhancedMessage } from '@/components/assistant-ui/message-content';
+import type { Message } from '@/stores/assistant/chat-store';
 import type { AssistantMessage } from '@/types/assistant';
 import type { BIQueryType } from '@/types/langfuse';
 import type { CopyResult } from '@/types/content-types';
@@ -86,7 +87,6 @@ export function AssistantChat({
 
   // Local state for enhanced chat functionality
   const [input, setInput] = useState('');
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [currentTraceId, setCurrentTraceId] = useState<string | null>(null);
   const [observabilityStats, setObservabilityStats] = useState({
     totalTraces: 0,
@@ -104,21 +104,10 @@ export function AssistantChat({
   // Effects
   // ============================================================================
 
-  // Sync messages from Mastra chat with enhanced chat messages
-  useEffect(() => {
-    if (messages && Array.isArray(messages)) {
-      const enhancedMessages: ChatMessage[] = messages.map((msg, index) => ({
-        ...msg,
-        traceId: msg.id ? `trace-${msg.id}` : undefined,
-      }));
-      setChatMessages(enhancedMessages);
-    }
-  }, [messages]);
-
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [chatMessages]);
+  }, [messages]);
 
   // Focus input on mount
   useEffect(() => {
@@ -233,14 +222,8 @@ export function AssistantChat({
     const traceId = await startChatTrace(userMessage);
 
     try {
-      // Send message using Mastra chat
-      await sendMessage({
-        content: userMessage,
-        metadata: {
-          traceId,
-          timestamp: new Date().toISOString(),
-        },
-      });
+      // Send message using Mastra chat - the hook expects just the content string
+      await sendMessage(userMessage);
       
       const processingTime = Date.now() - startTime;
 
@@ -305,28 +288,31 @@ export function AssistantChat({
     }
   }, [handleSendMessage]);
 
-  const handleClearChat = useCallback(async () => {
-    // Since clearMessages doesn't exist in the Mastra hook, we'll handle clearing locally
-    setChatMessages([]);
-    setInput('');
-    setObservabilityStats({
-      totalTraces: 0,
-      successfulQueries: 0,
-      averageResponseTime: 0,
-    });
-    
-    // Track clear action
-    if (isLangfuseEnabled) {
-      try {
-        await trackBIQuery('chat_cleared', 'data_analysis', {
-          queryType: 'data_analysis' as const,
-          severity: 'low' as const,
-        });
-      } catch (error) {
-        console.error('Error tracking chat clear:', error);
+  const handleNewChat = useCallback(async () => {
+    try {
+      await mastraChat?.createNewChat();
+      setInput('');
+      setObservabilityStats({
+        totalTraces: 0,
+        successfulQueries: 0,
+        averageResponseTime: 0,
+      });
+      
+      // Track new chat action
+      if (isLangfuseEnabled) {
+        try {
+          await trackBIQuery('new_chat_created', 'data_analysis', {
+            queryType: 'data_analysis' as const,
+            severity: 'low' as const,
+          });
+        } catch (error) {
+          console.error('Error tracking new chat:', error);
+        }
       }
+    } catch (error) {
+      console.error('Failed to create new chat:', error);
     }
-  }, [setChatMessages, setInput, setObservabilityStats, isLangfuseEnabled, trackBIQuery]);
+  }, [mastraChat, setInput, setObservabilityStats, isLangfuseEnabled, trackBIQuery]);
 
   const handleCopyResult = useCallback((result: CopyResult) => {
     console.log('🔍 DEBUG: Copy result:', result);
@@ -378,22 +364,22 @@ export function AssistantChat({
     );
   };
 
-  const renderMessage = (message: ChatMessage, index: number) => {
+  const renderMessage = (message: Message, index: number) => {
     console.log('🔍 DEBUG: Rendering message with EnhancedMessage:', {
       messageId: message.id,
       role: message.role,
       contentLength: message.content?.length || 0,
-      timestamp: message.timestamp
+      timestamp: message.created_at
     });
 
-    // Convert ChatMessage to AssistantMessage format for EnhancedMessage
+    // Convert Message to AssistantMessage format for EnhancedMessage
     const assistantMessage: AssistantMessage = {
       id: message.id,
       content: message.content || '',
       role: message.role,
-      timestamp: message.timestamp,
-      threadId: message.threadId,
-      metadata: message.metadata
+      timestamp: new Date(message.created_at),
+      threadId: message.thread_id,
+      metadata: {}
     };
 
     return (
@@ -424,10 +410,9 @@ export function AssistantChat({
           <Button
             variant="outline"
             size="sm"
-            onClick={handleClearChat}
-            disabled={chatMessages.length === 0}
+            onClick={handleNewChat}
           >
-            Clear Chat
+            New Chat
           </Button>
         </div>
         {renderObservabilityStatus()}
@@ -439,7 +424,7 @@ export function AssistantChat({
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              {error.message || 'An error occurred while processing your request.'}
+              {error || 'An error occurred while processing your request.'}
             </AlertDescription>
           </Alert>
         )}
@@ -447,14 +432,14 @@ export function AssistantChat({
         {/* Messages Area */}
         <ScrollArea className="flex-1" style={{ maxHeight }}>
           <div className="space-y-4 pr-4">
-            {chatMessages.length === 0 ? (
+            {messages?.length === 0 ? (
               <div className="text-center text-muted-foreground py-8">
                 <Bot className="h-12 w-12 mx-auto mb-4 opacity-50" />
                 <p>Start a conversation with your BI assistant</p>
                 <p className="text-sm mt-1">Ask about your dental manufacturing data and analytics</p>
               </div>
             ) : (
-              chatMessages.map((message, index) => renderMessage(message, index))
+              messages?.map((message, index) => renderMessage(message, index))
             )}
             
             {isLoading && (() => {

@@ -202,15 +202,7 @@ USER QUERY: ${content}
       // Create thread if none exists
       let threadId = currentThreadId;
       if (!threadId) {
-        threadId = await createThread({
-          title: 'Business Intelligence Analysis',
-          agentId,
-          resourceId,
-          metadata: {
-            type: 'business-intelligence',
-            createdAt: new Date().toISOString()
-          }
-        });
+        threadId = await createThread('Business Intelligence Analysis');
       }
 
       // Enhance the prompt with BI context
@@ -261,6 +253,7 @@ USER QUERY: ${content}
   const biMessages = useMemo((): BIMessage[] => {
     return messages.map(message => ({
       ...message,
+      timestamp: new Date(message.created_at),
       type: message.role === 'assistant' ? 'insight' : 'query',
       businessContext: {
         domain: 'dental-brace-manufacturing',
@@ -301,16 +294,7 @@ USER QUERY: ${content}
     // Enhanced actions
     sendMessage: handleNewMessage,
     createThread: async (title?: string) => {
-      return createThread({
-        title: title || 'Business Intelligence Analysis',
-        agentId,
-        resourceId,
-        metadata: {
-          type: 'business-intelligence',
-          domain: 'dental-brace-manufacturing',
-          createdAt: new Date().toISOString()
-        }
-      });
+      return createThread(title || 'Business Intelligence Analysis');
     },
     switchThread,
     deleteThread,

@@ -54,38 +54,108 @@ interface ApiResponse<T> {
 }
 ```
 
-## State Management Architecture
+## State Management Architecture (CRITICAL ARCHITECTURAL PRINCIPLE)
 
-### Zustand Store Rules
-- Components must **NEVER** communicate directly with stores
-- Always create custom hooks to interface with Zustand stores
-- Implement proper store slicing for large applications
-- Use TypeScript interfaces for all store state definitions
+### MANDATORY Rule: NO DIRECT STORE ACCESS
+- **FORBIDDEN**: React components must **NEVER** directly import or access Zustand stores
+- **MANDATORY**: All store interactions must go through custom hooks exclusively
+- **MANDATORY**: Custom hooks orchestrate ALL data loading, transformations, and side effects
+- **MANDATORY**: Components remain pure and focused solely on rendering
+- **MANDATORY**: Data orchestration logic belongs in hooks, NOT in components
 
-### Required Pattern Implementation
+### Architectural Benefits
+- **Separation of Concerns**: Data logic completely separated from UI rendering logic
+- **Reusability**: Hooks can be shared across multiple components without duplication
+- **Testability**: Data logic can be tested independently from UI components
+- **Maintainability**: Centralized data orchestration makes changes easier
+- **Performance**: Better optimization with selective store subscriptions
+- **Debugging**: Easier to trace data flow and state changes
+
+### REQUIRED Implementation Pattern
 ```typescript
-// ❌ Wrong - Direct store access in component
+// ❌ ABSOLUTELY FORBIDDEN - Direct store access in component
+import { useUserStore } from '@/stores/user-store';
+import { useOrderStore } from '@/stores/order-store';
+
 const Component = () => {
-  const store = useStore();
-  return <div>{store.data}</div>;
+  // NEVER do this - direct store access in component
+  const user = useUserStore(state => state.user);
+  const fetchUser = useUserStore(state => state.fetchUser);
+  const orders = useOrderStore(state => state.orders);
+  const fetchOrders = useOrderStore(state => state.fetchOrders);
+  
+  useEffect(() => {
+    // NEVER do data orchestration in components
+    fetchUser();
+    if (user?.id) {
+      fetchOrders(user.id);
+    }
+  }, [user?.id]);
+  
+  return <div>{user?.name} has {orders.length} orders</div>;
 };
 
-// ✅ Correct - Hook-based access pattern
-const useUserData = () => {
+// ✅ REQUIRED - Hook-based data orchestration architecture
+const useUserWithOrders = () => {
   const user = useUserStore(state => state.user);
   const setUser = useUserStore(state => state.setUser);
-  const isLoading = useUserStore(state => state.isLoading);
+  const userLoading = useUserStore(state => state.isLoading);
+  const userError = useUserStore(state => state.error);
+  const fetchUser = useUserStore(state => state.fetchUser);
   
-  return { user, setUser, isLoading };
+  const orders = useOrderStore(state => state.orders);
+  const ordersLoading = useOrderStore(state => state.isLoading);
+  const ordersError = useOrderStore(state => state.error);
+  const fetchOrders = useOrderStore(state => state.fetchOrders);
+  
+  // ALL data orchestration happens in the hook
+  useEffect(() => {
+    if (!user) {
+      fetchUser();
+    }
+  }, [user, fetchUser]);
+  
+  useEffect(() => {
+    if (user?.id && !orders.length) {
+      fetchOrders(user.id);
+    }
+  }, [user?.id, orders.length, fetchOrders]);
+  
+  // Return clean, computed interface to component
+  return {
+    user,
+    orders,
+    isLoading: userLoading || ordersLoading,
+    error: userError || ordersError,
+    refetchUser: fetchUser,
+    refetchOrders: () => user?.id && fetchOrders(user.id)
+  };
 };
 
+// Component stays pure and focused ONLY on rendering
 const Component = () => {
-  const { user, isLoading } = useUserData();
+  const { user, orders, isLoading, error } = useUserWithOrders();
   
   if (isLoading) return <LoadingSpinner />;
-  return <div>{user?.name}</div>;
+  if (error) return <ErrorMessage error={error} />;
+  if (!user) return <div>No user found</div>;
+  
+  return (
+    <div>
+      <h1>{user.name}</h1>
+      <p>Orders: {orders.length}</p>
+    </div>
+  );
 };
 ```
+
+### Hook Design Principles
+- **Single Responsibility**: Each hook handles one specific domain or feature area
+- **Data Orchestration**: Handle ALL async operations, caching, and state management in hooks
+- **Clean Interface**: Return only the data and functions that components actually need
+- **Error Handling**: Centralize ALL error handling logic within hooks
+- **Loading States**: Manage ALL async loading states within hooks, never in components
+- **Side Effects**: ALL useEffect calls for data fetching belong in hooks, not components
 
 ## UI Component Standards
 

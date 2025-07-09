@@ -18,29 +18,80 @@
 - Prefer type inference where appropriate but be explicit when needed
 - Use generic types and utility types when applicable
 
-## State Management Rules
-- Use Zustand stores for all global state management
-- Components must NEVER communicate directly with stores
-- Always create custom hooks to interface with Zustand stores
-- Example pattern:
-  ```typescript
-  // ❌ Wrong - Direct store access
-  const Component = () => {
-    const store = useStore();
-    return <div>{store.data}</div>;
-  };
+## State Management Architecture (CRITICAL PRINCIPLE)
+
+### Architectural Rule: NO DIRECT STORE ACCESS
+- **MANDATORY**: React components must **NEVER** directly import or access Zustand stores
+- **MANDATORY**: All store interactions must go through custom hooks
+- **MANDATORY**: Custom hooks orchestrate data loading, transformations, and side effects
+- **MANDATORY**: Components remain pure and focused on rendering
+
+### Benefits of Hook-Based Architecture
+- **Separation of Concerns**: Data logic separated from UI logic
+- **Reusability**: Hooks can be shared across multiple components
+- **Testability**: Easier to test data logic independently from UI
+- **Maintainability**: Centralized data orchestration in hooks
+- **Performance**: Better optimization opportunities with selective subscriptions
+
+### Required Implementation Pattern
+```typescript
+// ❌ FORBIDDEN - Direct store access in component
+import { useUserStore } from '@/stores/user-store';
+
+const Component = () => {
+  const user = useUserStore(state => state.user);
+  const setUser = useUserStore(state => state.setUser);
+  const fetchUser = useUserStore(state => state.fetchUser);
   
-  // ✅ Correct - Hook-based access
-  const useData = () => {
-    const data = useStore(state => state.data);
-    return data;
-  };
+  useEffect(() => {
+    fetchUser(); // Data loading in component - BAD!
+  }, []);
   
-  const Component = () => {
-    const data = useData();
-    return <div>{data}</div>;
+  return <div>{user?.name}</div>;
+};
+
+// ✅ REQUIRED - Hook-based architecture
+// Custom hook handles all data orchestration
+const useUserData = () => {
+  const user = useUserStore(state => state.user);
+  const setUser = useUserStore(state => state.setUser);
+  const isLoading = useUserStore(state => state.isLoading);
+  const error = useUserStore(state => state.error);
+  const fetchUser = useUserStore(state => state.fetchUser);
+  
+  // Data loading orchestrated in hook
+  useEffect(() => {
+    if (!user) {
+      fetchUser();
+    }
+  }, [user, fetchUser]);
+  
+  // Return clean interface to component
+  return { 
+    user, 
+    setUser, 
+    isLoading, 
+    error,
+    refetch: fetchUser 
   };
-  ```
+};
+
+// Component stays pure and focused on rendering
+const Component = () => {
+  const { user, isLoading, error } = useUserData();
+  
+  if (isLoading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage error={error} />;
+  return <div>{user?.name}</div>;
+};
+```
+
+### Hook Design Principles
+- **Single Responsibility**: Each hook should handle one domain/feature
+- **Data Orchestration**: Handle loading, caching, error states in hooks
+- **Clean Interface**: Return only what components need
+- **Error Handling**: Centralize error handling in hooks
+- **Loading States**: Manage async states in hooks, not components
 
 ## UI Component Standards
 - **ALWAYS** prefer shadcn/ui components over raw HTML elements

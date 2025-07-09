@@ -199,18 +199,36 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       initialize: async () => {
+        console.log('🔄 Auth Store - Initialize called');
+        
         if (get().isInitialized) {
+          console.log('✅ Auth Store - Already initialized, skipping');
           return;
         }
 
+        console.log('🚀 Auth Store - Starting initialization process');
         set({ isLoading: true });
 
         try {
+          console.log('📞 Auth Store - Calling getCurrentSession...');
           // Get current session
           const session = await getCurrentSession();
+          console.log('📨 Auth Store - getCurrentSession response:', {
+            hasSession: !!session,
+            hasUser: !!session?.user,
+            userId: session?.user?.id,
+            userEmail: session?.user?.email
+          });
           
           if (session?.user) {
+            console.log('👤 Auth Store - User found, transforming user data...');
             const user = transformSupabaseUser(session.user, session);
+            console.log('✨ Auth Store - User transformed:', {
+              userId: user.id,
+              userEmail: user.email,
+              isAuthenticated: true
+            });
+            
             set({
               user,
               session,
@@ -218,7 +236,9 @@ export const useAuthStore = create<AuthStore>()(
               isInitialized: true,
               isLoading: false
             });
+            console.log('✅ Auth Store - Initialization complete with authenticated user');
           } else {
+            console.log('🚫 Auth Store - No user session found, setting unauthenticated state');
             set({
               user: null,
               session: null,
@@ -226,9 +246,10 @@ export const useAuthStore = create<AuthStore>()(
               isInitialized: true,
               isLoading: false
             });
+            console.log('✅ Auth Store - Initialization complete without user');
           }
         } catch (error) {
-          console.error('Auth initialization error:', error);
+          console.error('💥 Auth Store - Initialization error:', error);
           set({
             user: null,
             session: null,
@@ -237,6 +258,7 @@ export const useAuthStore = create<AuthStore>()(
             isLoading: false,
             error: 'Failed to initialize authentication'
           });
+          console.log('❌ Auth Store - Initialization failed, error state set');
         }
       }
     }),
@@ -257,58 +279,86 @@ export const useAuthStore = create<AuthStore>()(
 let authListenerInitialized = false;
 
 export const initializeAuthListener = () => {
+  console.log('🎧 Auth Store - initializeAuthListener called');
+  
   if (authListenerInitialized) {
+    console.log('✅ Auth Store - Auth listener already initialized, skipping');
     return;
   }
 
+  console.log('🚀 Auth Store - Setting up auth state change listener');
   authListenerInitialized = true;
 
   supabase.auth.onAuthStateChange(async (event, session) => {
     const store = useAuthStore.getState();
     
-    console.log('Auth state change:', event, session?.user?.email);
+    console.log('🔄 Auth Store - Auth state change detected:', {
+      event,
+      hasSession: !!session,
+      hasUser: !!session?.user,
+      userId: session?.user?.id,
+      userEmail: session?.user?.email,
+      currentStoreUser: store.user?.id
+    });
 
     switch (event) {
       case 'SIGNED_IN':
+        console.log('✅ Auth Store - SIGNED_IN event processing');
         if (session?.user) {
+          console.log('👤 Auth Store - Transforming user for SIGNED_IN');
           const user = transformSupabaseUser(session.user, session);
+          console.log('📝 Auth Store - Setting user and session in store');
           store.setUser(user);
           store.setSession(session);
           store.clearError();
+          console.log('✅ Auth Store - SIGNED_IN processing complete');
+        } else {
+          console.warn('⚠️ Auth Store - SIGNED_IN event but no user in session');
         }
         break;
 
       case 'SIGNED_OUT':
+        console.log('🚪 Auth Store - SIGNED_OUT event processing');
         store.setUser(null);
         store.setSession(null);
         store.clearError();
+        console.log('✅ Auth Store - SIGNED_OUT processing complete');
         break;
 
       case 'TOKEN_REFRESHED':
+        console.log('🔄 Auth Store - TOKEN_REFRESHED event processing');
         if (session?.user) {
           const user = transformSupabaseUser(session.user, session);
           store.setUser(user);
           store.setSession(session);
+          console.log('✅ Auth Store - TOKEN_REFRESHED processing complete');
+        } else {
+          console.warn('⚠️ Auth Store - TOKEN_REFRESHED event but no user in session');
         }
         break;
 
       case 'USER_UPDATED':
+        console.log('👤 Auth Store - USER_UPDATED event processing');
         if (session?.user) {
           const user = transformSupabaseUser(session.user, session);
           store.setUser(user);
           store.setSession(session);
+          console.log('✅ Auth Store - USER_UPDATED processing complete');
+        } else {
+          console.warn('⚠️ Auth Store - USER_UPDATED event but no user in session');
         }
         break;
 
       case 'PASSWORD_RECOVERY':
-        // Handle password recovery if needed
-        console.log('Password recovery event detected');
+        console.log('🔑 Auth Store - PASSWORD_RECOVERY event detected');
         break;
 
       default:
-        console.log('Unhandled auth event:', event);
+        console.log('❓ Auth Store - Unhandled auth event:', event);
     }
   });
+  
+  console.log('✅ Auth Store - Auth state change listener setup complete');
 };
 
 /**

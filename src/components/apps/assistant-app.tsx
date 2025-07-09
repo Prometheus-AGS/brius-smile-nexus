@@ -11,8 +11,11 @@ import { Bot, BarChart3, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AssistantChat } from '@/components/assistant-ui';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
+import { ChatHistorySidebar } from '@/components/assistant/chat-history-sidebar';
+import { ChatHistoryToggle } from '@/components/assistant/chat-history-toggle';
 import { useDashboardActions, useDashboardData } from '@/stores/dashboard-store';
 import { useChatActions } from '@/stores/chat-store';
+import { useChatSidebar } from '@/hooks/use-chat-sidebar';
 import { useAuth } from '@/hooks/use-auth';
 import type { AssistantError, AssistantMessage, AssistantThread } from '@/types/assistant';
 
@@ -30,6 +33,19 @@ const AssistantAppInner: React.FC = () => {
   
   // Chat store integration
   const { loadHistory } = useChatActions();
+  
+  // Chat sidebar integration with debugging
+  const { isOpen: sidebarOpen, toggleSidebar } = useChatSidebar();
+  
+  // Debug logging for sidebar state
+  useEffect(() => {
+    console.log('[AssistantApp] Sidebar state changed:', {
+      sidebarOpen,
+      timestamp: new Date().toISOString(),
+      screenWidth: window.innerWidth,
+      isMobile: window.innerWidth < 768
+    });
+  }, [sidebarOpen]);
 
   // Debug logging for user authentication state
   useEffect(() => {
@@ -92,97 +108,111 @@ const AssistantAppInner: React.FC = () => {
         transition={{ duration: 0.5 }}
         className="flex-1 flex flex-col"
       >
-        <Card className="flex-1 flex flex-col">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="font-display font-medium flex items-center gap-2">
-                <Bot className="h-5 w-5 text-brius-primary" />
-                Business Intelligence Assistant
-              </CardTitle>
-              
-              {/* Dashboard Status and Controls */}
-              <div className="flex items-center gap-2">
-                {currentDashboard && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <BarChart3 className="h-4 w-4" />
-                    <span>Dashboard: {currentDashboard.title}</span>
-                    {currentDashboard.lastUpdated && (
-                      <span className="text-xs">
-                        Updated: {new Date(currentDashboard.lastUpdated).toLocaleTimeString()}
-                      </span>
+        <div className="flex-1 flex relative">
+          {/* Chat History Sidebar */}
+          <ChatHistorySidebar />
+          
+          {/* Main Content Area */}
+          <div className={`flex-1 flex flex-col transition-all duration-300 ease-in-out ${
+            sidebarOpen ? 'ml-80' : 'ml-0'
+          }`}>
+            <Card className="flex-1 flex flex-col">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="font-display font-medium flex items-center gap-2">
+                    <ChatHistoryToggle
+                      isOpen={sidebarOpen}
+                      onToggle={toggleSidebar}
+                    />
+                    <Bot className="h-5 w-5 text-brius-primary" />
+                    Business Intelligence Assistant
+                  </CardTitle>
+                  
+                  {/* Dashboard Status and Controls */}
+                  <div className="flex items-center gap-2">
+                    {currentDashboard && (
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <BarChart3 className="h-4 w-4" />
+                        <span>Dashboard: {currentDashboard.title}</span>
+                        {currentDashboard.lastUpdated && (
+                          <span className="text-xs">
+                            Updated: {new Date(currentDashboard.lastUpdated).toLocaleTimeString()}
+                          </span>
+                        )}
+                      </div>
                     )}
+                    
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleRefreshDashboard}
+                      disabled={dashboardLoading}
+                      className="flex items-center gap-1"
+                    >
+                      <RefreshCw className={`h-3 w-3 ${dashboardLoading ? 'animate-spin' : ''}`} />
+                      Refresh
+                    </Button>
+                  </div>
+                </div>
+            
+                {/* Dashboard Error Display */}
+                {dashboardError && (
+                  <div className="text-sm text-destructive bg-destructive/10 p-2 rounded">
+                    Dashboard Error: {dashboardError}
                   </div>
                 )}
                 
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleRefreshDashboard}
-                  disabled={dashboardLoading}
-                  className="flex items-center gap-1"
+                {/* Business Intelligence Context */}
+                {currentDashboard && (
+                  <div className="text-sm text-muted-foreground">
+                    Ask me about your business performance, analytics, and operational insights
+                  </div>
+                )}
+              </CardHeader>
+              
+              <CardContent className="flex-1 flex flex-col p-0">
+                {/* Main Assistant Chat Interface wrapped in its own error boundary */}
+                <ErrorBoundary
+                  showErrorDetails={process.env.NODE_ENV === 'development'}
+                  onError={(error, errorInfo) => {
+                    console.error('Assistant Chat Error:', error);
+                    console.error('Error Info:', errorInfo);
+                    
+                    // Log to error tracking service in production
+                    if (process.env.NODE_ENV === 'production') {
+                      // reportErrorToService(error, errorInfo, 'assistant-chat');
+                    }
+                  }}
+                  fallback={
+                    <div className="flex-1 flex items-center justify-center p-8">
+                      <Card className="w-full max-w-md">
+                        <CardHeader className="text-center">
+                          <CardTitle className="text-lg">Chat Temporarily Unavailable</CardTitle>
+                        </CardHeader>
+                        <CardContent className="text-center space-y-4">
+                          <p className="text-muted-foreground">
+                            The assistant chat is experiencing technical difficulties.
+                            Your dashboard data is still available above.
+                          </p>
+                          <Button
+                            onClick={() => window.location.reload()}
+                            className="w-full"
+                          >
+                            Reload Assistant
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  }
                 >
-                  <RefreshCw className={`h-3 w-3 ${dashboardLoading ? 'animate-spin' : ''}`} />
-                  Refresh
-                </Button>
-              </div>
-            </div>
-            
-            {/* Dashboard Error Display */}
-            {dashboardError && (
-              <div className="text-sm text-destructive bg-destructive/10 p-2 rounded">
-                Dashboard Error: {dashboardError}
-              </div>
-            )}
-            
-            {/* Business Intelligence Context */}
-            {currentDashboard && (
-              <div className="text-sm text-muted-foreground">
-                Ask me about your business performance, analytics, and operational insights
-              </div>
-            )}
-          </CardHeader>
-          
-          <CardContent className="flex-1 flex flex-col p-0">
-            {/* Main Assistant Chat Interface wrapped in its own error boundary */}
-            <ErrorBoundary
-              showErrorDetails={process.env.NODE_ENV === 'development'}
-              onError={(error, errorInfo) => {
-                console.error('Assistant Chat Error:', error);
-                console.error('Error Info:', errorInfo);
-                
-                // Log to error tracking service in production
-                if (process.env.NODE_ENV === 'production') {
-                  // reportErrorToService(error, errorInfo, 'assistant-chat');
-                }
-              }}
-              fallback={
-                <div className="flex-1 flex items-center justify-center p-8">
-                  <Card className="w-full max-w-md">
-                    <CardHeader className="text-center">
-                      <CardTitle className="text-lg">Chat Temporarily Unavailable</CardTitle>
-                    </CardHeader>
-                    <CardContent className="text-center space-y-4">
-                      <p className="text-muted-foreground">
-                        The assistant chat is experiencing technical difficulties. 
-                        Your dashboard data is still available above.
-                      </p>
-                      <Button 
-                        onClick={() => window.location.reload()} 
-                        className="w-full"
-                      >
-                        Reload Assistant
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </div>
-              }
-            >
-              <AssistantChat
-                className="flex-1"
-              />
-            </ErrorBoundary>
-          </CardContent>
-        </Card>
+                  <AssistantChat
+                    className="flex-1"
+                  />
+                </ErrorBoundary>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </motion.div>
     </div>
   );
