@@ -181,6 +181,43 @@ export interface CodeBlockProps {
 }
 
 /**
+ * Props for the SVG Renderer component
+ */
+export interface SVGRendererProps {
+  code: string;
+  title?: string;
+  className?: string;
+  onCopy?: (result: CopyResult) => void;
+  showControls?: boolean;
+  maxWidth?: string;
+  maxHeight?: string;
+}
+
+/**
+ * SVG validation result
+ */
+export interface SVGValidationResult {
+  isValid: boolean;
+  sanitizedSVG?: string;
+  errors?: string[];
+  warnings?: string[];
+  dimensions?: {
+    width: number;
+    height: number;
+  };
+}
+
+/**
+ * SVG renderer state
+ */
+export interface SVGRendererState {
+  isLoading: boolean;
+  error: string | null;
+  isFullscreen: boolean;
+  showCode: boolean;
+}
+
+/**
  * Props for the Mermaid Diagram component
  */
 export interface MermaidDiagramProps {

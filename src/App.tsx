@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 // Lazy load pages for better performance
 const Index = React.lazy(() => import("./pages/Index"));
 const LoginPage = React.lazy(() => import("./pages/login/index"));
+const SVGTestPage = React.lazy(() => import("./pages/svg-test"));
 const PortalLayout = React.lazy(() => import("./pages/portal/index"));
 const HomePage = React.lazy(() => import("./pages/portal/home"));
 const AssistantPage = React.lazy(() => import("./pages/portal/assistant"));
@@ -66,6 +67,7 @@ const App: React.FC = () => (
             {/* Public Routes */}
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/svg-test" element={<SVGTestPage />} />
             
             {/* Protected Portal Routes with Nested Routing */}
             <Route path="/portal" element={<PortalLayout />}>

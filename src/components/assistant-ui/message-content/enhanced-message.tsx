@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { MessageCopyButton } from './copy-button';
 import { CodeBlock, InlineCode } from './code-block';
 import { MermaidDiagram } from './mermaid-diagram';
+import { SVGRenderer } from './svg-renderer';
 import { useClipboard } from '@/hooks/use-clipboard';
 import type { EnhancedMessageProps } from '@/types/assistant';
 import type { CopyResult } from '@/types/content-types';
@@ -35,6 +36,16 @@ const MarkdownComponents = {
     if (language === 'mermaid') {
       return (
         <MermaidDiagram
+          code={codeContent}
+          className="my-4"
+        />
+      );
+    }
+
+    // Handle SVG content
+    if (language === 'svg' || (language === '' && codeContent.trim().startsWith('<svg'))) {
+      return (
+        <SVGRenderer
           code={codeContent}
           className="my-4"
         />

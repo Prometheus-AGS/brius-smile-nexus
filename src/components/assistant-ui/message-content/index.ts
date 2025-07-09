@@ -15,6 +15,7 @@ export { default as EnhancedMessage, MessageActions } from './enhanced-message';
 // Specialized content components
 export { default as CodeBlock } from './code-block';
 export { default as MermaidDiagram } from './mermaid-diagram';
+export { default as SVGRenderer } from './svg-renderer';
 export { default as MessageCopyButton } from './copy-button';
 
 // Re-export types for convenience
@@ -23,6 +24,9 @@ export type {
   MessageActionsProps,
   CodeBlockProps,
   MermaidDiagramProps,
+  SVGRendererProps,
+  SVGValidationResult,
+  SVGRendererState,
   CopyButtonProps
 } from '../../../types/assistant';
 
