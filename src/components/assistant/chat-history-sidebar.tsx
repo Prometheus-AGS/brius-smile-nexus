@@ -29,6 +29,7 @@ export const ChatHistorySidebar = memo<ChatHistorySidebarProps>(({
   const { isOpen, setOpen, searchQuery, setSearchQuery, selectedCategory, setSelectedCategory } = useChatSidebar();
   const {
     threads,
+    messages,
     isLoading,
     error,
     activeThreadId,
@@ -75,10 +76,19 @@ export const ChatHistorySidebar = memo<ChatHistorySidebarProps>(({
   }, [createNewThread, setOpen]);
   
   const handleThreadSelect = useCallback((thread: Thread) => {
+    console.log('[DEBUG] ChatHistorySidebar: Thread selected', {
+      threadId: thread.id,
+      threadTitle: thread.title,
+      timestamp: new Date().toISOString()
+    });
+    
+    // First set the active thread in the store
     setActiveThreadId(thread.id);
-    if (window.innerWidth < 768) { // md breakpoint
+    
+    // Then close the sidebar after a brief delay to ensure state update
+    setTimeout(() => {
       setOpen(false);
-    }
+    }, 100);
   }, [setActiveThreadId, setOpen]);
 
   const handleDeleteThread = useCallback((threadId: string) => {
@@ -110,6 +120,7 @@ export const ChatHistorySidebar = memo<ChatHistorySidebarProps>(({
       <div className="flex-1 min-h-0">
         <ChatHistoryList
           items={filteredThreads}
+          messages={messages}
           onItemClick={handleThreadSelect}
           onDeleteItem={handleDeleteThread}
           onUpdateItem={handleUpdateThread}
@@ -131,7 +142,7 @@ export const ChatHistorySidebar = memo<ChatHistorySidebarProps>(({
           animate={{ x: 0 }}
           exit={{ x: '-100%' }}
           transition={{ type: 'spring', damping: 25, stiffness: 200, duration: 0.3 }}
-          className={`fixed left-0 top-0 z-50 h-full w-80 bg-background border-r border-border shadow-lg flex flex-col ${className}`}
+          className={`fixed left-0 top-0 z-50 h-full w-[420px] bg-background border-r border-border shadow-lg flex flex-col ${className}`}
           style={{ maxHeight }}
         >
           <ChatHistoryHeader />

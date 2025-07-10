@@ -60,6 +60,7 @@ export type LangfuseObservationType = 'SPAN' | 'GENERATION' | 'EVENT';
  */
 export interface LangfuseBaseMetadata {
   userId?: string;
+  userName?: string;
   sessionId?: string;
   tags?: string[];
   metadata?: Record<string, unknown>;

@@ -13,6 +13,24 @@ export interface User {
   email_verified?: boolean;
   created_at?: string;
   updated_at?: string;
+  // Supabase user metadata for compatibility
+  user_metadata?: {
+    name?: string;
+    full_name?: string;
+    display_name?: string;
+    role?: string;
+    company_id?: string;
+    permissions?: string[];
+    default_dashboard?: string;
+    refresh_interval?: number;
+    timezone?: string;
+    [key: string]: string | number | boolean | string[] | undefined;
+  };
+  app_metadata?: {
+    provider?: string;
+    providers?: string[];
+    [key: string]: string | number | boolean | string[] | undefined;
+  };
 }
 
 /**

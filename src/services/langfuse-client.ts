@@ -245,7 +245,10 @@ export class LangfuseClientServiceImpl implements LangfuseClientService {
         sessionId: params.sessionId,
         version: params.version,
         release: params.release,
-        metadata,
+        metadata: {
+          ...metadata,
+          userName: params.userName,
+        },
       });
 
       if (this.config?.debug) {
@@ -345,7 +348,10 @@ export class LangfuseClientServiceImpl implements LangfuseClientService {
         level: params.level,
         statusMessage: params.statusMessage,
         version: params.version,
-        metadata,
+        metadata: {
+          ...metadata,
+          userName: params.userName,
+        },
       });
 
       if (this.config?.debug) {
@@ -443,7 +449,10 @@ export class LangfuseClientServiceImpl implements LangfuseClientService {
         level: params.level,
         statusMessage: params.statusMessage,
         version: params.version,
-        metadata,
+        metadata: {
+          ...metadata,
+          userName: params.userName,
+        },
       });
 
       if (this.config?.debug) {

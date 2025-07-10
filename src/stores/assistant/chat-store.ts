@@ -1,9 +1,11 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
+import { createMastraClient, MastraClientWithContext } from '@/lib/mastra';
 import { MastraClient } from '@mastra/client-js';
 import { createClient } from '@supabase/supabase-js';
 import { getLangfuseConfig } from '@/lib/langfuse-config';
 import { getLangfuseClientService } from '@/services/langfuse-client';
+import type { User } from '@/types/auth';
 
 // Local storage-based interfaces with user_id for multi-user support
 export interface Thread {
@@ -31,7 +33,7 @@ interface ChatStoreState {
   isLoading: boolean;
   isStreaming: boolean;
   error: string | null;
-  mastraClient: MastraClient | null;
+  mastraClient: MastraClientWithContext | null;
   currentUser: { id: string; email?: string } | null;
   
   // Thread management actions
@@ -200,6 +202,7 @@ export const useChatStore = create<ChatStoreState>()(
             const deletedThreadIndex = threads.findIndex((t) => t.id === threadId);
             
             if (deletedThreadIndex === -1) {
+              console.log('[DEBUG] ChatStore: Thread not found for deletion', { threadId });
               return {};
             }
             
@@ -207,12 +210,26 @@ export const useChatStore = create<ChatStoreState>()(
             const updatedMessages = messages.filter((m) => m.thread_id !== threadId);
             let newActiveThreadId = activeThreadId;
             
+            // If we're deleting the currently active thread, select a new one
             if (activeThreadId === threadId) {
               if (updatedThreads.length > 0) {
-                const nextIndex = Math.max(0, deletedThreadIndex - 1);
+                // Try to select the next thread, or the previous one if we're at the end
+                let nextIndex = deletedThreadIndex;
+                if (nextIndex >= updatedThreads.length) {
+                  nextIndex = updatedThreads.length - 1;
+                }
                 newActiveThreadId = updatedThreads[nextIndex].id;
+                
+                console.log('[DEBUG] ChatStore: Selected new active thread after deletion', {
+                  deletedThreadId: threadId,
+                  newActiveThreadId,
+                  deletedIndex: deletedThreadIndex,
+                  selectedIndex: nextIndex,
+                  remainingThreads: updatedThreads.length
+                });
               } else {
                 newActiveThreadId = null;
+                console.log('[DEBUG] ChatStore: No threads remaining after deletion', { threadId });
               }
             }
             
@@ -357,13 +374,10 @@ export const useChatStore = create<ChatStoreState>()(
 
         // Mastra integration functions
         initializeMastra: async () => {
-          console.log('[DEBUG] ChatStore: Initializing Mastra client');
+          console.log('[DEBUG] ChatStore: Initializing enhanced Mastra client with user context');
           
           try {
             set({ isLoading: true, error: null });
-            
-            const baseUrl = import.meta.env.VITE_MASTRA_API_URL || 'http://localhost:4111';
-            const client = new MastraClient({ baseUrl });
             
             // Get current user from Supabase
             const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -375,6 +389,21 @@ export const useChatStore = create<ChatStoreState>()(
               const { data: { user } } = await supabase.auth.getUser();
               currentUser = user ? { id: user.id, email: user.email } : null;
             }
+
+            if (!currentUser) {
+              throw new Error('User not authenticated - cannot initialize Mastra client');
+            }
+            
+            // Create enhanced Mastra client with user context
+            const userForMastra: User = {
+              id: currentUser.id,
+              email: currentUser.email || '',
+              name: currentUser.email || 'Unknown User',
+              role: 'user',
+              permissions: [],
+            };
+            
+            const client = createMastraClient(userForMastra);
             
             set({ 
               mastraClient: client, 
@@ -382,12 +411,13 @@ export const useChatStore = create<ChatStoreState>()(
               isLoading: false 
             });
             
-            console.log('[DEBUG] ChatStore: Mastra client initialized successfully', {
-              baseUrl,
+            console.log('[DEBUG] ChatStore: Enhanced Mastra client initialized successfully', {
+              userId: currentUser.id,
+              userName: currentUser.email,
               hasUser: !!currentUser
             });
           } catch (error) {
-            console.error('[DEBUG] ChatStore: Failed to initialize Mastra client', error);
+            console.error('[DEBUG] ChatStore: Failed to initialize enhanced Mastra client', error);
             set({ 
               error: 'Failed to initialize chat client', 
               isLoading: false 
@@ -433,10 +463,14 @@ export const useChatStore = create<ChatStoreState>()(
             // Start Langfuse trace for BI observability
             if (isLangfuseEnabled && langfuseClient.isEnabled()) {
               try {
+                // Extract user name from various possible sources
+                const userName = state.currentUser.email?.split('@')[0] || 'Unknown User';
+                
                 traceId = await langfuseClient.createBITrace({
                   name: 'bi-assistant-chat',
                   input: { userMessage: content },
                   userId: state.currentUser.id,
+                  userName: userName,
                   sessionId: activeThreadId,
                   biContext: {
                     queryType: 'data_analysis',
@@ -449,6 +483,8 @@ export const useChatStore = create<ChatStoreState>()(
                   },
                   metadata: {
                     threadId: activeThreadId,
+                    userName: userName,
+                    userEmail: state.currentUser.email,
                     userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Unknown',
                     timestamp: new Date().toISOString(),
                   },
@@ -488,6 +524,8 @@ export const useChatStore = create<ChatStoreState>()(
             // Track BI query in Langfuse
             if (isLangfuseEnabled && traceId && langfuseClient.isEnabled()) {
               try {
+                const userName = state.currentUser.email?.split('@')[0] || 'Unknown User';
+                
                 await langfuseClient.createBISpan({
                   traceId,
                   name: 'bi-query-processing',
@@ -497,6 +535,7 @@ export const useChatStore = create<ChatStoreState>()(
                     agentId,
                     threadId: activeThreadId 
                   },
+                  userName: userName,
                   biContext: {
                     queryType: 'data_analysis',
                     dataSource: 'business_intelligence',
@@ -508,6 +547,8 @@ export const useChatStore = create<ChatStoreState>()(
                   },
                   metadata: {
                     agentId,
+                    userName: userName,
+                    userEmail: state.currentUser.email,
                     processingStartTime: startTime,
                   },
                 });
@@ -568,12 +609,19 @@ export const useChatStore = create<ChatStoreState>()(
                 
                 // Track streaming error in Langfuse
                 if (isLangfuseEnabled && traceId && langfuseClient.isEnabled()) {
+                  const userName = state.currentUser.email?.split('@')[0] || 'Unknown User';
+                  
                   langfuseClient.trackError({
                     traceId,
                     error: error instanceof Error ? error : new Error('Streaming error'),
                     severity: 'medium',
                     category: 'system',
-                    context: { threadId: activeThreadId, assistantMessageId },
+                    context: { 
+                      threadId: activeThreadId, 
+                      assistantMessageId,
+                      userName: userName,
+                      userEmail: state.currentUser.email,
+                    },
                     userImpact: 'Chat response interrupted',
                     recoveryAction: 'User can retry the message',
                   }).catch(console.error);
@@ -586,6 +634,8 @@ export const useChatStore = create<ChatStoreState>()(
             // End Langfuse trace with success
             if (isLangfuseEnabled && traceId && langfuseClient.isEnabled()) {
               try {
+                const userName = state.currentUser.email?.split('@')[0] || 'Unknown User';
+                
                 await langfuseClient.updateTrace(traceId, {
                   output: { 
                     response: fullContent,
@@ -594,6 +644,8 @@ export const useChatStore = create<ChatStoreState>()(
                     messageCount: fullContent.length,
                   },
                   metadata: {
+                    userName: userName,
+                    userEmail: state.currentUser.email,
                     processingTime,
                     responseLength: fullContent.length,
                     completedAt: new Date().toISOString(),
@@ -618,6 +670,8 @@ export const useChatStore = create<ChatStoreState>()(
             // Track error in Langfuse
             if (isLangfuseEnabled && traceId && langfuseClient.isEnabled()) {
               try {
+                const userName = state.currentUser.email?.split('@')[0] || 'Unknown User';
+                
                 await langfuseClient.trackError({
                   traceId,
                   error: error instanceof Error ? error : new Error('Unknown error'),
@@ -625,6 +679,8 @@ export const useChatStore = create<ChatStoreState>()(
                   category: 'business_logic',
                   context: { 
                     userMessage: content,
+                    userName: userName,
+                    userEmail: state.currentUser.email,
                     processingTime,
                     threadId: threadId || state.activeThreadId,
                   },
@@ -637,6 +693,12 @@ export const useChatStore = create<ChatStoreState>()(
                     error: (error as Error).message,
                     success: false,
                     processingTime,
+                  },
+                  metadata: {
+                    userName: userName,
+                    userEmail: state.currentUser.email,
+                    processingTime,
+                    errorOccurredAt: new Date().toISOString(),
                   },
                 });
                 

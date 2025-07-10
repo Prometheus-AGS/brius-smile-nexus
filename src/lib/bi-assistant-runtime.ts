@@ -11,7 +11,8 @@ import {
   type AppendMessage,
   type AssistantRuntime
 } from '@assistant-ui/react';
-import { useMastraChat } from '@/hooks/use-mastra-chat';
+import { useMastraChatWithLangfuse } from '@/hooks/use-mastra-chat-with-langfuse';
+import { useChatStore } from '@/stores/assistant/chat-store';
 import type {
   BIMessage,
   BIThread,
@@ -33,7 +34,10 @@ export function useBIAssistantRuntime(config: BIRuntimeConfig = {}) {
     mastraConfig
   } = config;
 
-  // Use existing Mastra chat hook
+  // Get mastraClient from store
+  const mastraClient = useChatStore(state => state.mastraClient);
+
+  // Use Langfuse-enabled Mastra chat hook
   const {
     messages,
     threads,
@@ -48,7 +52,7 @@ export function useBIAssistantRuntime(config: BIRuntimeConfig = {}) {
     deleteThread,
     clearError,
     initialize
-  } = useMastraChat();
+  } = useMastraChatWithLangfuse(mastraClient);
 
   // State for assistant-ui integration
   const [isRunning, setIsRunning] = useState(false);
@@ -58,10 +62,9 @@ export function useBIAssistantRuntime(config: BIRuntimeConfig = {}) {
    * Initialize the runtime on mount
    */
   useEffect(() => {
-    if (!client) {
-      initialize(mastraConfig).catch(console.error);
-    }
-  }, [client, initialize, mastraConfig]);
+    // The useMastraChat hook handles initialization automatically
+    // No manual initialization needed
+  }, []);
 
   /**
    * Generate current date context for business intelligence queries
@@ -202,33 +205,31 @@ USER QUERY: ${content}
       // Create thread if none exists
       let threadId = currentThreadId;
       if (!threadId) {
-        threadId = await createThread('Business Intelligence Analysis');
+        threadId = await createThread({ title: 'Business Intelligence Analysis' });
       }
 
       // Enhance the prompt with BI context
       const enhancedPrompt = adaptPromptForBI(textContent);
 
-      const config: BISendMessageConfig = {
+      // Send the enhanced prompt using the Mastra chat hook
+      await sendMessage({
         content: enhancedPrompt,
         threadId,
         resourceId,
-        businessContext: getCurrentDateContext(),
         metadata: {
           agentId,
           timestamp: new Date().toISOString(),
           originalQuery: textContent,
           analysisType: 'general'
         }
-      };
-
-      await sendMessage(config);
+      });
     } catch (err) {
       console.error('Failed to send BI message:', err);
     } finally {
       setIsRunning(false);
       abortControllerRef.current = null;
     }
-  }, [currentThreadId, createThread, agentId, resourceId, adaptPromptForBI, getCurrentDateContext, sendMessage, isLoading, isStreaming]);
+  }, [currentThreadId, createThread, adaptPromptForBI, sendMessage, agentId, resourceId, isLoading, isStreaming]);
 
   /**
    * Convert messages to ThreadMessageLike format
@@ -283,7 +284,11 @@ USER QUERY: ${content}
     
     // Enhanced state
     messages: biMessages,
-    threads: threads as BIThread[],
+    threads: threads.map(thread => ({
+      ...thread,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    })) as BIThread[],
     currentThreadId,
     isLoading,
     isStreaming,
@@ -294,12 +299,12 @@ USER QUERY: ${content}
     // Enhanced actions
     sendMessage: handleNewMessage,
     createThread: async (title?: string) => {
-      return createThread(title || 'Business Intelligence Analysis');
+      return createThread({ title: title || 'Business Intelligence Analysis' });
     },
     switchThread,
     deleteThread,
     clearError,
-    initialize: () => initialize(mastraConfig),
+    initialize: () => Promise.resolve(),
     
     // BI-specific utilities
     getCurrentDateContext,

@@ -8,6 +8,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { MastraClient } from '@mastra/client-js';
+import type { MastraClientWithContext } from '@/lib/mastra';
 import { createClient, type User } from '@supabase/supabase-js';
 import type {
   UseAssistantChatReturn,
@@ -73,6 +74,7 @@ const getCurrentUser = async () => {
  * Provides comprehensive tracking of all BI assistant interactions
  */
 export function useMastraChatWithLangfuse(
+  mastraClientWithContext?: MastraClientWithContext | null,
   initialConfig?: MastraClientConfig
 ): UseAssistantChatReturn {
   // Langfuse integration
@@ -221,14 +223,24 @@ export function useMastraChatWithLangfuse(
         clientConfig.baseUrl = import.meta.env.VITE_MASTRA_API_URL || 'http://localhost:4111';
       }
 
-      console.log('🚀 Initializing Mastra Client:', {
-        baseUrl: clientConfig.baseUrl,
-        config: clientConfig
-      });
-
-      const mastraClient = new MastraClient({
-        baseUrl: clientConfig.baseUrl
-      });
+      // Use provided mastraClientWithContext or create a fallback
+      let mastraClient: MastraClient;
+      
+      if (mastraClientWithContext) {
+        console.log('🚀 Using provided Mastra Client with context:', {
+          hasUserContext: !!mastraClientWithContext.userContext,
+          userId: mastraClientWithContext.userContext?.userId
+        });
+        mastraClient = mastraClientWithContext.client;
+      } else {
+        console.log('🚀 Creating fallback Mastra Client:', {
+          baseUrl: clientConfig.baseUrl,
+          config: clientConfig
+        });
+        mastraClient = new MastraClient({
+          baseUrl: clientConfig.baseUrl
+        });
+      }
       
       setClient(mastraClient);
 
@@ -352,6 +364,7 @@ export function useMastraChatWithLangfuse(
       setIsLoading(false);
     }
   }, [
+    mastraClientWithContext,
     initialConfig, 
     createError, 
     user, 
@@ -829,12 +842,26 @@ Focus on business impact and ROI in your recommendations.`
         })
       );
 
+      // Create enhanced resource ID with user context for server-side logging
+      const enhancedBusinessContext = createBusinessContext();
+      const contextualResourceId = enhancedBusinessContext ? 
+        `${config.resourceId || user?.id || 'default'}|ctx:${Buffer.from(JSON.stringify({
+          userId: enhancedBusinessContext.userId,
+          userName: user?.user_metadata?.full_name || user?.email || 'Unknown User',
+          userRole: enhancedBusinessContext.userRole,
+          companyId: enhancedBusinessContext.companyId,
+          correlationId: traceId,
+          sessionId: `session-${Date.now()}`,
+          timestamp: new Date().toISOString()
+        })).toString('base64')}` :
+        config.resourceId || user?.id || 'default';
+
       // Send message to agent and stream response with performance tracking
       const response = await measureQueryPerformance(
         () => agent.stream({
           messages: contextualMessages,
           threadId: threadId,
-          resourceId: config.resourceId || user?.id || 'default',
+          resourceId: contextualResourceId,
         }),
         'agent-stream-response',
         traceId,

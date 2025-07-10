@@ -8,13 +8,14 @@ import { FixedSizeList as List } from 'react-window';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
-import { MessageSquare, Clock, Trash, Pencil } from 'lucide-react';
+import { MessageSquare, Clock, Trash, Pencil, Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import type { Thread } from '@/stores/assistant/chat-store';
+import type { Thread, Message } from '@/stores/assistant/chat-store';
 
 interface ChatHistoryListProps {
   items: Thread[];
+  messages: Message[];
   onItemClick: (item: Thread) => void;
   onDeleteItem: (threadId: string) => void;
   onUpdateItem: (threadId: string, updates: Partial<Thread>) => void;
@@ -28,9 +29,10 @@ interface ChatHistoryListProps {
 
 interface ChatHistoryItemProps {
   index: number;
-  style: React.CSSProperties;
+  style?: React.CSSProperties;
   data: {
     items: Thread[];
+    messages: Message[];
     onItemClick: (item: Thread) => void;
     onDeleteItem: (threadId: string) => void;
     onUpdateItem: (threadId: string, updates: Partial<Thread>) => void;
@@ -38,94 +40,221 @@ interface ChatHistoryItemProps {
   };
 }
 
-const ChatHistoryItem = memo<ChatHistoryItemProps>(({ index, style, data }) => {
-  const { items, onItemClick, onDeleteItem, onUpdateItem, selectedItemId } = data;
+const ChatHistoryItem = memo<ChatHistoryItemProps>(({ index, style = {}, data }) => {
+  const { items, messages, onItemClick, onDeleteItem, onUpdateItem, selectedItemId } = data;
   const item = items[index];
   const [isEditing, setIsEditing] = useState(false);
+  const [isHoveringTitle, setIsHoveringTitle] = useState(false);
   const [newTitle, setNewTitle] = useState(item.title);
+  const [originalTitle, setOriginalTitle] = useState(item.title);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Find the first user message for this thread to use as preview text
+  const firstUserMessage = useMemo(() => {
+    return messages.find(msg => msg.thread_id === item.id && msg.role === 'user');
+  }, [messages, item.id]);
 
   useEffect(() => {
     if (isEditing) {
       inputRef.current?.focus();
+      inputRef.current?.select();
     }
   }, [isEditing]);
 
-  const handleClick = useCallback(() => {
+  // Update local state when item title changes externally
+  useEffect(() => {
+    if (!isEditing) {
+      setNewTitle(item.title);
+      setOriginalTitle(item.title);
+    }
+  }, [item.title, isEditing]);
+
+  const handleItemClick = useCallback(() => {
+    // Only allow item selection when NOT in editing mode
     if (!isEditing) {
       onItemClick(item);
     }
   }, [item, onItemClick, isEditing]);
 
-  const handleUpdate = () => {
-    if (newTitle.trim() && newTitle.trim() !== item.title) {
-      onUpdateItem(item.id, { title: newTitle.trim() });
+  const handleStartEdit = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setOriginalTitle(item.title);
+    setNewTitle(item.title);
+    setIsEditing(true);
+  }, [item.title]);
+
+  const handleSaveEdit = useCallback(() => {
+    const trimmedTitle = newTitle.trim();
+    if (trimmedTitle && trimmedTitle !== originalTitle) {
+      onUpdateItem(item.id, { title: trimmedTitle });
     }
     setIsEditing(false);
-  };
+  }, [newTitle, originalTitle, onUpdateItem, item.id]);
+
+  const handleCancelEdit = useCallback(() => {
+    setNewTitle(originalTitle);
+    setIsEditing(false);
+  }, [originalTitle]);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSaveEdit();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      handleCancelEdit();
+    }
+  }, [handleSaveEdit, handleCancelEdit]);
+
+  const handleDeleteClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDeleteItem(item.id);
+  }, [onDeleteItem, item.id]);
 
   const isSelected = selectedItemId === item.id;
-  const previewText = item.title || 'No preview available';
+  // Use the first user message content as preview text, fallback to title if no message found
+  const previewText = firstUserMessage?.content || item.title || 'No preview available';
   const truncatedPreview = previewText.length > 100 ? `${previewText.substring(0, 100)}...` : previewText;
 
   return (
     <div style={style}>
       <div
         className={`
-          group p-3 mx-2 mb-2 rounded-lg border cursor-pointer transition-all duration-200
-          hover:bg-accent hover:border-accent-foreground/20
-          ${isSelected
-            ? 'bg-accent border-accent-foreground/30 shadow-sm'
-            : 'bg-background border-border'
+          group p-3 mx-2 mb-2 rounded-lg border transition-all duration-200
+          ${isEditing 
+            ? 'bg-accent/50 border-primary/50 shadow-sm cursor-default' 
+            : `cursor-pointer hover:bg-accent hover:border-accent-foreground/20 ${
+                isSelected
+                  ? 'bg-accent border-accent-foreground/30 shadow-sm'
+                  : 'bg-background border-border'
+              }`
           }
         `}
-        onClick={handleClick}
+        onClick={handleItemClick}
         role="button"
         tabIndex={0}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
+          if (!isEditing && (e.key === 'Enter' || e.key === ' ')) {
             e.preventDefault();
-            handleClick();
+            handleItemClick();
           }
         }}
         aria-label={`Chat: ${item.title}`}
       >
         <div className="flex items-start justify-between mb-2">
-          <div className="flex items-center space-x-2 flex-1 min-w-0">
+          <div className="flex items-center space-x-2 flex-1 min-w-0 pr-2">
             <MessageSquare className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+            
             {isEditing ? (
-              <Input
-                ref={inputRef}
-                value={newTitle}
-                onChange={(e) => setNewTitle(e.target.value)}
-                onBlur={handleUpdate}
-                onKeyDown={(e) => e.key === 'Enter' && handleUpdate()}
-                className='h-6 text-sm'
-                onClick={(e) => e.stopPropagation()}
-              />
+              <div className="flex items-center space-x-2 flex-1">
+                <Input
+                  ref={inputRef}
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="h-6 text-sm flex-1"
+                  onClick={(e) => e.stopPropagation()}
+                />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 hover:bg-green-100 hover:text-green-600 flex-shrink-0"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSaveEdit();
+                  }}
+                  title="Save changes"
+                >
+                  <Check className="h-3 w-3" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 hover:bg-red-100 hover:text-red-600 flex-shrink-0"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCancelEdit();
+                  }}
+                  title="Cancel editing"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
             ) : (
-              <h3 className="text-sm font-medium truncate flex-grow" title={item.title}>
-                {item.title}
-              </h3>
+              <div className="flex items-center flex-1 min-w-0">
+                {/* Edit button - shows on hover, positioned on the left */}
+                {isHoveringTitle && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-5 w-5 mr-1 opacity-80 hover:opacity-100 hover:bg-primary/10 hover:text-primary flex-shrink-0"
+                    onClick={handleStartEdit}
+                    title="Edit title"
+                  >
+                    <Pencil className="h-3 w-3" />
+                  </Button>
+                )}
+                
+                <div 
+                  className="flex-1 min-w-0"
+                  onMouseEnter={() => setIsHoveringTitle(true)}
+                  onMouseLeave={() => setIsHoveringTitle(false)}
+                >
+                  <h3 
+                    className={`text-sm font-medium truncate transition-colors duration-200 ${
+                      isHoveringTitle ? 'cursor-text text-primary' : 'cursor-pointer'
+                    }`}
+                    title={item.title}
+                    style={{
+                      display: '-webkit-box',
+                      WebkitLineClamp: 1,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      maxWidth: '100%'
+                    }}
+                  >
+                    {item.title}
+                  </h3>
+                </div>
+              </div>
             )}
           </div>
-          <div className="flex items-center space-x-1 text-xs text-muted-foreground ml-2">
+          
+          <div className="flex items-center space-x-1 text-xs text-muted-foreground ml-2 flex-shrink-0">
             <Clock className="h-3 w-3" />
             <span>{formatRelativeTime(new Date(item.created_at).getTime())}</span>
           </div>
         </div>
+        
         <div className="flex items-end justify-between">
-          <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed pr-2">
+          <p 
+            className="whitespace-pre-line text-xs text-muted-foreground leading-relaxed pr-2 flex-1"
+            style={{
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
+            }}
+          >
             {truncatedPreview}
           </p>
-          <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
-            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={(e) => { e.stopPropagation(); setIsEditing(true); }}>
-              <Pencil className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={(e) => { e.stopPropagation(); onDeleteItem(item.id); }}>
-              <Trash className="h-4 w-4" />
-            </Button>
-          </div>
+          
+          {/* Delete button - only show when not editing */}
+          {!isEditing && (
+            <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex-shrink-0">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-6 w-6 hover:bg-destructive/10 hover:text-destructive" 
+                onClick={handleDeleteClick}
+                title="Delete thread"
+              >
+                <Trash className="h-3 w-3" />
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -182,6 +311,7 @@ function formatRelativeTime(timestamp: number): string {
 
 export const ChatHistoryList = memo<ChatHistoryListProps>(({
   items,
+  messages,
   onItemClick,
   onDeleteItem,
   onUpdateItem,
@@ -194,11 +324,12 @@ export const ChatHistoryList = memo<ChatHistoryListProps>(({
 }) => {
   const listData = useMemo(() => ({
     items,
+    messages,
     onItemClick,
     onDeleteItem,
     onUpdateItem,
     selectedItemId,
-  }), [items, onItemClick, onDeleteItem, onUpdateItem, selectedItemId]);
+  }), [items, messages, onItemClick, onDeleteItem, onUpdateItem, selectedItemId]);
 
   if (error) {
     return (
@@ -244,9 +375,9 @@ export const ChatHistoryList = memo<ChatHistoryListProps>(({
           <ChatHistoryItem
             key={item.id}
             index={items.indexOf(item)}
-            style={{}}
             data={{
               items,
+              messages,
               onItemClick,
               onDeleteItem,
               onUpdateItem,
