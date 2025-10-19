@@ -1,73 +1,424 @@
-# Welcome to your Lovable project
+# Brius Smile Nexus - Mastra Business Intelligence Platform
 
-## Project info
+A production-ready **Mastra-based business intelligence web application** built with React 19, featuring AI-powered analytics, real-time dashboards, and comprehensive business intelligence capabilities with **full chat functionality**.
 
-**URL**: https://lovable.dev/projects/3571bba4-c3e4-44cf-92e8-12ef41528d1e
+## 🚀 Project Overview
 
-## How can I edit this code?
+**Brius Smile Nexus** is a modern business intelligence platform that leverages **Mastra v0.21.1** agents to provide intelligent analytics, automated reporting, and interactive dashboards. The application has evolved from a database migration tool into a sophisticated BI platform with AI-powered insights and real-time data visualization.
 
-There are several ways of editing your application.
+### Key Features
 
-**Use Lovable**
+- **🤖 AI-Powered Chat Interface**: Complete Mastra v0.21.1 business intelligence agent integration with chat history
+- **💬 Advanced Chat Operations**: Full message rendering, markdown support, and conversation management
+- **📊 Interactive Dashboards**: Real-time data visualization with customizable widgets
+- **📈 Advanced Reporting**: Automated report generation with multiple formats (JSON, CSV, PDF)
+- **🔍 Intelligent Insights**: AI-driven trend analysis, anomaly detection, and recommendations
+- **🎯 Business Intelligence**: Comprehensive analytics for healthcare and business operations
+- **🔐 Enterprise Security**: Supabase authentication with role-based access control
+- **📱 Responsive Design**: Modern UI built with shadcn/ui components and Tailwind CSS
+- **⚡ Real-time Updates**: Live data synchronization and streaming capabilities
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/3571bba4-c3e4-44cf-92e8-12ef41528d1e) and start prompting.
+## 🛠 Technology Stack
 
-Changes made via Lovable will be committed automatically to this repo.
+### Frontend Framework
+- **React 19** - Latest React with concurrent features and improved performance
+- **Vite 7** - Lightning-fast build tool with HMR and optimized bundling
+- **TypeScript** - Strict type safety with zero `any` usage
+- **Tailwind CSS** - Utility-first CSS framework for rapid UI development
 
-**Use your preferred IDE**
+### UI Components & Design
+- **shadcn/ui** - High-quality, accessible component library
+- **Lucide React** - Beautiful, customizable icons
+- **Framer Motion** - Smooth animations and transitions
+- **Recharts** - Powerful charting library for data visualization
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### State Management & Architecture
+- **Zustand** - Lightweight, scalable state management
+- **Hook-based Architecture** - Clean separation of concerns with custom hooks
+- **React Router 7** - Modern client-side routing
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### AI & Business Intelligence
+- **Mastra v0.21.1** - AI agent framework for business intelligence
+- **Custom BI Client** - Production-ready Mastra client with fallback support
+- **Streaming Support** - Real-time AI response streaming
+- **Multi-format Reports** - JSON, CSV, and PDF report generation
 
-Follow these steps:
+### Backend & Database
+- **Supabase** - PostgreSQL database with real-time subscriptions
+- **Row Level Security (RLS)** - Enterprise-grade data security
+- **Real-time Subscriptions** - Live data updates across the application
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Observability & Monitoring
+- **Langfuse** - LLM observability and analytics
+- **Structured Logging** - Comprehensive application monitoring
+- **Error Tracking** - Global error handling and reporting
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### Development & Build Tools
+- **Yarn 4.9.0** - Fast, reliable package management
+- **ESLint** - Code quality and consistency enforcement
+- **TypeScript Strict Mode** - Maximum type safety
+- **Vite Plugins** - Optimized development experience
 
-# Step 3: Install the necessary dependencies.
-npm i
+## 🏗 Architecture
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+### Component Architecture
+The application follows a **strict hook-based data orchestration pattern** where:
+
+- **Components** remain pure and focused solely on rendering
+- **Custom Hooks** handle all data loading, transformations, and side effects
+- **Zustand Stores** manage global state with proper TypeScript typing
+- **Services** provide clean interfaces to external systems
+
+```typescript
+// ✅ Correct Architecture Pattern
+const useBusinessData = () => {
+  const data = useBIStore(state => state.data);
+  const isLoading = useBIStore(state => state.isLoading);
+  const error = useBIStore(state => state.error);
+  const fetchData = useBIStore(state => state.fetchData);
+  
+  useEffect(() => {
+    if (!data) {
+      fetchData();
+    }
+  }, [data, fetchData]);
+  
+  return { data, isLoading, error, refetch: fetchData };
+};
+
+const BusinessDashboard = () => {
+  const { data, isLoading, error } = useBusinessData();
+  
+  if (isLoading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage error={error} />;
+  return <DashboardView data={data} />;
+};
 ```
 
-**Edit a file directly in GitHub**
+### Mastra Integration Architecture
+- **MastraBIClient** - Production-ready client with connection pooling and error handling
+- **Fallback Support** - Graceful degradation when Mastra service is unavailable
+- **Type-safe APIs** - Comprehensive TypeScript interfaces for all Mastra operations
+- **Streaming Support** - Real-time response streaming with chunk processing
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🚀 Getting Started
 
-**Use GitHub Codespaces**
+### Prerequisites
+- **Node.js 18+** - Latest LTS version recommended
+- **Yarn 4.9.0+** - Package manager (automatically managed via packageManager field)
+- **Mastra Agent Service** - Business intelligence agent (optional for development)
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Installation
 
-## What technologies are used for this project?
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd brius-smile-nexus
+   ```
 
-This project is built with:
+2. **Install dependencies**
+   ```bash
+   yarn install
+   ```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+3. **Configure environment variables**
+   ```bash
+   cp .env.example .env.local
+   ```
 
-## How can I deploy this project?
+   Update the following required variables:
+   ```env
+   # Supabase Configuration (Required)
+   VITE_SUPABASE_URL=your_supabase_project_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   
+   # Mastra Agent Configuration
+   VITE_MASTRA_BASE_URL=http://localhost:3000
+   VITE_MASTRA_AGENT_NAME=business-intelligence
+   VITE_MASTRA_API_KEY=your_mastra_api_key  # Optional for localhost
+   
+   # Langfuse Observability (Optional)
+   VITE_LANGFUSE_BASE_URL=https://langfuse.brius.com
+   VITE_LANGFUSE_PUBLIC_KEY=your_langfuse_public_key
+   VITE_LANGFUSE_SECRET_KEY=your_langfuse_secret_key
+   ```
 
-Simply open [Lovable](https://lovable.dev/projects/3571bba4-c3e4-44cf-92e8-12ef41528d1e) and click on Share -> Publish.
+4. **Start the development server**
+   ```bash
+   yarn dev
+   ```
 
-## Can I connect a custom domain to my Lovable project?
+   The application will be available at `http://localhost:5173`
 
-Yes, you can!
+### Connecting to Mastra Business Intelligence Agent
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+The application is designed to work with a **Mastra v0.21.1 business intelligence agent**. To set up the agent:
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+1. **Install Mastra CLI** (if not already installed)
+   ```bash
+   npm install -g @mastra/cli
+   ```
+
+2. **Create a business intelligence agent**
+   ```bash
+   mastra create agent business-intelligence
+   cd business-intelligence
+   ```
+
+3. **Configure the agent** for business intelligence operations
+   ```typescript
+   // agent.config.ts
+   export default {
+     name: 'business-intelligence',
+     capabilities: ['analytics', 'reporting', 'dashboard', 'streaming'],
+     // Add your specific BI configuration
+   };
+   ```
+
+4. **Start the Mastra agent service**
+   ```bash
+   mastra start --port 3000
+   ```
+
+The web application will automatically connect to the agent and provide full BI functionality.
+
+## 📊 Chat & BI Functionality Status
+
+### ✅ **READY FOR PRODUCTION** - Chat Operations
+
+#### **Complete Chat Interface**
+- **✅ MastraBIChat Component** - Full-featured chat interface with business intelligence context
+- **✅ Message Rendering** - Advanced markdown support with syntax highlighting
+- **✅ Chat History Management** - Complete conversation persistence and retrieval
+- **✅ Real-time Streaming** - Live response streaming with chunk processing
+- **✅ Error Handling** - Comprehensive error boundaries and user feedback
+- **✅ Loading States** - Proper loading indicators and status management
+
+#### **Advanced Markdown Extensions** 
+- **✅ Code Block Rendering** - Syntax highlighting with react-syntax-highlighter
+- **✅ Copy Functionality** - One-click copy for code blocks and messages
+- **✅ Mermaid Diagram Support** - Interactive diagram rendering
+- **✅ SVG Rendering** - Direct SVG content display
+- **✅ Table Support** - Formatted table rendering with GitHub Flavored Markdown
+- **✅ Enhanced Typography** - Proper heading, list, and paragraph styling
+
+#### **Business Intelligence Features**
+- **✅ BI-Specific Prompts** - Pre-configured business intelligence suggestions
+- **✅ Context Enhancement** - Automatic business context injection
+- **✅ Date Range Processing** - Smart date context for analytics queries
+- **✅ Industry Focus** - Dental brace manufacturing business context
+- **✅ Executive Insights** - Business-ready response formatting
+
+### ✅ **PRODUCTION-READY** - Core Infrastructure
+
+#### **Mastra Integration**
+- **✅ MastraBIClient Service** - Production-ready Mastra v0.21.1 client
+- **✅ Type-safe APIs** - Comprehensive TypeScript interfaces
+- **✅ Error Handling** - Robust error handling with retry logic
+- **✅ Fallback Support** - Graceful degradation when agent unavailable
+- **✅ Health Monitoring** - Agent health checks and status monitoring
+- **✅ Connection Management** - Automatic reconnection and connection pooling
+
+#### **State Management & Architecture**
+- **✅ useMastraBIAgent Hook** - Complete hook-based data orchestration
+- **✅ Zustand Integration** - Global state management with TypeScript
+- **✅ Custom Hooks** - Data orchestration hooks for all major features
+- **✅ Service Layer** - Clean interfaces to external systems
+- **✅ Feature Flags** - Runtime configuration management
+
+#### **UI/UX Implementation**
+- **✅ shadcn/ui Components** - Complete UI component library implementation
+- **✅ Responsive Design** - Mobile-first responsive layout
+- **✅ Theme Support** - Light/dark mode with proper styling
+- **✅ Accessibility** - ARIA compliance and keyboard navigation
+- **✅ Performance Optimization** - React.memo and code splitting
+
+### 🔧 **INTEGRATION REQUIREMENTS** - External Services
+
+#### **Required for Full Operation**
+- **🔧 Mastra Agent Service** - Business intelligence agent deployment
+  - Default: `http://localhost:3000`
+  - Agent name: `business-intelligence`
+  - Capabilities: `['analytics', 'reporting', 'dashboard', 'streaming']`
+
+- **🔧 Supabase Project** - Database and authentication configuration
+  - Required: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
+  - Features: Authentication, real-time subscriptions, RLS policies
+
+- **🔧 Langfuse Setup** - Optional observability platform
+  - LLM request/response monitoring
+  - Performance analytics and debugging
+  - Usage tracking and optimization
+
+#### **Environment Configuration**
+- **🔧 Production Environment Variables** - All required variables configured
+- **🔧 Build Optimization** - Production build configuration and deployment
+- **🔧 Security Configuration** - API keys, CORS, and security headers
+
+## 🎯 Usage Examples
+
+### Basic Chat Interaction
+```typescript
+import { MastraBIChat } from '@/components/assistant-ui/mastra-bi-chat';
+
+const ChatInterface = () => {
+  return (
+    <MastraBIChat
+      placeholder="Ask me about your business intelligence data..."
+      showSuggestions={true}
+      agentId="business-intelligence"
+      className="h-96"
+    />
+  );
+};
+```
+
+### Advanced Analytics Query
+```typescript
+import { useMastraBIAgent } from '@/hooks/use-mastra-bi-agent';
+
+const AnalyticsComponent = () => {
+  const { executeQuery, isLoading, error } = useMastraBIAgent();
+  
+  const handleAnalytics = async () => {
+    const result = await executeQuery({
+      id: 'analytics-1',
+      type: 'data_analysis',
+      query: 'Analyze patient trends for the last 30 days',
+      timeRange: {
+        start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+        end: new Date()
+      }
+    });
+    
+    console.log('Analytics Result:', result);
+  };
+  
+  return (
+    <Button onClick={handleAnalytics} disabled={isLoading}>
+      {isLoading ? 'Analyzing...' : 'Run Analytics'}
+    </Button>
+  );
+};
+```
+
+### Dashboard Loading
+```typescript
+const DashboardComponent = () => {
+  const { loadDashboard, isLoading } = useMastraBIAgent();
+  
+  useEffect(() => {
+    loadDashboard('main-dashboard').then(dashboard => {
+      console.log('Dashboard loaded:', dashboard);
+    });
+  }, [loadDashboard]);
+  
+  if (isLoading) return <DashboardSkeleton />;
+  return <DashboardView />;
+};
+```
+
+## 🔧 Development
+
+### Project Structure
+```
+src/
+├── components/          # React components
+│   ├── assistant-ui/   # AI assistant components (READY)
+│   │   ├── mastra-bi-chat.tsx        # Main chat interface
+│   │   ├── enhanced-message.tsx      # Advanced message rendering
+│   │   ├── message-content/          # Markdown extensions
+│   │   │   ├── code-block.tsx        # Code syntax highlighting
+│   │   │   ├── copy-button.tsx       # Copy functionality
+│   │   │   ├── mermaid-diagram.tsx   # Diagram rendering
+│   │   │   └── svg-renderer.tsx      # SVG support
+│   │   └── index.ts                  # Component exports
+│   └── ui/             # shadcn/ui components
+├── hooks/              # Custom React hooks (READY)
+│   ├── use-mastra-bi-agent.ts       # Main BI agent hook
+│   ├── use-clipboard.ts             # Copy functionality
+│   └── use-chat.ts                  # Chat state management
+├── services/           # External service integrations (READY)
+│   ├── mastra-bi-client.ts          # Mastra client service
+│   └── feature-flags.ts             # Feature flag management
+├── stores/             # Zustand state stores (READY)
+├── types/              # TypeScript type definitions (READY)
+└── lib/               # Utility functions (READY)
+```
+
+### Key Development Commands
+```bash
+# Development server
+yarn dev
+
+# Type checking
+yarn type-check
+
+# Linting
+yarn lint
+
+# Build for production
+yarn build
+
+# Preview production build
+yarn preview
+```
+
+### Code Quality Standards
+- **Strict TypeScript** - No `any` types, comprehensive interfaces
+- **Hook-based Architecture** - Components never directly access stores
+- **shadcn/ui Components** - Consistent UI component usage
+- **Error Boundaries** - Comprehensive error handling
+- **Performance Optimization** - React.memo, code splitting, lazy loading
+
+## 🚀 Production Deployment
+
+The application is production-ready and can be deployed to any modern hosting platform:
+
+### Recommended Deployment Platforms
+- **Vercel** - Optimized for React applications
+- **Netlify** - Static site hosting with serverless functions
+- **AWS Amplify** - Full-stack deployment with AWS integration
+- **Docker** - Containerized deployment (Dockerfile included)
+
+### Build Configuration
+```bash
+# Production build
+yarn build
+
+# Build outputs to dist/ directory
+# Optimized for modern browsers
+# Includes source maps and asset optimization
+```
+
+### Deployment Checklist
+- ✅ Environment variables configured
+- ✅ Mastra agent service deployed and accessible
+- ✅ Supabase project configured with proper RLS policies
+- ✅ Build optimization enabled
+- ✅ Error monitoring configured (optional Langfuse)
+
+## 📚 Documentation
+
+- **Architecture Decisions** - See `docs/` directory for detailed architectural documentation
+- **API Documentation** - TypeScript interfaces provide comprehensive API documentation
+- **Component Documentation** - shadcn/ui component documentation
+- **Mastra Integration** - See Mastra v0.21.1 documentation for agent configuration
+
+## 🤝 Contributing
+
+This project follows strict development standards:
+
+1. **TypeScript Strict Mode** - All code must be fully typed
+2. **Hook-based Architecture** - Follow established patterns
+3. **Component Standards** - Use shadcn/ui components consistently
+4. **Testing** - Write tests for new functionality
+5. **Documentation** - Update documentation for significant changes
+
+## 📄 License
+
+This project is proprietary software developed for Brius healthcare operations.
+
+---
+
+**Brius Smile Nexus** - Transforming healthcare operations through AI-powered business intelligence with complete chat functionality ready for production deployment.

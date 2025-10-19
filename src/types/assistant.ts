@@ -3,7 +3,7 @@
  * Defines interfaces for Mastra client integration and assistant chat functionality
  */
 
-import type { MastraClient } from '@mastra/client-js';
+
 import type {
   ParsedMessageContent,
   MessageActionsConfig,
@@ -12,14 +12,17 @@ import type {
   CopyResult
 } from './content-types';
 
+
 /**
  * Configuration for initializing the Mastra client
  */
-export interface MastraClientConfig {
+export interface AIClientConfig {
   baseUrl?: string;
-  retries?: number;
-  backoffMs?: number;
-  maxBackoffMs?: number;
+  apiKey?: string;
+  model?: string;
+  maxRetries?: number;
+  timeout?: number;
+  debug?: boolean;
 }
 
 /**
@@ -67,13 +70,19 @@ export interface SendMessageConfig {
 }
 
 /**
- * Response from the Mastra agent
+ * Response from the AI agent (replaces Mastra AgentResponse)
  */
 export interface AgentResponse {
   id: string;
   content: string;
   timestamp: Date;
   metadata?: Record<string, unknown>;
+  usage?: {
+    prompt_tokens: number;
+    completion_tokens: number;
+    total_tokens: number;
+  };
+  tool_calls?: Record<string, unknown>[]; // TODO: Replace with proper Mastra tool call types
 }
 
 /**
@@ -96,7 +105,7 @@ export interface AssistantChatState {
   isLoading: boolean;
   isStreaming: boolean;
   error: AssistantError | null;
-  client: MastraClient | null;
+  client: unknown | null; // Will be properly typed when we refactor the store
 }
 
 /**
@@ -108,7 +117,7 @@ export interface AssistantChatActions {
   switchThread: (threadId: string) => Promise<void>;
   deleteThread: (threadId: string) => Promise<void>;
   clearError: () => void;
-  initialize: (config?: MastraClientConfig) => Promise<void>;
+  initialize: (config?: AIClientConfig) => Promise<void>;
 }
 
 /**
@@ -361,7 +370,7 @@ export interface BIRuntimeConfig {
   agentId?: string;
   resourceId?: string;
   businessContext?: BusinessIntelligenceContext;
-  mastraConfig?: MastraClientConfig;
+  aiClientConfig?: AIClientConfig;
 }
 
 /**

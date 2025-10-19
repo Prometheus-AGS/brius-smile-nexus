@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/database';
+import { interceptAuthError } from './auth-error-interceptor';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -18,8 +19,16 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 /**
  * Supabase client instance with proper TypeScript typing
+ * Using singleton pattern to prevent multiple instances
  */
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+let supabaseInstance: ReturnType<typeof createClient<Database>> | null = null;
+
+const createSupabaseClient = () => {
+  if (supabaseInstance) {
+    return supabaseInstance;
+  }
+
+  supabaseInstance = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
@@ -55,7 +64,12 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
       'X-Client-Info': 'brius-smile-nexus@1.0.0'
     }
   }
-});
+  });
+
+  return supabaseInstance;
+};
+
+export const supabase = createSupabaseClient();
 
 /**
  * Auth-specific utilities and configurations
@@ -100,14 +114,41 @@ export const authConfig = {
  */
 export const getCurrentSession = async () => {
   try {
+    console.log('🔍 Supabase - getCurrentSession called');
     const { data: { session }, error } = await supabase.auth.getSession();
     if (error) {
-      console.error('Error getting session:', error);
+      console.error('❌ Supabase - getCurrentSession error:', error);
+      
+      // Handle specific error types
+      if (error.message?.includes('server responded with a status of 500')) {
+        console.warn('⚠️ Supabase server error (500) - treating as no session');
+        return null;
+      }
+      
+      // Check if this is an auth error
+      if (interceptAuthError(error, 'Supabase getCurrentSession')) {
+        return null; // Auth error was handled
+      }
+      
       return null;
     }
+    console.log('✅ Supabase - getCurrentSession success:', !!session);
     return session;
   } catch (error) {
-    console.error('Failed to get current session:', error);
+    console.error('💥 Supabase - getCurrentSession failed:', error);
+    
+    // Handle network errors and server errors gracefully
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage.includes('500') || errorMessage.includes('server')) {
+      console.warn('⚠️ Supabase server/network error - treating as no session');
+      return null;
+    }
+    
+    // Check if this is an auth error
+    if (interceptAuthError(error, 'Supabase getCurrentSession Network')) {
+      return null; // Auth error was handled
+    }
+    
     return null;
   }
 };
@@ -134,14 +175,30 @@ export const getCurrentUser = async () => {
  */
 export const refreshSession = async () => {
   try {
+    console.log('🔄 Supabase - refreshSession called');
     const { data: { session }, error } = await supabase.auth.refreshSession();
     if (error) {
-      console.error('Error refreshing session:', error);
+      console.error('❌ Supabase - refreshSession error:', error);
+      
+      // Handle server errors gracefully
+      if (error.message?.includes('server responded with a status of 500')) {
+        console.warn('⚠️ Supabase server error (500) during refresh - session may be invalid');
+        return null;
+      }
+      
       return null;
     }
+    console.log('✅ Supabase - refreshSession success:', !!session);
     return session;
   } catch (error) {
-    console.error('Failed to refresh session:', error);
+    console.error('💥 Supabase - refreshSession failed:', error);
+    
+    // Handle network/server errors gracefully
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    if (errorMessage.includes('500') || errorMessage.includes('server')) {
+      console.warn('⚠️ Supabase server/network error during refresh');
+    }
+    
     return null;
   }
 };
@@ -167,18 +224,24 @@ export const signOut = async () => {
  */
 export const signInWithPassword = async (email: string, password: string) => {
   try {
+    console.log('🔍 Supabase - signInWithPassword called for:', email);
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email.trim().toLowerCase(),
       password
     });
     
     if (error) {
+      console.error('❌ Supabase - signInWithPassword error:', error);
+      
+      // Don't intercept login errors as auth failures (they're expected)
+      // Just throw the original error for proper login error handling
       throw error;
     }
     
+    console.log('✅ Supabase - signInWithPassword success');
     return data;
   } catch (error) {
-    console.error('Failed to sign in:', error);
+    console.error('💥 Supabase - signInWithPassword failed:', error);
     throw error;
   }
 };

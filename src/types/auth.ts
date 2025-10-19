@@ -13,6 +13,10 @@ export interface User {
   email_verified?: boolean;
   created_at?: string;
   updated_at?: string;
+  // Additional properties for agent server context
+  tier?: string;
+  language?: string;
+  organization?: string;
   // Supabase user metadata for compatibility
   user_metadata?: {
     name?: string;

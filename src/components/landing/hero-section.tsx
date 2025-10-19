@@ -8,6 +8,8 @@ interface HeroSectionProps {
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ onGetStartedClick }) => {
+  console.log('🎯 HeroSection - Rendering hero component');
+  
   return (
     <section className="bg-brius-gradient py-24 px-4">
       <div className="container mx-auto text-center">

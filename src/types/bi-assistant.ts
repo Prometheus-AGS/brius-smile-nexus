@@ -3,7 +3,6 @@
  * Extends existing assistant types with BI-specific state management
  */
 
-import type { MastraClient } from '@mastra/client-js';
 import type {
   BIMessage,
   BIThread,
@@ -11,9 +10,10 @@ import type {
   BISendMessageConfig,
   BIRuntimeConfig,
   AssistantError,
-  MastraClientConfig
+  AIClientConfig
 } from './assistant';
 import type { ChatHistoryEntry } from './business-intelligence';
+import type { MastraBIClient } from '@/services/mastra-bi-client';
 
 /**
  * Streaming state for real-time message updates
@@ -75,7 +75,7 @@ export interface MessageState {
  * Configuration state
  */
 export interface ConfigState {
-  mastraConfig: MastraClientConfig;
+  aiClientConfig: AIClientConfig;
   runtimeConfig: BIRuntimeConfig;
   businessContext: BusinessIntelligenceContext | null;
   agentId: string | null;
@@ -95,7 +95,7 @@ export interface BIAssistantState {
   config: ConfigState;
   
   // Global state
-  client: MastraClient | null;
+  client: MastraBIClient | null;
   error: AssistantError | null;
   initialized: boolean;
   version: string;
@@ -169,7 +169,7 @@ export interface MessageActions {
  */
 export interface ConfigActions {
   initialize: (config?: BIRuntimeConfig) => Promise<void>;
-  updateMastraConfig: (config: Partial<MastraClientConfig>) => void;
+  updateAIClientConfig: (config: Partial<AIClientConfig>) => void;
   updateRuntimeConfig: (config: Partial<BIRuntimeConfig>) => void;
   setBusinessContext: (context: BusinessIntelligenceContext | null) => void;
   setAgentId: (agentId: string | null) => void;
@@ -241,7 +241,7 @@ export interface BIAssistantSelectors {
   // Global selectors
   error: (state: BIAssistantState) => AssistantError | null;
   initialized: (state: BIAssistantState) => boolean;
-  client: (state: BIAssistantState) => MastraClient | null;
+  client: (state: BIAssistantState) => MastraBIClient | null;
 }
 
 /**

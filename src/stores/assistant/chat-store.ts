@@ -1,11 +1,8 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import { createMastraClient, MastraClientWithContext } from '@/lib/mastra';
-import { MastraClient } from '@mastra/client-js';
 import { createClient } from '@supabase/supabase-js';
 import { getLangfuseConfig } from '@/lib/langfuse-config';
 import { getLangfuseClientService } from '@/services/langfuse-client';
-import type { User } from '@/types/auth';
 
 // Local storage-based interfaces with user_id for multi-user support
 export interface Thread {
@@ -25,6 +22,17 @@ export interface Message {
   created_at: string;
 }
 
+// User context interface for agent server headers
+export interface UserContext {
+  id: string;
+  email?: string;
+  role?: string;
+  tier?: string;
+  language?: string;
+  organization?: string;
+  sessionId?: string;
+}
+
 interface ChatStoreState {
   // State
   threads: Thread[];
@@ -33,8 +41,8 @@ interface ChatStoreState {
   isLoading: boolean;
   isStreaming: boolean;
   error: string | null;
-  mastraClient: MastraClientWithContext | null;
-  currentUser: { id: string; email?: string } | null;
+  openaiClient: boolean;
+  currentUser: UserContext | null;
   
   // Thread management actions
   setActiveThreadId: (threadId: string | null) => void;
@@ -49,10 +57,13 @@ interface ChatStoreState {
   updateMessage: (messageId: string, updates: Partial<Message>) => void;
   deleteMessage: (messageId: string) => void;
   
-  // Mastra integration actions
-  initializeMastra: () => Promise<void>;
-  sendMessage: (content: string, threadId?: string) => Promise<void>;
+  // OpenAI integration actions
+  initializeOpenAI: () => Promise<void>;
   createNewChat: (userId: string) => Promise<string>;
+  
+  // User context management
+  getUserContextHeaders: () => Record<string, string>;
+  updateUserContext: (context: Partial<UserContext>) => void;
   
   // Utility actions
   createNewThread: () => void;
@@ -90,7 +101,7 @@ export const useChatStore = create<ChatStoreState>()(
         isLoading: false,
         isStreaming: false,
         error: null,
-        mastraClient: null,
+        openaiClient: false,
         currentUser: null,
 
         setActiveThreadId: (threadId) => {
@@ -372,52 +383,57 @@ export const useChatStore = create<ChatStoreState>()(
           set({ isStreaming: streaming });
         },
 
-        // Mastra integration functions
-        initializeMastra: async () => {
-          console.log('[DEBUG] ChatStore: Initializing enhanced Mastra client with user context');
+        // OpenAI integration functions
+        initializeOpenAI: async () => {
+          console.log('[DEBUG] ChatStore: Initializing OpenAI client with user context');
           
           try {
             set({ isLoading: true, error: null });
             
-            // Get current user from Supabase
+            // Get current user from Supabase with extended context
             const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
             const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
             
-            let currentUser = null;
+            let currentUser: UserContext | null = null;
             if (supabaseUrl && supabaseKey) {
               const supabase = createClient(supabaseUrl, supabaseKey);
               const { data: { user } } = await supabase.auth.getUser();
-              currentUser = user ? { id: user.id, email: user.email } : null;
+              
+              if (user) {
+                // Create user context with proper headers format for agent server
+                currentUser = {
+                  id: user.id,
+                  email: user.email || undefined,
+                  role: user.user_metadata?.role || 'user',
+                  tier: user.user_metadata?.tier || 'standard',
+                  language: user.user_metadata?.language || 'en',
+                  organization: user.user_metadata?.organization || 'default',
+                  sessionId: `session-${Date.now()}-${user.id}`,
+                };
+              }
             }
 
             if (!currentUser) {
-              throw new Error('User not authenticated - cannot initialize Mastra client');
+              throw new Error('User not authenticated - cannot initialize OpenAI client');
             }
             
-            // Create enhanced Mastra client with user context
-            const userForMastra: User = {
-              id: currentUser.id,
-              email: currentUser.email || '',
-              name: currentUser.email || 'Unknown User',
-              role: 'user',
-              permissions: [],
-            };
-            
-            const client = createMastraClient(userForMastra);
-            
+            // Initialize OpenAI client (will be handled by Vercel AI SDK)
             set({ 
-              mastraClient: client, 
+              openaiClient: true, 
               currentUser,
               isLoading: false 
             });
             
-            console.log('[DEBUG] ChatStore: Enhanced Mastra client initialized successfully', {
+            console.log('[DEBUG] ChatStore: OpenAI client initialized successfully', {
               userId: currentUser.id,
               userName: currentUser.email,
+              userRole: currentUser.role,
+              userTier: currentUser.tier,
+              userOrganization: currentUser.organization,
               hasUser: !!currentUser
             });
           } catch (error) {
-            console.error('[DEBUG] ChatStore: Failed to initialize enhanced Mastra client', error);
+            console.error('[DEBUG] ChatStore: Failed to initialize OpenAI client', error);
             set({ 
               error: 'Failed to initialize chat client', 
               isLoading: false 
@@ -434,8 +450,8 @@ export const useChatStore = create<ChatStoreState>()(
           
           const state = get();
           
-          if (!state.mastraClient) {
-            await get().initializeMastra();
+          if (!state.openaiClient) {
+            await get().initializeOpenAI();
           }
           
           if (!state.currentUser) {
@@ -505,129 +521,9 @@ export const useChatStore = create<ChatStoreState>()(
               content
             });
             
-            // Get available agents and send message
-            const agentsList = await state.mastraClient!.getAgents();
-            const agents = Array.isArray(agentsList) ? agentsList : [agentsList];
-            
-            if (!agents || agents.length === 0) {
-              throw new Error('No agents available');
-            }
-            
-            const firstAgent = agents[0];
-            const agentId = firstAgent.id || firstAgent.name || 'businessIntelligenceAgent';
-            const agent = state.mastraClient!.getAgent(agentId);
-            
-            // Generate assistant message ID but don't create the message yet
-            const assistantMessageId = generateId();
-            let assistantMessageCreated = false;
-
-            // Track BI query in Langfuse
-            if (isLangfuseEnabled && traceId && langfuseClient.isEnabled()) {
-              try {
-                const userName = state.currentUser.email?.split('@')[0] || 'Unknown User';
-                
-                await langfuseClient.createBISpan({
-                  traceId,
-                  name: 'bi-query-processing',
-                  startTime: new Date(),
-                  input: { 
-                    query: content,
-                    agentId,
-                    threadId: activeThreadId 
-                  },
-                  userName: userName,
-                  biContext: {
-                    queryType: 'data_analysis',
-                    dataSource: 'business_intelligence',
-                    businessContext: {
-                      department: 'operations',
-                      useCase: 'business_intelligence',
-                      priority: 'high',
-                    },
-                  },
-                  metadata: {
-                    agentId,
-                    userName: userName,
-                    userEmail: state.currentUser.email,
-                    processingStartTime: startTime,
-                  },
-                });
-              } catch (langfuseError) {
-                console.error('[DEBUG] ChatStore: Failed to track BI query', langfuseError);
-              }
-            }
-            
-            // Send message and stream response
-            const response = await agent.stream({
-              messages: [
-                {
-                  role: 'system',
-                  content: `You are a Business Intelligence Assistant for a service company. 
-                  Help business owners make data-driven decisions by analyzing trends, performance, and providing actionable insights.`
-                },
-                {
-                  role: 'user',
-                  content
-                }
-              ],
-              threadId: activeThreadId,
-              resourceId: state.currentUser.id
-            });
-            
-            // Process streaming response
-            let fullContent = '';
-            response.processDataStream({
-              onTextPart: (text: string) => {
-                // Preserve all characters including newlines and whitespace
-                fullContent += text;
-                
-                // Create assistant message on first text part
-                if (!assistantMessageCreated) {
-                  const assistantMessage = {
-                    id: assistantMessageId,
-                    thread_id: activeThreadId,
-                    user_id: state.currentUser.id,
-                    role: 'assistant' as const,
-                    content: fullContent, // Use fullContent to ensure proper accumulation
-                    created_at: getCurrentTimestamp(),
-                  };
-                  
-                  set((state) => ({
-                    messages: [...state.messages, assistantMessage],
-                    error: null,
-                  }));
-                  
-                  assistantMessageCreated = true;
-                } else {
-                  // Update existing message with accumulated content
-                  get().updateMessage(assistantMessageId, { content: fullContent });
-                }
-              },
-              onErrorPart: (error: unknown) => {
-                console.error('[DEBUG] ChatStore: Stream error', error);
-                set({ error: 'Streaming error occurred' });
-                
-                // Track streaming error in Langfuse
-                if (isLangfuseEnabled && traceId && langfuseClient.isEnabled()) {
-                  const userName = state.currentUser.email?.split('@')[0] || 'Unknown User';
-                  
-                  langfuseClient.trackError({
-                    traceId,
-                    error: error instanceof Error ? error : new Error('Streaming error'),
-                    severity: 'medium',
-                    category: 'system',
-                    context: { 
-                      threadId: activeThreadId, 
-                      assistantMessageId,
-                      userName: userName,
-                      userEmail: state.currentUser.email,
-                    },
-                    userImpact: 'Chat response interrupted',
-                    recoveryAction: 'User can retry the message',
-                  }).catch(console.error);
-                }
-              }
-            });
+            // Note: The actual AI response will be handled by the useOpenAIChat hook
+            // This store method is now simplified to just handle message persistence
+            console.log('[DEBUG] ChatStore: Message processing will be handled by useOpenAIChat hook');
 
             const processingTime = Date.now() - startTime;
 
@@ -638,16 +534,14 @@ export const useChatStore = create<ChatStoreState>()(
                 
                 await langfuseClient.updateTrace(traceId, {
                   output: { 
-                    response: fullContent,
-                    processingTime,
                     success: true,
-                    messageCount: fullContent.length,
+                    processingTime,
+                    messageAdded: true,
                   },
                   metadata: {
                     userName: userName,
                     userEmail: state.currentUser.email,
                     processingTime,
-                    responseLength: fullContent.length,
                     completedAt: new Date().toISOString(),
                   },
                 });
@@ -721,6 +615,32 @@ export const useChatStore = create<ChatStoreState>()(
           get().setActiveThreadId(newThread.id);
           
           return newThread.id;
+        },
+
+        // User context management for agent server headers
+        getUserContextHeaders: () => {
+          const state = get();
+          if (!state.currentUser) {
+            return {};
+          }
+
+          return {
+            'x-user-id': state.currentUser.id,
+            'x-user-role': state.currentUser.role || 'user',
+            'x-user-tier': state.currentUser.tier || 'standard',
+            'x-user-language': state.currentUser.language || 'en',
+            'x-organization': state.currentUser.organization || 'default',
+            'x-session-id': state.currentUser.sessionId || `session-${Date.now()}`,
+          };
+        },
+
+        updateUserContext: (context: Partial<UserContext>) => {
+          set((state) => ({
+            currentUser: state.currentUser ? {
+              ...state.currentUser,
+              ...context,
+            } : null,
+          }));
         },
       }),
       {

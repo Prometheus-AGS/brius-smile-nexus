@@ -1,6 +1,6 @@
 /**
  * Business Intelligence Assistant Runtime
- * Integrates Mastra client with assistant-ui's useExternalStoreRuntime
+ * Integrates OpenAI client with assistant-ui's useExternalStoreRuntime
  * Provides specialized BI functionality and context-aware prompts
  */
 
@@ -11,8 +11,9 @@ import {
   type AppendMessage,
   type AssistantRuntime
 } from '@assistant-ui/react';
-import { useMastraChatWithLangfuse } from '@/hooks/use-mastra-chat-with-langfuse';
+import { useOpenAIChat } from '@/hooks/use-openai-chat';
 import { useChatStore } from '@/stores/assistant/chat-store';
+import { useAuth } from '@/hooks/use-auth';
 import type {
   BIMessage,
   BIThread,
@@ -24,35 +25,30 @@ import type {
 
 /**
  * Custom hook that creates a Business Intelligence Assistant Runtime
- * Integrates with assistant-ui for optimal chat experience
+ * Integrates with assistant-ui for optimal chat experience using OpenAI
  */
 export function useBIAssistantRuntime(config: BIRuntimeConfig = {}) {
   const {
     agentId = import.meta.env.VITE_BUSINESS_INTELLIGENCE_NAME || 'business-intelligence',
     resourceId = 'default',
     businessContext,
-    mastraConfig
   } = config;
 
-  // Get mastraClient from store
-  const mastraClient = useChatStore(state => state.mastraClient);
+  // Get current user for OpenAI chat
+  const { user } = useAuth();
 
-  // Use Langfuse-enabled Mastra chat hook
+  // Use OpenAI chat hook instead of Mastra
+  const openaiChat = useOpenAIChat(user || undefined);
+
+  // Get chat store state
   const {
-    messages,
     threads,
-    currentThreadId,
+    messages: storeMessages,
+    activeThreadId: currentThreadId,
     isLoading,
     isStreaming,
-    error,
-    client,
-    sendMessage,
-    createThread,
-    switchThread,
-    deleteThread,
-    clearError,
-    initialize
-  } = useMastraChatWithLangfuse(mastraClient);
+    error: storeError,
+  } = useChatStore();
 
   // State for assistant-ui integration
   const [isRunning, setIsRunning] = useState(false);
@@ -62,7 +58,7 @@ export function useBIAssistantRuntime(config: BIRuntimeConfig = {}) {
    * Initialize the runtime on mount
    */
   useEffect(() => {
-    // The useMastraChat hook handles initialization automatically
+    // The useOpenAIChat hook handles initialization automatically
     // No manual initialization needed
   }, []);
 
@@ -204,66 +200,63 @@ USER QUERY: ${content}
 
       // Create thread if none exists
       let threadId = currentThreadId;
-      if (!threadId) {
-        threadId = await createThread({ title: 'Business Intelligence Analysis' });
+      if (!threadId && openaiChat.createNewThread) {
+        openaiChat.createNewThread();
+        threadId = openaiChat.activeThreadId;
       }
 
       // Enhance the prompt with BI context
       const enhancedPrompt = adaptPromptForBI(textContent);
 
-      // Send the enhanced prompt using the Mastra chat hook
-      await sendMessage({
-        content: enhancedPrompt,
-        threadId,
-        resourceId,
-        metadata: {
-          agentId,
-          timestamp: new Date().toISOString(),
-          originalQuery: textContent,
-          analysisType: 'general'
-        }
-      });
+      // Send the enhanced prompt using the OpenAI chat hook
+      if (openaiChat.sendMessage) {
+        await openaiChat.sendMessage(enhancedPrompt);
+      }
     } catch (err) {
       console.error('Failed to send BI message:', err);
     } finally {
       setIsRunning(false);
       abortControllerRef.current = null;
     }
-  }, [currentThreadId, createThread, adaptPromptForBI, sendMessage, agentId, resourceId, isLoading, isStreaming]);
+  }, [currentThreadId, adaptPromptForBI, openaiChat, isLoading, isStreaming]);
 
   /**
-   * Convert messages to ThreadMessageLike format
+   * Convert store messages to ThreadMessageLike format
    */
   const threadMessages = useMemo((): ThreadMessageLike[] => {
-    return messages.map(message => ({
-      id: message.id,
-      role: message.role,
-      content: Array.isArray(message.content) 
-        ? message.content 
-        : [{ type: 'text', text: message.content }],
-      metadata: {
-        custom: {}
-      },
-      createdAt: new Date()
-    }));
-  }, [messages]);
+    return storeMessages
+      .filter(msg => msg.thread_id === currentThreadId)
+      .map(message => ({
+        id: message.id,
+        role: message.role,
+        content: [{ type: 'text', text: message.content }],
+        metadata: {
+          custom: {}
+        },
+        createdAt: new Date(message.created_at)
+      }));
+  }, [storeMessages, currentThreadId]);
 
   /**
    * Convert messages to BI format for enhanced functionality
    */
   const biMessages = useMemo((): BIMessage[] => {
-    return messages.map(message => ({
-      ...message,
-      timestamp: new Date(message.created_at),
-      type: message.role === 'assistant' ? 'insight' : 'query',
-      businessContext: {
-        domain: 'dental-brace-manufacturing',
-        metrics: ['production', 'quality', 'financial', 'customer'],
-        timeframe: 'current',
-        confidence: message.role === 'assistant' ? 0.85 : undefined
-      }
-    }));
-  }, [messages]);
+    return storeMessages
+      .filter(msg => msg.thread_id === currentThreadId)
+      .map(message => ({
+        id: message.id,
+        role: message.role,
+        content: message.content,
+        timestamp: new Date(message.created_at),
+        type: message.role === 'assistant' ? 'insight' : 'query',
+        businessContext: {
+          domain: 'dental-brace-manufacturing',
+          metrics: ['production', 'quality', 'financial', 'customer'],
+          timeframe: 'current',
+          confidence: message.role === 'assistant' ? 0.85 : undefined
+        }
+      }));
+  }, [storeMessages, currentThreadId]);
 
   /**
    * Create assistant-ui runtime
@@ -286,24 +279,28 @@ USER QUERY: ${content}
     messages: biMessages,
     threads: threads.map(thread => ({
       ...thread,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      createdAt: new Date(thread.created_at),
+      updatedAt: new Date(thread.updated_at)
     })) as BIThread[],
     currentThreadId,
-    isLoading,
-    isStreaming,
+    isLoading: isLoading || openaiChat.isLoading,
+    isStreaming: isStreaming || openaiChat.isStreaming,
     isRunning,
-    error,
-    client,
+    error: storeError || openaiChat.error?.message || null,
+    client: openaiChat, // Return the OpenAI chat hook as the client
     
     // Enhanced actions
     sendMessage: handleNewMessage,
     createThread: async (title?: string) => {
-      return createThread({ title: title || 'Business Intelligence Analysis' });
+      if (openaiChat.createNewThread) {
+        openaiChat.createNewThread();
+        return openaiChat.activeThreadId || 'new-thread';
+      }
+      return 'new-thread';
     },
-    switchThread,
-    deleteThread,
-    clearError,
+    switchThread: openaiChat.switchThread,
+    deleteThread: openaiChat.deleteThread,
+    clearError: openaiChat.clearError,
     initialize: () => Promise.resolve(),
     
     // BI-specific utilities

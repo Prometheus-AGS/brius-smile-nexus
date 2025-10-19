@@ -1,10 +1,21 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart3, Package, Users, MessageSquare } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { BarChart3, Package, Users, MessageSquare, RefreshCw } from 'lucide-react';
+import { useMastraBIAgent } from '@/hooks/use-mastra-bi-agent';
 
-const stats = [
+interface DashboardStats {
+  title: string;
+  value: string;
+  change: string;
+  icon: React.ComponentType<{ className?: string }>;
+  color: string;
+}
+
+const defaultStats: DashboardStats[] = [
   {
     title: 'Active Orders',
     value: '247',
@@ -36,6 +47,73 @@ const stats = [
 ];
 
 export const HomeApp: React.FC = () => {
+  const { executeQuery, isLoading, error, clearError, checkHealth, isHealthy } = useMastraBIAgent();
+  const [stats, setStats] = useState<DashboardStats[]>(defaultStats);
+  const [agentResponse, setAgentResponse] = useState<string>('');
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+  /**
+   * Initialize home dashboard with agent data
+   */
+  const initializeDashboard = async () => {
+    try {
+      clearError();
+      
+      // First check agent health
+      await checkHealth();
+      
+      if (!isHealthy) {
+        console.warn('Agent is not healthy, using default data');
+        return;
+      }
+
+      // Request dashboard data from the agent
+      const dashboardQuery = {
+        id: `home-dashboard-${Date.now()}`,
+        type: 'dashboard_query' as const,
+        query: 'Provide current business intelligence summary for the home dashboard including active orders, patient counts, AI interactions, and recent reports. Include specific numbers and trends.',
+        parameters: {
+          dashboard_type: 'home_overview',
+          include_metrics: ['orders', 'patients', 'ai_interactions', 'reports'],
+          time_range: '30_days',
+        },
+        timeRange: {
+          start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
+          end: new Date(),
+        },
+        metrics: ['active_orders', 'patient_count', 'ai_interactions', 'reports_generated'],
+        dimensions: ['status', 'department', 'type'],
+      };
+
+      const result = await executeQuery(dashboardQuery);
+      
+      if (result && result.data) {
+        setAgentResponse(typeof result.data === 'string' ? result.data : JSON.stringify(result.data, null, 2));
+        setLastUpdated(new Date());
+        
+        // Try to extract metrics from the response if available
+        if (result.insights?.trends) {
+          console.log('Agent provided insights:', result.insights);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to initialize dashboard with agent data:', error);
+      // Keep using default stats on error
+    }
+  };
+
+  /**
+   * Refresh dashboard data
+   */
+  const refreshDashboard = () => {
+    initializeDashboard();
+  };
+
+  // Initialize dashboard on component mount
+  useEffect(() => {
+    initializeDashboard();
+  }, []);
+
   return (
     <div className="space-y-6">
       <motion.div
@@ -43,9 +121,60 @@ export const HomeApp: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h2 className="text-2xl font-display font-medium text-brius-black mb-6">
-          Operations Overview
-        </h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-display font-medium text-brius-black">
+            Operations Overview
+          </h2>
+          <div className="flex items-center space-x-2">
+            <div className={`w-2 h-2 rounded-full ${isHealthy ? 'bg-green-500' : 'bg-red-500'}`} />
+            <span className="text-sm text-brius-gray">
+              Agent: {isHealthy ? 'Connected' : 'Disconnected'}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={refreshDashboard}
+              disabled={isLoading}
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+          </div>
+        </div>
+
+        {/* Error Display */}
+        {error && (
+          <Alert className="mb-6">
+            <AlertDescription>
+              <strong>Agent Error:</strong> {error.message}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={clearError}
+                className="ml-2"
+              >
+                Dismiss
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Agent Response Display */}
+        {agentResponse && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="font-display font-medium">AI Business Intelligence Summary</CardTitle>
+              <CardDescription className="font-body">
+                {lastUpdated ? `Last updated: ${lastUpdated.toLocaleTimeString()}` : 'Real-time insights from your business intelligence agent'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-sm font-body whitespace-pre-wrap">
+                {agentResponse}
+              </div>
+            </CardContent>
+          </Card>
+        )}
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {stats.map((stat, index) => (

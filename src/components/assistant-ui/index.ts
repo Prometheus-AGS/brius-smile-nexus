@@ -8,6 +8,8 @@ export { Thread } from './thread';
 export { Message } from './message';
 export { Composer } from './composer';
 export { WelcomeSuggestions } from './welcome-suggestions';
+export { default as MastraBIChat } from './mastra-bi-chat';
+export { default as BIAssistantChat } from './bi-assistant-chat';
 
 // Re-export types for convenience
 export type {

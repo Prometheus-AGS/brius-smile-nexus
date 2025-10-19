@@ -9,6 +9,8 @@ interface LandingHeaderProps {
 }
 
 export const LandingHeader: React.FC<LandingHeaderProps> = ({ onLoginClick }) => {
+  console.log('🎯 LandingHeader - Rendering header component');
+  
   return (
     <motion.header 
       className="bg-white shadow-sm border-b border-brius-gray-light"

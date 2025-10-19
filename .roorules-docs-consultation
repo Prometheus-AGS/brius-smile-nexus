@@ -1,0 +1,80 @@
+# Roo Code Generation Rules - Documentation Consultation
+
+## Primary Documentation Consultation Rule
+
+**CRITICAL**: Before generating any code, ALWAYS consult the `docs/` directory markdown files to understand the project's architecture, specifications, and constraints.
+
+## Core Business Intelligence Agent Communication Rule
+
+**ABSOLUTE REQUIREMENT**: The client application must NEVER communicate directly with workflows. The ONLY job this application has is to communicate with the businessIntelligence agent. That is it.
+
+### Architecture Pattern to Follow
+```
+Web Application → Mastra Client → businessIntelligence Agent → [Agent handles workflows internally]
+```
+
+### Code Generation Guidelines
+
+1. **Always Check Documentation First**
+   - Read `docs/mastra-client-agent-communication-specification.md` for communication patterns
+   - Consult `docs/mastra-bi-agent-migration-plan.md` for migration context
+   - Review relevant docs in `docs/` subdirectories for specific features
+
+2. **Enforce BI Agent Communication Pattern**
+   - Generate code that ONLY communicates with the businessIntelligence agent
+   - Never create direct workflow API calls
+   - Never implement client-side business logic that belongs in the agent
+   - Always use the standard agent endpoints: `/api/agents/businessIntelligenceAgent/generate`
+
+3. **Forbidden Code Patterns**
+   ```typescript
+   // ❌ NEVER generate code like this:
+   const workflowResult = await mastraClient.executeWorkflow(question, context);
+   const directCall = await fetch('/api/workflows/someWorkflow');
+   ```
+
+4. **Required Code Patterns**
+   ```typescript
+   // ✅ ALWAYS generate code like this:
+   const response = await mastraClient.generate(messages, userContext, options);
+   ```
+
+5. **Documentation-Driven Development**
+   - Before writing any Mastra-related code, reference the communication specification
+   - Ensure all generated code follows the documented API patterns
+   - Maintain consistency with existing architectural decisions documented in `docs/`
+
+6. **Client Responsibilities (Only These)**
+   - Message formatting for the BI agent
+   - Context management and session information
+   - Error handling for network/auth issues
+   - Response processing and display
+   - User authentication management
+
+7. **Agent Responsibilities (Never Implement These on Client)**
+   - Business logic execution
+   - Workflow orchestration
+   - Data processing and analysis
+   - Tool management
+   - Response generation logic
+
+## Implementation Checklist
+
+When generating code that interacts with Mastra:
+
+- [ ] Consulted `docs/mastra-client-agent-communication-specification.md`
+- [ ] Verified code only communicates with businessIntelligence agent
+- [ ] No direct workflow calls implemented
+- [ ] Proper message formatting used
+- [ ] Error handling limited to client concerns only
+- [ ] Business logic delegated to the agent
+
+## Documentation Files to Always Consider
+
+- `docs/mastra-client-agent-communication-specification.md` - Core communication rules
+- `docs/mastra-bi-agent-migration-plan.md` - Migration context
+- `docs/mastra-production-deployment.md` - Production considerations
+- `docs/mastra-cors-troubleshooting.md` - CORS and connectivity issues
+- Any relevant files in `docs/` subdirectories
+
+This rule ensures all generated code maintains the proper separation of concerns and follows the established architecture patterns documented in the project.

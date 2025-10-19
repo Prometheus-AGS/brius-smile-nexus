@@ -18,7 +18,6 @@ export default defineConfig({
       allowedHeaders: "*"
     },
     allowedHosts: true, // Allow all hosts
-    proxy: {}, // Empty proxy to ensure Vite doesn't interfere with nginx
     hmr: {
       port: 8080, // Use same port as dev server
       host: 'localhost',

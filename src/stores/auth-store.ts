@@ -277,19 +277,26 @@ export const useAuthStore = create<AuthStore>()(
  * Set up Supabase auth state change listener
  */
 let authListenerInitialized = false;
+let authSubscription: { unsubscribe: () => void } | null = null;
 
 export const initializeAuthListener = () => {
   console.log('🎧 Auth Store - initializeAuthListener called');
   
-  if (authListenerInitialized) {
+  if (authListenerInitialized && authSubscription) {
     console.log('✅ Auth Store - Auth listener already initialized, skipping');
-    return;
+    return authSubscription;
+  }
+
+  // Clean up any existing subscription
+  if (authSubscription) {
+    console.log('🧹 Auth Store - Cleaning up existing auth listener');
+    authSubscription.unsubscribe();
   }
 
   console.log('🚀 Auth Store - Setting up auth state change listener');
   authListenerInitialized = true;
 
-  supabase.auth.onAuthStateChange(async (event, session) => {
+  const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
     const store = useAuthStore.getState();
     
     console.log('🔄 Auth Store - Auth state change detected:', {
@@ -353,21 +360,39 @@ export const initializeAuthListener = () => {
         console.log('🔑 Auth Store - PASSWORD_RECOVERY event detected');
         break;
 
+      case 'INITIAL_SESSION':
+        console.log('🚀 Auth Store - INITIAL_SESSION event processing');
+        if (session?.user) {
+          console.log('👤 Auth Store - Initial session has user, setting authenticated state');
+          const user = transformSupabaseUser(session.user, session);
+          store.setUser(user);
+          store.setSession(session);
+          store.clearError();
+          console.log('✅ Auth Store - INITIAL_SESSION processing complete with user');
+        } else {
+          console.log('🚫 Auth Store - Initial session has no user, setting unauthenticated state');
+          store.setUser(null);
+          store.setSession(null);
+          store.clearError();
+          console.log('✅ Auth Store - INITIAL_SESSION processing complete without user');
+        }
+        break;
+
       default:
         console.log('❓ Auth Store - Unhandled auth event:', event);
     }
   });
-  
+
+  authSubscription = subscription;
   console.log('✅ Auth Store - Auth state change listener setup complete');
+  return subscription;
 };
 
 /**
- * Initialize auth on store creation
+ * Initialize auth listener on store creation
+ * Note: Auth state initialization is handled by AppInitializer component
  */
 if (typeof window !== 'undefined') {
   // Initialize auth listener
   initializeAuthListener();
-  
-  // Initialize auth state
-  useAuthStore.getState().initialize();
 }
