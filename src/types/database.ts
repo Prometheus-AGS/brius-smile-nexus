@@ -1,4362 +1,2466 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
+/* eslint-disable */
+/* tslint:disable */
+// @ts-nocheck
+/*
+ * ---------------------------------------------------------------
+ * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
+ * ##                                                           ##
+ * ## AUTHOR: acacode                                           ##
+ * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
+ * ---------------------------------------------------------------
+ */
 
-export type Database = {
-  public: {
-    Tables: {
-      audit_log: {
-        Row: {
-          action: string
-          changed_data: Json | null
-          created_at: string | null
-          id: string
-          ip_address: unknown | null
-          previous_data: Json | null
-          record_id: string
-          table_name: string
-          user_agent: string | null
-          user_id: string | null
-        }
-        Insert: {
-          action: string
-          changed_data?: Json | null
-          created_at?: string | null
-          id?: string
-          ip_address?: unknown | null
-          previous_data?: Json | null
-          record_id: string
-          table_name: string
-          user_agent?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          action?: string
-          changed_data?: Json | null
-          created_at?: string | null
-          id?: string
-          ip_address?: unknown | null
-          previous_data?: Json | null
-          record_id?: string
-          table_name?: string
-          user_agent?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      brackets: {
-        Row: {
-          active: boolean | null
-          angulation: number | null
-          arch_type: string | null
-          base_shape: string | null
-          bracket_type: string
-          created_at: string | null
-          created_by: string | null
-          description: string | null
-          height_mm: number | null
-          id: string
-          legacy_bracket_id: number | null
-          legacy_project_id: number | null
-          manufacturer: string | null
-          material: string | null
-          metadata: Json | null
-          model_number: string | null
-          name: string
-          prescription: string | null
-          sku: string | null
-          slot_size: number | null
-          thickness_mm: number | null
-          tooth_position: string | null
-          torque: number | null
-          unit_cost: number | null
-          updated_at: string | null
-          width_mm: number | null
-        }
-        Insert: {
-          active?: boolean | null
-          angulation?: number | null
-          arch_type?: string | null
-          base_shape?: string | null
-          bracket_type?: string
-          created_at?: string | null
-          created_by?: string | null
-          description?: string | null
-          height_mm?: number | null
-          id?: string
-          legacy_bracket_id?: number | null
-          legacy_project_id?: number | null
-          manufacturer?: string | null
-          material?: string | null
-          metadata?: Json | null
-          model_number?: string | null
-          name: string
-          prescription?: string | null
-          sku?: string | null
-          slot_size?: number | null
-          thickness_mm?: number | null
-          tooth_position?: string | null
-          torque?: number | null
-          unit_cost?: number | null
-          updated_at?: string | null
-          width_mm?: number | null
-        }
-        Update: {
-          active?: boolean | null
-          angulation?: number | null
-          arch_type?: string | null
-          base_shape?: string | null
-          bracket_type?: string
-          created_at?: string | null
-          created_by?: string | null
-          description?: string | null
-          height_mm?: number | null
-          id?: string
-          legacy_bracket_id?: number | null
-          legacy_project_id?: number | null
-          manufacturer?: string | null
-          material?: string | null
-          metadata?: Json | null
-          model_number?: string | null
-          name?: string
-          prescription?: string | null
-          sku?: string | null
-          slot_size?: number | null
-          thickness_mm?: number | null
-          tooth_position?: string | null
-          torque?: number | null
-          unit_cost?: number | null
-          updated_at?: string | null
-          width_mm?: number | null
-        }
-        Relationships: []
-      }
-      case_files: {
-        Row: {
-          case_id: string
-          created_at: string | null
-          created_by: string | null
-          display_order: number | null
-          file_id: string
-          file_purpose: string | null
-          id: string
-          notes: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          case_id: string
-          created_at?: string | null
-          created_by?: string | null
-          display_order?: number | null
-          file_id: string
-          file_purpose?: string | null
-          id?: string
-          notes?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          case_id?: string
-          created_at?: string | null
-          created_by?: string | null
-          display_order?: number | null
-          file_id?: string
-          file_purpose?: string | null
-          id?: string
-          notes?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "case_files_case_id_fkey"
-            columns: ["case_id"]
-            isOneToOne: false
-            referencedRelation: "cases"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "case_files_file_id_fkey"
-            columns: ["file_id"]
-            isOneToOne: false
-            referencedRelation: "files"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      case_messages: {
-        Row: {
-          attachment_ids: Json | null
-          case_id: string
-          content: string
-          deleted: boolean | null
-          deleted_at: string | null
-          delivery_status: string | null
-          id: string
-          is_confidential: boolean | null
-          is_urgent: boolean | null
-          legacy_message_id: number | null
-          legacy_record_id: number | null
-          message_type: Database["public"]["Enums"]["case_message_type"]
-          metadata: Json | null
-          parent_message_id: string | null
-          priority: number | null
-          read_at: string | null
-          recipient_id: string | null
-          related_tooth_numbers: Json | null
-          requires_response: boolean | null
-          responded_at: string | null
-          scheduled_at: string | null
-          sender_id: string | null
-          sent_at: string | null
-          subject: string | null
-          tags: Json | null
-          thread_root_id: string | null
-          treatment_phase: string | null
-        }
-        Insert: {
-          attachment_ids?: Json | null
-          case_id: string
-          content: string
-          deleted?: boolean | null
-          deleted_at?: string | null
-          delivery_status?: string | null
-          id?: string
-          is_confidential?: boolean | null
-          is_urgent?: boolean | null
-          legacy_message_id?: number | null
-          legacy_record_id?: number | null
-          message_type: Database["public"]["Enums"]["case_message_type"]
-          metadata?: Json | null
-          parent_message_id?: string | null
-          priority?: number | null
-          read_at?: string | null
-          recipient_id?: string | null
-          related_tooth_numbers?: Json | null
-          requires_response?: boolean | null
-          responded_at?: string | null
-          scheduled_at?: string | null
-          sender_id?: string | null
-          sent_at?: string | null
-          subject?: string | null
-          tags?: Json | null
-          thread_root_id?: string | null
-          treatment_phase?: string | null
-        }
-        Update: {
-          attachment_ids?: Json | null
-          case_id?: string
-          content?: string
-          deleted?: boolean | null
-          deleted_at?: string | null
-          delivery_status?: string | null
-          id?: string
-          is_confidential?: boolean | null
-          is_urgent?: boolean | null
-          legacy_message_id?: number | null
-          legacy_record_id?: number | null
-          message_type?: Database["public"]["Enums"]["case_message_type"]
-          metadata?: Json | null
-          parent_message_id?: string | null
-          priority?: number | null
-          read_at?: string | null
-          recipient_id?: string | null
-          related_tooth_numbers?: Json | null
-          requires_response?: boolean | null
-          responded_at?: string | null
-          scheduled_at?: string | null
-          sender_id?: string | null
-          sent_at?: string | null
-          subject?: string | null
-          tags?: Json | null
-          thread_root_id?: string | null
-          treatment_phase?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "case_messages_case_id_fkey"
-            columns: ["case_id"]
-            isOneToOne: false
-            referencedRelation: "cases"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "case_messages_parent_message_id_fkey"
-            columns: ["parent_message_id"]
-            isOneToOne: false
-            referencedRelation: "case_messages"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "case_messages_thread_root_id_fkey"
-            columns: ["thread_root_id"]
-            isOneToOne: false
-            referencedRelation: "case_messages"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      case_states: {
-        Row: {
-          automated: boolean | null
-          case_id: string
-          changed_at: string | null
-          changed_by_id: string | null
-          current_state: Database["public"]["Enums"]["case_state_type"]
-          id: string
-          legacy_state_id: number | null
-          metadata: Json | null
-          notes: string | null
-          previous_state: Database["public"]["Enums"]["case_state_type"] | null
-          reason: string | null
-        }
-        Insert: {
-          automated?: boolean | null
-          case_id: string
-          changed_at?: string | null
-          changed_by_id?: string | null
-          current_state: Database["public"]["Enums"]["case_state_type"]
-          id?: string
-          legacy_state_id?: number | null
-          metadata?: Json | null
-          notes?: string | null
-          previous_state?: Database["public"]["Enums"]["case_state_type"] | null
-          reason?: string | null
-        }
-        Update: {
-          automated?: boolean | null
-          case_id?: string
-          changed_at?: string | null
-          changed_by_id?: string | null
-          current_state?: Database["public"]["Enums"]["case_state_type"]
-          id?: string
-          legacy_state_id?: number | null
-          metadata?: Json | null
-          notes?: string | null
-          previous_state?: Database["public"]["Enums"]["case_state_type"] | null
-          reason?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "case_states_case_id_fkey"
-            columns: ["case_id"]
-            isOneToOne: false
-            referencedRelation: "cases"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      cases: {
-        Row: {
-          actual_duration_months: number | null
-          bite_correction_method: string | null
-          case_name: string | null
-          case_number: string
-          cbct_available: boolean | null
-          chief_complaint: string | null
-          clinical_conditions: string | null
-          clinical_notes: string | null
-          complexity: Database["public"]["Enums"]["case_complexity_type"] | null
-          consultation_date: string | null
-          created_at: string | null
-          deleted: boolean | null
-          deleted_at: string | null
-          diagnosis_date: string | null
-          estimated_duration_months: number | null
-          extraction_compromise: boolean | null
-          id: string
-          impressions_available: boolean | null
-          is_comprehensive: boolean | null
-          legacy_instruction_id: number | null
-          legacy_patient_id: number | null
-          lower_teeth_treated: number | null
-          malocclusion_category: string | null
-          metadata: Json | null
-          office_id: string | null
-          patient_id: string
-          photos_available: boolean | null
-          primary_doctor_id: string
-          status: Database["public"]["Enums"]["case_status_type"] | null
-          treatment_end_date: string | null
-          treatment_notes: string | null
-          treatment_objective: string | null
-          treatment_start_date: string | null
-          updated_at: string | null
-          upper_teeth_treated: number | null
-        }
-        Insert: {
-          actual_duration_months?: number | null
-          bite_correction_method?: string | null
-          case_name?: string | null
-          case_number: string
-          cbct_available?: boolean | null
-          chief_complaint?: string | null
-          clinical_conditions?: string | null
-          clinical_notes?: string | null
-          complexity?:
-            | Database["public"]["Enums"]["case_complexity_type"]
-            | null
-          consultation_date?: string | null
-          created_at?: string | null
-          deleted?: boolean | null
-          deleted_at?: string | null
-          diagnosis_date?: string | null
-          estimated_duration_months?: number | null
-          extraction_compromise?: boolean | null
-          id?: string
-          impressions_available?: boolean | null
-          is_comprehensive?: boolean | null
-          legacy_instruction_id?: number | null
-          legacy_patient_id?: number | null
-          lower_teeth_treated?: number | null
-          malocclusion_category?: string | null
-          metadata?: Json | null
-          office_id?: string | null
-          patient_id: string
-          photos_available?: boolean | null
-          primary_doctor_id: string
-          status?: Database["public"]["Enums"]["case_status_type"] | null
-          treatment_end_date?: string | null
-          treatment_notes?: string | null
-          treatment_objective?: string | null
-          treatment_start_date?: string | null
-          updated_at?: string | null
-          upper_teeth_treated?: number | null
-        }
-        Update: {
-          actual_duration_months?: number | null
-          bite_correction_method?: string | null
-          case_name?: string | null
-          case_number?: string
-          cbct_available?: boolean | null
-          chief_complaint?: string | null
-          clinical_conditions?: string | null
-          clinical_notes?: string | null
-          complexity?:
-            | Database["public"]["Enums"]["case_complexity_type"]
-            | null
-          consultation_date?: string | null
-          created_at?: string | null
-          deleted?: boolean | null
-          deleted_at?: string | null
-          diagnosis_date?: string | null
-          estimated_duration_months?: number | null
-          extraction_compromise?: boolean | null
-          id?: string
-          impressions_available?: boolean | null
-          is_comprehensive?: boolean | null
-          legacy_instruction_id?: number | null
-          legacy_patient_id?: number | null
-          lower_teeth_treated?: number | null
-          malocclusion_category?: string | null
-          metadata?: Json | null
-          office_id?: string | null
-          patient_id?: string
-          photos_available?: boolean | null
-          primary_doctor_id?: string
-          status?: Database["public"]["Enums"]["case_status_type"] | null
-          treatment_end_date?: string | null
-          treatment_notes?: string | null
-          treatment_objective?: string | null
-          treatment_start_date?: string | null
-          updated_at?: string | null
-          upper_teeth_treated?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "cases_office_id_fkey"
-            columns: ["office_id"]
-            isOneToOne: false
-            referencedRelation: "offices"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "cases_patient_id_fkey"
-            columns: ["patient_id"]
-            isOneToOne: false
-            referencedRelation: "patients"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "cases_primary_doctor_id_fkey"
-            columns: ["primary_doctor_id"]
-            isOneToOne: false
-            referencedRelation: "doctors"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      categories: {
-        Row: {
-          created_at: string | null
-          display_order: number | null
-          id: string
-          legacy_category_id: number | null
-          name: string
-          parent_id: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          display_order?: number | null
-          id?: string
-          legacy_category_id?: number | null
-          name: string
-          parent_id?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          display_order?: number | null
-          id?: string
-          legacy_category_id?: number | null
-          name?: string
-          parent_id?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "categories_parent_id_fkey"
-            columns: ["parent_id"]
-            isOneToOne: false
-            referencedRelation: "categories"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      comments: {
-        Row: {
-          author_id: string | null
-          comment_type: Database["public"]["Enums"]["comment_type_enum"]
-          content: string
-          created_at: string | null
-          id: string
-          legacy_id: number | null
-          legacy_table: string | null
-          parent_comment_id: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          author_id?: string | null
-          comment_type: Database["public"]["Enums"]["comment_type_enum"]
-          content: string
-          created_at?: string | null
-          id?: string
-          legacy_id?: number | null
-          legacy_table?: string | null
-          parent_comment_id?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          author_id?: string | null
-          comment_type?: Database["public"]["Enums"]["comment_type_enum"]
-          content?: string
-          created_at?: string | null
-          id?: string
-          legacy_id?: number | null
-          legacy_table?: string | null
-          parent_comment_id?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "comments_parent_comment_id_fkey"
-            columns: ["parent_comment_id"]
-            isOneToOne: false
-            referencedRelation: "comments"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      courses: {
-        Row: {
-          course_type: number | null
-          created_at: string | null
-          customization: Json | null
-          id: string
-          legacy_id: number | null
-          name: string
-          updated_at: string | null
-        }
-        Insert: {
-          course_type?: number | null
-          created_at?: string | null
-          customization?: Json | null
-          id?: string
-          legacy_id?: number | null
-          name: string
-          updated_at?: string | null
-        }
-        Update: {
-          course_type?: number | null
-          created_at?: string | null
-          customization?: Json | null
-          id?: string
-          legacy_id?: number | null
-          name?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      customer_feedback: {
-        Row: {
-          assigned_to: string | null
-          created_at: string
-          customer_satisfied: boolean | null
-          description: string
-          discount_amount: number | null
-          feedback_type: Database["public"]["Enums"]["feedback_type"]
-          followup_completed: boolean | null
-          followup_date: string | null
-          id: string
-          legacy_record_id: number | null
-          regarding_order_id: string | null
-          regarding_patient_id: string | null
-          regarding_staff_id: string | null
-          requires_followup: boolean | null
-          resolution_notes: string | null
-          resolved_at: string | null
-          response_time_hours: number | null
-          resulted_in_discount: boolean | null
-          resulted_in_remake: boolean | null
-          severity: Database["public"]["Enums"]["severity"] | null
-          source_id: string | null
-          source_organization_id: string | null
-          source_type: string
-          status: string
-          subject: string
-          updated_at: string
-        }
-        Insert: {
-          assigned_to?: string | null
-          created_at?: string
-          customer_satisfied?: boolean | null
-          description: string
-          discount_amount?: number | null
-          feedback_type: Database["public"]["Enums"]["feedback_type"]
-          followup_completed?: boolean | null
-          followup_date?: string | null
-          id?: string
-          legacy_record_id?: number | null
-          regarding_order_id?: string | null
-          regarding_patient_id?: string | null
-          regarding_staff_id?: string | null
-          requires_followup?: boolean | null
-          resolution_notes?: string | null
-          resolved_at?: string | null
-          response_time_hours?: number | null
-          resulted_in_discount?: boolean | null
-          resulted_in_remake?: boolean | null
-          severity?: Database["public"]["Enums"]["severity"] | null
-          source_id?: string | null
-          source_organization_id?: string | null
-          source_type: string
-          status?: string
-          subject: string
-          updated_at?: string
-        }
-        Update: {
-          assigned_to?: string | null
-          created_at?: string
-          customer_satisfied?: boolean | null
-          description?: string
-          discount_amount?: number | null
-          feedback_type?: Database["public"]["Enums"]["feedback_type"]
-          followup_completed?: boolean | null
-          followup_date?: string | null
-          id?: string
-          legacy_record_id?: number | null
-          regarding_order_id?: string | null
-          regarding_patient_id?: string | null
-          regarding_staff_id?: string | null
-          requires_followup?: boolean | null
-          resolution_notes?: string | null
-          resolved_at?: string | null
-          response_time_hours?: number | null
-          resulted_in_discount?: boolean | null
-          resulted_in_remake?: boolean | null
-          severity?: Database["public"]["Enums"]["severity"] | null
-          source_id?: string | null
-          source_organization_id?: string | null
-          source_type?: string
-          status?: string
-          subject?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "customer_feedback_regarding_order_id_fkey"
-            columns: ["regarding_order_id"]
-            isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "customer_feedback_source_organization_id_fkey"
-            columns: ["source_organization_id"]
-            isOneToOne: false
-            referencedRelation: "offices"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      discounts: {
-        Row: {
-          code: string | null
-          created_at: string | null
-          current_uses: number | null
-          discount_type: Database["public"]["Enums"]["discount_type"]
-          fixed_amount: number | null
-          id: string
-          is_active: boolean | null
-          legacy_discount_id: number | null
-          max_uses: number | null
-          metadata: Json | null
-          minimum_order_amount: number | null
-          name: string
-          percentage: number | null
-          valid_from: string | null
-          valid_until: string | null
-        }
-        Insert: {
-          code?: string | null
-          created_at?: string | null
-          current_uses?: number | null
-          discount_type: Database["public"]["Enums"]["discount_type"]
-          fixed_amount?: number | null
-          id?: string
-          is_active?: boolean | null
-          legacy_discount_id?: number | null
-          max_uses?: number | null
-          metadata?: Json | null
-          minimum_order_amount?: number | null
-          name: string
-          percentage?: number | null
-          valid_from?: string | null
-          valid_until?: string | null
-        }
-        Update: {
-          code?: string | null
-          created_at?: string | null
-          current_uses?: number | null
-          discount_type?: Database["public"]["Enums"]["discount_type"]
-          fixed_amount?: number | null
-          id?: string
-          is_active?: boolean | null
-          legacy_discount_id?: number | null
-          max_uses?: number | null
-          metadata?: Json | null
-          minimum_order_amount?: number | null
-          name?: string
-          percentage?: number | null
-          valid_from?: string | null
-          valid_until?: string | null
-        }
-        Relationships: []
-      }
-      doctor_notes: {
-        Row: {
-          author_id: string | null
-          comment_id: string | null
-          created_at: string | null
-          doctor_id: string
-          id: string
-          legacy_note_id: number | null
-          metadata: Json | null
-          text: string | null
-        }
-        Insert: {
-          author_id?: string | null
-          comment_id?: string | null
-          created_at?: string | null
-          doctor_id: string
-          id?: string
-          legacy_note_id?: number | null
-          metadata?: Json | null
-          text?: string | null
-        }
-        Update: {
-          author_id?: string | null
-          comment_id?: string | null
-          created_at?: string | null
-          doctor_id?: string
-          id?: string
-          legacy_note_id?: number | null
-          metadata?: Json | null
-          text?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "doctor_notes_comment_id_fkey"
-            columns: ["comment_id"]
-            isOneToOne: false
-            referencedRelation: "comments"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      doctor_offices: {
-        Row: {
-          created_at: string | null
-          doctor_id: string
-          id: string
-          is_active: boolean | null
-          is_primary: boolean | null
-          office_id: string
-        }
-        Insert: {
-          created_at?: string | null
-          doctor_id: string
-          id?: string
-          is_active?: boolean | null
-          is_primary?: boolean | null
-          office_id: string
-        }
-        Update: {
-          created_at?: string | null
-          doctor_id?: string
-          id?: string
-          is_active?: boolean | null
-          is_primary?: boolean | null
-          office_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "doctor_offices_office_id_fkey"
-            columns: ["office_id"]
-            isOneToOne: false
-            referencedRelation: "offices"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      doctors: {
-        Row: {
-          accepts_insurance: boolean | null
-          bio: string | null
-          board_certifications: Json | null
-          consultation_duration_minutes: number | null
-          consultation_fee: number | null
-          doctor_number: string | null
-          education: Json | null
-          follow_up_duration_minutes: number | null
-          id: string
-          is_accepting_patients: boolean | null
-          joined_practice_at: string | null
-          languages_spoken: Json | null
-          legacy_doctor_id: number | null
-          legacy_user_id: number | null
-          license_number: string | null
-          licensed_since: string | null
-          max_patient_load: number | null
-          npi_number: string | null
-          payment_terms: Json | null
-          practice_type: string | null
-          primary_office_id: string | null
-          professional_memberships: Json | null
-          profile_id: string
-          specialties: Json | null
-          specialty: string | null
-          status: Database["public"]["Enums"]["doctor_status_type"] | null
-          updated_at: string | null
-          working_hours: Json | null
-          years_experience: number | null
-        }
-        Insert: {
-          accepts_insurance?: boolean | null
-          bio?: string | null
-          board_certifications?: Json | null
-          consultation_duration_minutes?: number | null
-          consultation_fee?: number | null
-          doctor_number?: string | null
-          education?: Json | null
-          follow_up_duration_minutes?: number | null
-          id?: string
-          is_accepting_patients?: boolean | null
-          joined_practice_at?: string | null
-          languages_spoken?: Json | null
-          legacy_doctor_id?: number | null
-          legacy_user_id?: number | null
-          license_number?: string | null
-          licensed_since?: string | null
-          max_patient_load?: number | null
-          npi_number?: string | null
-          payment_terms?: Json | null
-          practice_type?: string | null
-          primary_office_id?: string | null
-          professional_memberships?: Json | null
-          profile_id: string
-          specialties?: Json | null
-          specialty?: string | null
-          status?: Database["public"]["Enums"]["doctor_status_type"] | null
-          updated_at?: string | null
-          working_hours?: Json | null
-          years_experience?: number | null
-        }
-        Update: {
-          accepts_insurance?: boolean | null
-          bio?: string | null
-          board_certifications?: Json | null
-          consultation_duration_minutes?: number | null
-          consultation_fee?: number | null
-          doctor_number?: string | null
-          education?: Json | null
-          follow_up_duration_minutes?: number | null
-          id?: string
-          is_accepting_patients?: boolean | null
-          joined_practice_at?: string | null
-          languages_spoken?: Json | null
-          legacy_doctor_id?: number | null
-          legacy_user_id?: number | null
-          license_number?: string | null
-          licensed_since?: string | null
-          max_patient_load?: number | null
-          npi_number?: string | null
-          payment_terms?: Json | null
-          practice_type?: string | null
-          primary_office_id?: string | null
-          professional_memberships?: Json | null
-          profile_id?: string
-          specialties?: Json | null
-          specialty?: string | null
-          status?: Database["public"]["Enums"]["doctor_status_type"] | null
-          updated_at?: string | null
-          working_hours?: Json | null
-          years_experience?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "doctors_primary_office_id_fkey"
-            columns: ["primary_office_id"]
-            isOneToOne: false
-            referencedRelation: "offices"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      external_links: {
-        Row: {
-          created_at: string | null
-          external_id: string
-          id: string
-          internal_entity_id: string
-          internal_entity_type: string
-          is_active: boolean | null
-          legacy_link_id: number | null
-          link_type: string
-          metadata: Json | null
-          system_name: string
-        }
-        Insert: {
-          created_at?: string | null
-          external_id: string
-          id?: string
-          internal_entity_id: string
-          internal_entity_type: string
-          is_active?: boolean | null
-          legacy_link_id?: number | null
-          link_type: string
-          metadata?: Json | null
-          system_name: string
-        }
-        Update: {
-          created_at?: string | null
-          external_id?: string
-          id?: string
-          internal_entity_id?: string
-          internal_entity_type?: string
-          is_active?: boolean | null
-          legacy_link_id?: number | null
-          link_type?: string
-          metadata?: Json | null
-          system_name?: string
-        }
-        Relationships: []
-      }
-      files: {
-        Row: {
-          checksum: string | null
-          file_size_bytes: number | null
-          file_type: string | null
-          file_uid: string
-          filename: string
-          id: string
-          legacy_file_id: number | null
-          metadata: Json | null
-          mime_type: string | null
-          order_id: string | null
-          storage_path: string | null
-          uploaded_at: string | null
-          uploaded_by: string | null
-        }
-        Insert: {
-          checksum?: string | null
-          file_size_bytes?: number | null
-          file_type?: string | null
-          file_uid: string
-          filename: string
-          id?: string
-          legacy_file_id?: number | null
-          metadata?: Json | null
-          mime_type?: string | null
-          order_id?: string | null
-          storage_path?: string | null
-          uploaded_at?: string | null
-          uploaded_by?: string | null
-        }
-        Update: {
-          checksum?: string | null
-          file_size_bytes?: number | null
-          file_type?: string | null
-          file_uid?: string
-          filename?: string
-          id?: string
-          legacy_file_id?: number | null
-          metadata?: Json | null
-          mime_type?: string | null
-          order_id?: string | null
-          storage_path?: string | null
-          uploaded_at?: string | null
-          uploaded_by?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "files_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      files_temp: {
-        Row: {
-          checksum: string | null
-          created_at: string | null
-          file_size_bytes: number | null
-          file_type: string
-          file_uid: string
-          filename: string
-          id: string
-          legacy_file_id: number | null
-          metadata: Json | null
-          mime_type: string | null
-          order_id: string | null
-          storage_path: string
-          updated_at: string | null
-          uploaded_at: string | null
-          uploaded_by: string | null
-        }
-        Insert: {
-          checksum?: string | null
-          created_at?: string | null
-          file_size_bytes?: number | null
-          file_type: string
-          file_uid?: string
-          filename: string
-          id?: string
-          legacy_file_id?: number | null
-          metadata?: Json | null
-          mime_type?: string | null
-          order_id?: string | null
-          storage_path: string
-          updated_at?: string | null
-          uploaded_at?: string | null
-          uploaded_by?: string | null
-        }
-        Update: {
-          checksum?: string | null
-          created_at?: string | null
-          file_size_bytes?: number | null
-          file_type?: string
-          file_uid?: string
-          filename?: string
-          id?: string
-          legacy_file_id?: number | null
-          metadata?: Json | null
-          mime_type?: string | null
-          order_id?: string | null
-          storage_path?: string
-          updated_at?: string | null
-          uploaded_at?: string | null
-          uploaded_by?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "files_temp_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      global_settings: {
-        Row: {
-          category: string | null
-          created_at: string | null
-          description: string | null
-          id: string
-          setting_key: string
-          setting_value: Json
-          updated_at: string | null
-        }
-        Insert: {
-          category?: string | null
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          setting_key: string
-          setting_value: Json
-          updated_at?: string | null
-        }
-        Update: {
-          category?: string | null
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          setting_key?: string
-          setting_value?: Json
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      jaws: {
-        Row: {
-          bond_teeth: string | null
-          created_at: string | null
-          extract_teeth: string | null
-          id: string
-          jaw_type: string
-          labial: boolean | null
-          legacy_jaw_id: number | null
-          metadata: Json | null
-          order_id: string | null
-          product_id: string | null
-          replacement_reason: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          bond_teeth?: string | null
-          created_at?: string | null
-          extract_teeth?: string | null
-          id?: string
-          jaw_type: string
-          labial?: boolean | null
-          legacy_jaw_id?: number | null
-          metadata?: Json | null
-          order_id?: string | null
-          product_id?: string | null
-          replacement_reason?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          bond_teeth?: string | null
-          created_at?: string | null
-          extract_teeth?: string | null
-          id?: string
-          jaw_type?: string
-          labial?: boolean | null
-          legacy_jaw_id?: number | null
-          metadata?: Json | null
-          order_id?: string | null
-          product_id?: string | null
-          replacement_reason?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "jaws_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "jaws_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      mastra_evals: {
-        Row: {
-          agent_name: string
-          created_at: string
-          created_atZ: string | null
-          createdAt: string | null
-          createdAtZ: string | null
-          global_run_id: string
-          input: string
-          instructions: string
-          metric_name: string
-          output: string
-          result: Json
-          run_id: string
-          test_info: Json | null
-        }
-        Insert: {
-          agent_name: string
-          created_at: string
-          created_atZ?: string | null
-          createdAt?: string | null
-          createdAtZ?: string | null
-          global_run_id: string
-          input: string
-          instructions: string
-          metric_name: string
-          output: string
-          result: Json
-          run_id: string
-          test_info?: Json | null
-        }
-        Update: {
-          agent_name?: string
-          created_at?: string
-          created_atZ?: string | null
-          createdAt?: string | null
-          createdAtZ?: string | null
-          global_run_id?: string
-          input?: string
-          instructions?: string
-          metric_name?: string
-          output?: string
-          result?: Json
-          run_id?: string
-          test_info?: Json | null
-        }
-        Relationships: []
-      }
-      mastra_messages: {
-        Row: {
-          content: string
-          createdAt: string
-          createdAtZ: string | null
-          id: string
-          resourceId: string | null
-          role: string
-          thread_id: string
-          type: string
-        }
-        Insert: {
-          content: string
-          createdAt: string
-          createdAtZ?: string | null
-          id: string
-          resourceId?: string | null
-          role: string
-          thread_id: string
-          type: string
-        }
-        Update: {
-          content?: string
-          createdAt?: string
-          createdAtZ?: string | null
-          id?: string
-          resourceId?: string | null
-          role?: string
-          thread_id?: string
-          type?: string
-        }
-        Relationships: []
-      }
-      mastra_resources: {
-        Row: {
-          createdAt: string
-          createdAtZ: string | null
-          id: string
-          metadata: Json | null
-          updatedAt: string
-          updatedAtZ: string | null
-          workingMemory: string | null
-        }
-        Insert: {
-          createdAt: string
-          createdAtZ?: string | null
-          id: string
-          metadata?: Json | null
-          updatedAt: string
-          updatedAtZ?: string | null
-          workingMemory?: string | null
-        }
-        Update: {
-          createdAt?: string
-          createdAtZ?: string | null
-          id?: string
-          metadata?: Json | null
-          updatedAt?: string
-          updatedAtZ?: string | null
-          workingMemory?: string | null
-        }
-        Relationships: []
-      }
-      mastra_scorers: {
-        Row: {
-          additionalContext: Json | null
-          analyzePrompt: string | null
-          analyzeStepResult: Json | null
-          createdAt: string
-          createdAtZ: string | null
-          entity: Json | null
-          entityId: string | null
-          entityType: string | null
-          extractPrompt: string | null
-          extractStepResult: Json | null
-          generateReasonPrompt: string | null
-          generateScorePrompt: string | null
-          id: string
-          input: Json
-          metadata: Json | null
-          output: Json
-          preprocessPrompt: string | null
-          preprocessStepResult: Json | null
-          reason: string | null
-          reasonPrompt: string | null
-          resourceId: string | null
-          runId: string
-          runtimeContext: Json | null
-          score: number
-          scorer: Json
-          scorerId: string
-          source: string
-          threadId: string | null
-          traceId: string | null
-          updatedAt: string
-          updatedAtZ: string | null
-        }
-        Insert: {
-          additionalContext?: Json | null
-          analyzePrompt?: string | null
-          analyzeStepResult?: Json | null
-          createdAt: string
-          createdAtZ?: string | null
-          entity?: Json | null
-          entityId?: string | null
-          entityType?: string | null
-          extractPrompt?: string | null
-          extractStepResult?: Json | null
-          generateReasonPrompt?: string | null
-          generateScorePrompt?: string | null
-          id: string
-          input: Json
-          metadata?: Json | null
-          output: Json
-          preprocessPrompt?: string | null
-          preprocessStepResult?: Json | null
-          reason?: string | null
-          reasonPrompt?: string | null
-          resourceId?: string | null
-          runId: string
-          runtimeContext?: Json | null
-          score: number
-          scorer: Json
-          scorerId: string
-          source: string
-          threadId?: string | null
-          traceId?: string | null
-          updatedAt: string
-          updatedAtZ?: string | null
-        }
-        Update: {
-          additionalContext?: Json | null
-          analyzePrompt?: string | null
-          analyzeStepResult?: Json | null
-          createdAt?: string
-          createdAtZ?: string | null
-          entity?: Json | null
-          entityId?: string | null
-          entityType?: string | null
-          extractPrompt?: string | null
-          extractStepResult?: Json | null
-          generateReasonPrompt?: string | null
-          generateScorePrompt?: string | null
-          id?: string
-          input?: Json
-          metadata?: Json | null
-          output?: Json
-          preprocessPrompt?: string | null
-          preprocessStepResult?: Json | null
-          reason?: string | null
-          reasonPrompt?: string | null
-          resourceId?: string | null
-          runId?: string
-          runtimeContext?: Json | null
-          score?: number
-          scorer?: Json
-          scorerId?: string
-          source?: string
-          threadId?: string | null
-          traceId?: string | null
-          updatedAt?: string
-          updatedAtZ?: string | null
-        }
-        Relationships: []
-      }
-      mastra_threads: {
-        Row: {
-          createdAt: string
-          createdAtZ: string | null
-          id: string
-          metadata: string | null
-          resourceId: string
-          title: string
-          updatedAt: string
-          updatedAtZ: string | null
-        }
-        Insert: {
-          createdAt: string
-          createdAtZ?: string | null
-          id: string
-          metadata?: string | null
-          resourceId: string
-          title: string
-          updatedAt: string
-          updatedAtZ?: string | null
-        }
-        Update: {
-          createdAt?: string
-          createdAtZ?: string | null
-          id?: string
-          metadata?: string | null
-          resourceId?: string
-          title?: string
-          updatedAt?: string
-          updatedAtZ?: string | null
-        }
-        Relationships: []
-      }
-      mastra_traces: {
-        Row: {
-          attributes: Json | null
-          createdAt: string
-          createdAtZ: string | null
-          endTime: number
-          events: Json | null
-          id: string
-          kind: number
-          links: Json | null
-          name: string
-          other: string | null
-          parentSpanId: string | null
-          scope: string
-          startTime: number
-          status: Json | null
-          traceId: string
-        }
-        Insert: {
-          attributes?: Json | null
-          createdAt: string
-          createdAtZ?: string | null
-          endTime: number
-          events?: Json | null
-          id: string
-          kind: number
-          links?: Json | null
-          name: string
-          other?: string | null
-          parentSpanId?: string | null
-          scope: string
-          startTime: number
-          status?: Json | null
-          traceId: string
-        }
-        Update: {
-          attributes?: Json | null
-          createdAt?: string
-          createdAtZ?: string | null
-          endTime?: number
-          events?: Json | null
-          id?: string
-          kind?: number
-          links?: Json | null
-          name?: string
-          other?: string | null
-          parentSpanId?: string | null
-          scope?: string
-          startTime?: number
-          status?: Json | null
-          traceId?: string
-        }
-        Relationships: []
-      }
-      mastra_workflow_snapshot: {
-        Row: {
-          createdAt: string
-          createdAtZ: string | null
-          resourceId: string | null
-          run_id: string
-          snapshot: string
-          updatedAt: string
-          updatedAtZ: string | null
-          workflow_name: string
-        }
-        Insert: {
-          createdAt: string
-          createdAtZ?: string | null
-          resourceId?: string | null
-          run_id: string
-          snapshot: string
-          updatedAt: string
-          updatedAtZ?: string | null
-          workflow_name: string
-        }
-        Update: {
-          createdAt?: string
-          createdAtZ?: string | null
-          resourceId?: string | null
-          run_id?: string
-          snapshot?: string
-          updatedAt?: string
-          updatedAtZ?: string | null
-          workflow_name?: string
-        }
-        Relationships: []
-      }
-      memory_messages_1024: {
-        Row: {
-          embedding: string | null
-          id: number
-          metadata: Json | null
-          vector_id: string
-        }
-        Insert: {
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-          vector_id: string
-        }
-        Update: {
-          embedding?: string | null
-          id?: number
-          metadata?: Json | null
-          vector_id?: string
-        }
-        Relationships: []
-      }
-      message_attachments: {
-        Row: {
-          attachment_type: string | null
-          created_at: string | null
-          file_id: string
-          id: string
-          legacy_attachment_id: number | null
-          legacy_file_id: number | null
-          legacy_record_id: number | null
-          message_id: string
-          metadata: Json | null
-          updated_at: string | null
-        }
-        Insert: {
-          attachment_type?: string | null
-          created_at?: string | null
-          file_id: string
-          id?: string
-          legacy_attachment_id?: number | null
-          legacy_file_id?: number | null
-          legacy_record_id?: number | null
-          message_id: string
-          metadata?: Json | null
-          updated_at?: string | null
-        }
-        Update: {
-          attachment_type?: string | null
-          created_at?: string | null
-          file_id?: string
-          id?: string
-          legacy_attachment_id?: number | null
-          legacy_file_id?: number | null
-          legacy_record_id?: number | null
-          message_id?: string
-          metadata?: Json | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "message_attachments_file_id_fkey"
-            columns: ["file_id"]
-            isOneToOne: false
-            referencedRelation: "files"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "message_attachments_message_id_fkey"
-            columns: ["message_id"]
-            isOneToOne: false
-            referencedRelation: "messages"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      messages: {
-        Row: {
-          content: string
-          created_at: string | null
-          id: string
-          is_read: boolean | null
-          legacy_record_id: number | null
-          message_type: string
-          metadata: Json | null
-          recipient_id: string | null
-          recipient_type: string
-          sender_id: string | null
-          title: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          content: string
-          created_at?: string | null
-          id?: string
-          is_read?: boolean | null
-          legacy_record_id?: number | null
-          message_type?: string
-          metadata?: Json | null
-          recipient_id?: string | null
-          recipient_type: string
-          sender_id?: string | null
-          title?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          content?: string
-          created_at?: string | null
-          id?: string
-          is_read?: boolean | null
-          legacy_record_id?: number | null
-          message_type?: string
-          metadata?: Json | null
-          recipient_id?: string | null
-          recipient_type?: string
-          sender_id?: string | null
-          title?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      migration_control: {
-        Row: {
-          batch_size: number | null
-          completed_at: string | null
-          error_message: string | null
-          id: number
-          operation: string | null
-          phase: string | null
-          records_processed: number | null
-          source_query: string | null
-          started_at: string | null
-          status: string | null
-          table_name: string | null
-          total_records: number | null
-          validation_query: string | null
-          worker_id: number | null
-        }
-        Insert: {
-          batch_size?: number | null
-          completed_at?: string | null
-          error_message?: string | null
-          id?: number
-          operation?: string | null
-          phase?: string | null
-          records_processed?: number | null
-          source_query?: string | null
-          started_at?: string | null
-          status?: string | null
-          table_name?: string | null
-          total_records?: number | null
-          validation_query?: string | null
-          worker_id?: number | null
-        }
-        Update: {
-          batch_size?: number | null
-          completed_at?: string | null
-          error_message?: string | null
-          id?: number
-          operation?: string | null
-          phase?: string | null
-          records_processed?: number | null
-          source_query?: string | null
-          started_at?: string | null
-          status?: string | null
-          table_name?: string | null
-          total_records?: number | null
-          validation_query?: string | null
-          worker_id?: number | null
-        }
-        Relationships: []
-      }
-      migration_mappings: {
-        Row: {
-          entity_type: string
-          legacy_id: number
-          migrated_at: string | null
-          migration_batch: string | null
-          new_id: string
-        }
-        Insert: {
-          entity_type: string
-          legacy_id: number
-          migrated_at?: string | null
-          migration_batch?: string | null
-          new_id: string
-        }
-        Update: {
-          entity_type?: string
-          legacy_id?: number
-          migrated_at?: string | null
-          migration_batch?: string | null
-          new_id?: string
-        }
-        Relationships: []
-      }
-      offers: {
-        Row: {
-          accepted_at: string | null
-          created_at: string | null
-          description: string | null
-          id: string
-          is_accepted: boolean | null
-          is_active: boolean | null
-          legacy_offer_id: number | null
-          metadata: Json | null
-          offer_amount: number
-          order_id: string
-        }
-        Insert: {
-          accepted_at?: string | null
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          is_accepted?: boolean | null
-          is_active?: boolean | null
-          legacy_offer_id?: number | null
-          metadata?: Json | null
-          offer_amount: number
-          order_id: string
-        }
-        Update: {
-          accepted_at?: string | null
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          is_accepted?: boolean | null
-          is_active?: boolean | null
-          legacy_offer_id?: number | null
-          metadata?: Json | null
-          offer_amount?: number
-          order_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "offers_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      offices: {
-        Row: {
-          address: string | null
-          apartment: string | null
-          city: string | null
-          country: string | null
-          created_at: string | null
-          email_notifications: boolean | null
-          id: string
-          is_active: boolean | null
-          legacy_office_id: number | null
-          metadata: Json | null
-          name: string
-          phone: string | null
-          square_customer_id: string | null
-          state: string | null
-          tax_rate: number | null
-          updated_at: string | null
-          zip_code: string | null
-        }
-        Insert: {
-          address?: string | null
-          apartment?: string | null
-          city?: string | null
-          country?: string | null
-          created_at?: string | null
-          email_notifications?: boolean | null
-          id?: string
-          is_active?: boolean | null
-          legacy_office_id?: number | null
-          metadata?: Json | null
-          name: string
-          phone?: string | null
-          square_customer_id?: string | null
-          state?: string | null
-          tax_rate?: number | null
-          updated_at?: string | null
-          zip_code?: string | null
-        }
-        Update: {
-          address?: string | null
-          apartment?: string | null
-          city?: string | null
-          country?: string | null
-          created_at?: string | null
-          email_notifications?: boolean | null
-          id?: string
-          is_active?: boolean | null
-          legacy_office_id?: number | null
-          metadata?: Json | null
-          name?: string
-          phone?: string | null
-          square_customer_id?: string | null
-          state?: string | null
-          tax_rate?: number | null
-          updated_at?: string | null
-          zip_code?: string | null
-        }
-        Relationships: []
-      }
-      operations: {
-        Row: {
-          case_id: string
-          created_at: string | null
-          details: Json | null
-          id: string
-          legacy_id: number | null
-          operation_type: string
-          operator_profile: string | null
-          performed_at: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          case_id: string
-          created_at?: string | null
-          details?: Json | null
-          id?: string
-          legacy_id?: number | null
-          operation_type: string
-          operator_profile?: string | null
-          performed_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          case_id?: string
-          created_at?: string | null
-          details?: Json | null
-          id?: string
-          legacy_id?: number | null
-          operation_type?: string
-          operator_profile?: string | null
-          performed_at?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "operations_case_id_fkey"
-            columns: ["case_id"]
-            isOneToOne: false
-            referencedRelation: "cases"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      order_cases: {
-        Row: {
-          case_id: string
-          created_at: string | null
-          id: string
-          order_id: string
-          relationship_type: string | null
-        }
-        Insert: {
-          case_id: string
-          created_at?: string | null
-          id?: string
-          order_id: string
-          relationship_type?: string | null
-        }
-        Update: {
-          case_id?: string
-          created_at?: string | null
-          id?: string
-          order_id?: string
-          relationship_type?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "order_cases_case_id_fkey"
-            columns: ["case_id"]
-            isOneToOne: false
-            referencedRelation: "cases"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "order_cases_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      order_files: {
-        Row: {
-          category: string | null
-          created_at: string | null
-          file_id: string
-          file_type: number | null
-          id: string
-          legacy_file_id: number
-          legacy_instruction_id: number
-          metadata: Json | null
-          order_id: string
-          parameters: Json | null
-          product_id: number | null
-          record_id: number | null
-          status: number | null
-          updated_at: string | null
-          uploaded_at: string | null
-        }
-        Insert: {
-          category?: string | null
-          created_at?: string | null
-          file_id: string
-          file_type?: number | null
-          id?: string
-          legacy_file_id: number
-          legacy_instruction_id: number
-          metadata?: Json | null
-          order_id: string
-          parameters?: Json | null
-          product_id?: number | null
-          record_id?: number | null
-          status?: number | null
-          updated_at?: string | null
-          uploaded_at?: string | null
-        }
-        Update: {
-          category?: string | null
-          created_at?: string | null
-          file_id?: string
-          file_type?: number | null
-          id?: string
-          legacy_file_id?: number
-          legacy_instruction_id?: number
-          metadata?: Json | null
-          order_id?: string
-          parameters?: Json | null
-          product_id?: number | null
-          record_id?: number | null
-          status?: number | null
-          updated_at?: string | null
-          uploaded_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "order_files_file_id_fkey"
-            columns: ["file_id"]
-            isOneToOne: false
-            referencedRelation: "files"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "order_files_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      order_states: {
-        Row: {
-          actor_id: string | null
-          changed_at: string | null
-          from_status: Database["public"]["Enums"]["order_status"] | null
-          id: string
-          is_active: boolean | null
-          legacy_state_id: number | null
-          metadata: Json | null
-          order_id: string
-          to_status: Database["public"]["Enums"]["order_status"]
-        }
-        Insert: {
-          actor_id?: string | null
-          changed_at?: string | null
-          from_status?: Database["public"]["Enums"]["order_status"] | null
-          id?: string
-          is_active?: boolean | null
-          legacy_state_id?: number | null
-          metadata?: Json | null
-          order_id: string
-          to_status: Database["public"]["Enums"]["order_status"]
-        }
-        Update: {
-          actor_id?: string | null
-          changed_at?: string | null
-          from_status?: Database["public"]["Enums"]["order_status"] | null
-          id?: string
-          is_active?: boolean | null
-          legacy_state_id?: number | null
-          metadata?: Json | null
-          order_id?: string
-          to_status?: Database["public"]["Enums"]["order_status"]
-        }
-        Relationships: [
-          {
-            foreignKeyName: "order_states_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      orders: {
-        Row: {
-          amount: number | null
-          approved_at: string | null
-          complaint: string | null
-          course_type: Database["public"]["Enums"]["course_type"]
-          created_at: string | null
-          deleted: boolean | null
-          deleted_at: string | null
-          doctor_id: string
-          exports: Json | null
-          id: string
-          legacy_instruction_id: number | null
-          metadata: Json | null
-          notes: string | null
-          office_id: string | null
-          order_number: string
-          patient_id: string
-          shipped_at: string | null
-          status: Database["public"]["Enums"]["order_status"]
-          submitted_at: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          amount?: number | null
-          approved_at?: string | null
-          complaint?: string | null
-          course_type: Database["public"]["Enums"]["course_type"]
-          created_at?: string | null
-          deleted?: boolean | null
-          deleted_at?: string | null
-          doctor_id: string
-          exports?: Json | null
-          id?: string
-          legacy_instruction_id?: number | null
-          metadata?: Json | null
-          notes?: string | null
-          office_id?: string | null
-          order_number: string
-          patient_id: string
-          shipped_at?: string | null
-          status?: Database["public"]["Enums"]["order_status"]
-          submitted_at?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          amount?: number | null
-          approved_at?: string | null
-          complaint?: string | null
-          course_type?: Database["public"]["Enums"]["course_type"]
-          created_at?: string | null
-          deleted?: boolean | null
-          deleted_at?: string | null
-          doctor_id?: string
-          exports?: Json | null
-          id?: string
-          legacy_instruction_id?: number | null
-          metadata?: Json | null
-          notes?: string | null
-          office_id?: string | null
-          order_number?: string
-          patient_id?: string
-          shipped_at?: string | null
-          status?: Database["public"]["Enums"]["order_status"]
-          submitted_at?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "orders_doctor_id_fkey"
-            columns: ["doctor_id"]
-            isOneToOne: false
-            referencedRelation: "doctors"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "orders_office_id_fkey"
-            columns: ["office_id"]
-            isOneToOne: false
-            referencedRelation: "offices"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "orders_patient_id_fkey"
-            columns: ["patient_id"]
-            isOneToOne: false
-            referencedRelation: "patients"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      patient_events: {
-        Row: {
-          created_at: string | null
-          description: string | null
-          duration_minutes: number | null
-          event_type: string
-          id: string
-          legacy_event_id: number | null
-          metadata: Json | null
-          order_id: string | null
-          patient_id: string
-          scheduled_at: string | null
-          status: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          description?: string | null
-          duration_minutes?: number | null
-          event_type: string
-          id?: string
-          legacy_event_id?: number | null
-          metadata?: Json | null
-          order_id?: string | null
-          patient_id: string
-          scheduled_at?: string | null
-          status?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          description?: string | null
-          duration_minutes?: number | null
-          event_type?: string
-          id?: string
-          legacy_event_id?: number | null
-          metadata?: Json | null
-          order_id?: string | null
-          patient_id?: string
-          scheduled_at?: string | null
-          status?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "patient_events_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      patients: {
-        Row: {
-          archived: boolean | null
-          assigned_office_id: string | null
-          date_of_birth: string | null
-          enrolled_at: string | null
-          id: string
-          insurance_info: Json | null
-          legacy_patient_id: number | null
-          legacy_user_id: number | null
-          medical_history: Json | null
-          patient_number: string | null
-          primary_doctor_id: string | null
-          profile_id: string
-          schemes: string | null
-          sex: Database["public"]["Enums"]["gender"] | null
-          status: Database["public"]["Enums"]["patient_status_type"] | null
-          suffix: string | null
-          suspended: boolean | null
-          updated_at: string | null
-        }
-        Insert: {
-          archived?: boolean | null
-          assigned_office_id?: string | null
-          date_of_birth?: string | null
-          enrolled_at?: string | null
-          id?: string
-          insurance_info?: Json | null
-          legacy_patient_id?: number | null
-          legacy_user_id?: number | null
-          medical_history?: Json | null
-          patient_number?: string | null
-          primary_doctor_id?: string | null
-          profile_id: string
-          schemes?: string | null
-          sex?: Database["public"]["Enums"]["gender"] | null
-          status?: Database["public"]["Enums"]["patient_status_type"] | null
-          suffix?: string | null
-          suspended?: boolean | null
-          updated_at?: string | null
-        }
-        Update: {
-          archived?: boolean | null
-          assigned_office_id?: string | null
-          date_of_birth?: string | null
-          enrolled_at?: string | null
-          id?: string
-          insurance_info?: Json | null
-          legacy_patient_id?: number | null
-          legacy_user_id?: number | null
-          medical_history?: Json | null
-          patient_number?: string | null
-          primary_doctor_id?: string | null
-          profile_id?: string
-          schemes?: string | null
-          sex?: Database["public"]["Enums"]["gender"] | null
-          status?: Database["public"]["Enums"]["patient_status_type"] | null
-          suffix?: string | null
-          suspended?: boolean | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "patients_assigned_office_id_fkey"
-            columns: ["assigned_office_id"]
-            isOneToOne: false
-            referencedRelation: "offices"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "patients_primary_doctor_id_fkey"
-            columns: ["primary_doctor_id"]
-            isOneToOne: false
-            referencedRelation: "doctors"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      payment_items: {
-        Row: {
-          created_at: string | null
-          id: string
-          legacy_ware_id: number | null
-          metadata: Json | null
-          name: string
-          payment_id: string
-          product_id: string | null
-          purchase_id: string | null
-          quantity: number | null
-          total_amount: number
-          unit_price: number
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          legacy_ware_id?: number | null
-          metadata?: Json | null
-          name: string
-          payment_id: string
-          product_id?: string | null
-          purchase_id?: string | null
-          quantity?: number | null
-          total_amount: number
-          unit_price: number
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          legacy_ware_id?: number | null
-          metadata?: Json | null
-          name?: string
-          payment_id?: string
-          product_id?: string | null
-          purchase_id?: string | null
-          quantity?: number | null
-          total_amount?: number
-          unit_price?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "payment_items_payment_id_fkey"
-            columns: ["payment_id"]
-            isOneToOne: false
-            referencedRelation: "payments"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "payment_items_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "payment_items_purchase_id_fkey"
-            columns: ["purchase_id"]
-            isOneToOne: false
-            referencedRelation: "purchases"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      payment_operations: {
-        Row: {
-          amount: number
-          attempt_count: number | null
-          card_bin: string | null
-          card_brand: string | null
-          card_last_four: string | null
-          id: string
-          is_office_card: boolean | null
-          legacy_operation_id: number | null
-          metadata: Json | null
-          operation_type: string
-          payment_id: string
-          processed_at: string | null
-          square_order_id: string | null
-          square_payment_id: string | null
-          square_refund_id: string | null
-        }
-        Insert: {
-          amount: number
-          attempt_count?: number | null
-          card_bin?: string | null
-          card_brand?: string | null
-          card_last_four?: string | null
-          id?: string
-          is_office_card?: boolean | null
-          legacy_operation_id?: number | null
-          metadata?: Json | null
-          operation_type: string
-          payment_id: string
-          processed_at?: string | null
-          square_order_id?: string | null
-          square_payment_id?: string | null
-          square_refund_id?: string | null
-        }
-        Update: {
-          amount?: number
-          attempt_count?: number | null
-          card_bin?: string | null
-          card_brand?: string | null
-          card_last_four?: string | null
-          id?: string
-          is_office_card?: boolean | null
-          legacy_operation_id?: number | null
-          metadata?: Json | null
-          operation_type?: string
-          payment_id?: string
-          processed_at?: string | null
-          square_order_id?: string | null
-          square_payment_id?: string | null
-          square_refund_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "payment_operations_payment_id_fkey"
-            columns: ["payment_id"]
-            isOneToOne: false
-            referencedRelation: "payments"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      payments: {
-        Row: {
-          amount: number
-          created_at: string | null
-          currency: string | null
-          external_payment_id: string | null
-          id: string
-          legacy_payment_id: number | null
-          metadata: Json | null
-          order_id: string
-          patient_id: string | null
-          payment_method: string | null
-          processed_at: string | null
-          status: Database["public"]["Enums"]["payment_status"]
-          transaction_reference: string | null
-        }
-        Insert: {
-          amount: number
-          created_at?: string | null
-          currency?: string | null
-          external_payment_id?: string | null
-          id?: string
-          legacy_payment_id?: number | null
-          metadata?: Json | null
-          order_id: string
-          patient_id?: string | null
-          payment_method?: string | null
-          processed_at?: string | null
-          status?: Database["public"]["Enums"]["payment_status"]
-          transaction_reference?: string | null
-        }
-        Update: {
-          amount?: number
-          created_at?: string | null
-          currency?: string | null
-          external_payment_id?: string | null
-          id?: string
-          legacy_payment_id?: number | null
-          metadata?: Json | null
-          order_id?: string
-          patient_id?: string | null
-          payment_method?: string | null
-          processed_at?: string | null
-          status?: Database["public"]["Enums"]["payment_status"]
-          transaction_reference?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "payments_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      products: {
-        Row: {
-          base_price: number | null
-          course_type: Database["public"]["Enums"]["course_type"]
-          created_at: string | null
-          customization: Json | null
-          id: string
-          is_active: boolean | null
-          legacy_course_id: number | null
-          metadata: Json | null
-          name: string
-          updated_at: string | null
-        }
-        Insert: {
-          base_price?: number | null
-          course_type: Database["public"]["Enums"]["course_type"]
-          created_at?: string | null
-          customization?: Json | null
-          id?: string
-          is_active?: boolean | null
-          legacy_course_id?: number | null
-          metadata?: Json | null
-          name: string
-          updated_at?: string | null
-        }
-        Update: {
-          base_price?: number | null
-          course_type?: Database["public"]["Enums"]["course_type"]
-          created_at?: string | null
-          customization?: Json | null
-          id?: string
-          is_active?: boolean | null
-          legacy_course_id?: number | null
-          metadata?: Json | null
-          name?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      projects: {
-        Row: {
-          created_at: string | null
-          creator_id: string
-          file_size_bytes: number | null
-          file_uid: string | null
-          id: string
-          is_original: boolean | null
-          is_public: boolean | null
-          legacy_plan_id: number | null
-          legacy_project_id: number | null
-          metadata: Json | null
-          mime_type: string | null
-          name: string
-          order_id: string | null
-          plan_notes: string | null
-          plan_number: number | null
-          project_type: Database["public"]["Enums"]["project_type"]
-          status: Database["public"]["Enums"]["project_status"]
-          storage_path: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          creator_id: string
-          file_size_bytes?: number | null
-          file_uid?: string | null
-          id?: string
-          is_original?: boolean | null
-          is_public?: boolean | null
-          legacy_plan_id?: number | null
-          legacy_project_id?: number | null
-          metadata?: Json | null
-          mime_type?: string | null
-          name: string
-          order_id?: string | null
-          plan_notes?: string | null
-          plan_number?: number | null
-          project_type: Database["public"]["Enums"]["project_type"]
-          status?: Database["public"]["Enums"]["project_status"]
-          storage_path?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          creator_id?: string
-          file_size_bytes?: number | null
-          file_uid?: string | null
-          id?: string
-          is_original?: boolean | null
-          is_public?: boolean | null
-          legacy_plan_id?: number | null
-          legacy_project_id?: number | null
-          metadata?: Json | null
-          mime_type?: string | null
-          name?: string
-          order_id?: string | null
-          plan_notes?: string | null
-          plan_number?: number | null
-          project_type?: Database["public"]["Enums"]["project_type"]
-          status?: Database["public"]["Enums"]["project_status"]
-          storage_path?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "projects_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      purchases: {
-        Row: {
-          id: string
-          legacy_purchase_id: number | null
-          metadata: Json | null
-          order_id: string
-          product_id: string
-          purchased_at: string | null
-          quantity: number | null
-          total_amount: number
-          unit_price: number
-        }
-        Insert: {
-          id?: string
-          legacy_purchase_id?: number | null
-          metadata?: Json | null
-          order_id: string
-          product_id: string
-          purchased_at?: string | null
-          quantity?: number | null
-          total_amount: number
-          unit_price: number
-        }
-        Update: {
-          id?: string
-          legacy_purchase_id?: number | null
-          metadata?: Json | null
-          order_id?: string
-          product_id?: string
-          purchased_at?: string | null
-          quantity?: number | null
-          total_amount?: number
-          unit_price?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "purchases_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "purchases_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      role_permissions: {
-        Row: {
-          created_at: string | null
-          id: string
-          permission: string
-          role_id: string
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          id?: string
-          permission: string
-          role_id: string
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          permission?: string
-          role_id?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "role_permissions_role_id_fkey"
-            columns: ["role_id"]
-            isOneToOne: false
-            referencedRelation: "roles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      roles: {
-        Row: {
-          created_at: string | null
-          description: string | null
-          id: string
-          legacy_id: number | null
-          name: string
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          legacy_id?: number | null
-          name: string
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          legacy_id?: number | null
-          name?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      shipments: {
-        Row: {
-          carrier: string | null
-          created_at: string | null
-          delivered_at: string | null
-          id: string
-          metadata: Json | null
-          order_id: string
-          shipped_at: string | null
-          shipping_address: Json | null
-          tracking_number: string | null
-        }
-        Insert: {
-          carrier?: string | null
-          created_at?: string | null
-          delivered_at?: string | null
-          id?: string
-          metadata?: Json | null
-          order_id: string
-          shipped_at?: string | null
-          shipping_address?: Json | null
-          tracking_number?: string | null
-        }
-        Update: {
-          carrier?: string | null
-          created_at?: string | null
-          delivered_at?: string | null
-          id?: string
-          metadata?: Json | null
-          order_id?: string
-          shipped_at?: string | null
-          shipping_address?: Json | null
-          tracking_number?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "shipments_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      storages: {
-        Row: {
-          address: string | null
-          created_at: string | null
-          id: string
-          legacy_id: number | null
-          name: string
-          updated_at: string | null
-        }
-        Insert: {
-          address?: string | null
-          created_at?: string | null
-          id?: string
-          legacy_id?: number | null
-          name: string
-          updated_at?: string | null
-        }
-        Update: {
-          address?: string | null
-          created_at?: string | null
-          id?: string
-          legacy_id?: number | null
-          name?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      system_messages: {
-        Row: {
-          barcode: string | null
-          carrier: string | null
-          created_at: string
-          id: string
-          legacy_record_id: number | null
-          message_code: string | null
-          message_data: Json
-          message_type: string
-          order_id: string | null
-          processed: boolean | null
-          processed_at: string | null
-          shipment_id: string | null
-          source_system: string
-          tracking_number: string | null
-        }
-        Insert: {
-          barcode?: string | null
-          carrier?: string | null
-          created_at?: string
-          id?: string
-          legacy_record_id?: number | null
-          message_code?: string | null
-          message_data: Json
-          message_type: string
-          order_id?: string | null
-          processed?: boolean | null
-          processed_at?: string | null
-          shipment_id?: string | null
-          source_system: string
-          tracking_number?: string | null
-        }
-        Update: {
-          barcode?: string | null
-          carrier?: string | null
-          created_at?: string
-          id?: string
-          legacy_record_id?: number | null
-          message_code?: string | null
-          message_data?: Json
-          message_type?: string
-          order_id?: string | null
-          processed?: boolean | null
-          processed_at?: string | null
-          shipment_id?: string | null
-          source_system?: string
-          tracking_number?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "system_messages_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "system_messages_shipment_id_fkey"
-            columns: ["shipment_id"]
-            isOneToOne: false
-            referencedRelation: "shipments"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      tasks: {
-        Row: {
-          action_name: string | null
-          approved_at: string | null
-          assigned_at: string | null
-          assigned_by: string | null
-          assigned_to: string | null
-          checked: boolean | null
-          completed_at: string | null
-          description: string | null
-          due_at: string | null
-          id: string
-          jaw_specification: number | null
-          legacy_task_id: number | null
-          metadata: Json | null
-          order_id: string
-          quality_notes: string | null
-          quality_score: number | null
-          started_at: string | null
-          status: Database["public"]["Enums"]["task_status"]
-          template_id: string | null
-          template_name: string
-        }
-        Insert: {
-          action_name?: string | null
-          approved_at?: string | null
-          assigned_at?: string | null
-          assigned_by?: string | null
-          assigned_to?: string | null
-          checked?: boolean | null
-          completed_at?: string | null
-          description?: string | null
-          due_at?: string | null
-          id?: string
-          jaw_specification?: number | null
-          legacy_task_id?: number | null
-          metadata?: Json | null
-          order_id: string
-          quality_notes?: string | null
-          quality_score?: number | null
-          started_at?: string | null
-          status?: Database["public"]["Enums"]["task_status"]
-          template_id?: string | null
-          template_name: string
-        }
-        Update: {
-          action_name?: string | null
-          approved_at?: string | null
-          assigned_at?: string | null
-          assigned_by?: string | null
-          assigned_to?: string | null
-          checked?: boolean | null
-          completed_at?: string | null
-          description?: string | null
-          due_at?: string | null
-          id?: string
-          jaw_specification?: number | null
-          legacy_task_id?: number | null
-          metadata?: Json | null
-          order_id?: string
-          quality_notes?: string | null
-          quality_score?: number | null
-          started_at?: string | null
-          status?: Database["public"]["Enums"]["task_status"]
-          template_id?: string | null
-          template_name?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "tasks_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "tasks_template_id_fkey"
-            columns: ["template_id"]
-            isOneToOne: false
-            referencedRelation: "templates"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      team_communications: {
-        Row: {
-          approval_required: boolean | null
-          approved_at: string | null
-          approved_by: string | null
-          author_id: string
-          body: string
-          communication_type: Database["public"]["Enums"]["team_communication_type"]
-          created_at: string
-          department: string | null
-          id: string
-          is_broadcast: boolean | null
-          legacy_record_id: number | null
-          order_id: string | null
-          project_id: string | null
-          subject: string | null
-          task_id: string | null
-          team_id: string | null
-          triggers_workflow: boolean | null
-          visibility: string | null
-          workflow_action: string | null
-        }
-        Insert: {
-          approval_required?: boolean | null
-          approved_at?: string | null
-          approved_by?: string | null
-          author_id: string
-          body: string
-          communication_type: Database["public"]["Enums"]["team_communication_type"]
-          created_at?: string
-          department?: string | null
-          id?: string
-          is_broadcast?: boolean | null
-          legacy_record_id?: number | null
-          order_id?: string | null
-          project_id?: string | null
-          subject?: string | null
-          task_id?: string | null
-          team_id?: string | null
-          triggers_workflow?: boolean | null
-          visibility?: string | null
-          workflow_action?: string | null
-        }
-        Update: {
-          approval_required?: boolean | null
-          approved_at?: string | null
-          approved_by?: string | null
-          author_id?: string
-          body?: string
-          communication_type?: Database["public"]["Enums"]["team_communication_type"]
-          created_at?: string
-          department?: string | null
-          id?: string
-          is_broadcast?: boolean | null
-          legacy_record_id?: number | null
-          order_id?: string | null
-          project_id?: string | null
-          subject?: string | null
-          task_id?: string | null
-          team_id?: string | null
-          triggers_workflow?: boolean | null
-          visibility?: string | null
-          workflow_action?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fk_team_comm_project"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "team_communications_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "team_communications_task_id_fkey"
-            columns: ["task_id"]
-            isOneToOne: false
-            referencedRelation: "tasks"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "team_communications_team_id_fkey"
-            columns: ["team_id"]
-            isOneToOne: false
-            referencedRelation: "teams"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      teams: {
-        Row: {
-          created_at: string | null
-          description: string | null
-          id: string
-          is_active: boolean | null
-          metadata: Json | null
-          name: string
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          is_active?: boolean | null
-          metadata?: Json | null
-          name: string
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          is_active?: boolean | null
-          metadata?: Json | null
-          name?: string
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      technician_roles: {
-        Row: {
-          abbreviation: string | null
-          assigned_at: string | null
-          id: string
-          is_active: boolean | null
-          legacy_role_id: number | null
-          role_name: string
-          role_type: Database["public"]["Enums"]["technician_type"]
-          technician_id: string
-        }
-        Insert: {
-          abbreviation?: string | null
-          assigned_at?: string | null
-          id?: string
-          is_active?: boolean | null
-          legacy_role_id?: number | null
-          role_name: string
-          role_type: Database["public"]["Enums"]["technician_type"]
-          technician_id: string
-        }
-        Update: {
-          abbreviation?: string | null
-          assigned_at?: string | null
-          id?: string
-          is_active?: boolean | null
-          legacy_role_id?: number | null
-          role_name?: string
-          role_type?: Database["public"]["Enums"]["technician_type"]
-          technician_id?: string
-        }
-        Relationships: []
-      }
-      technicians: {
-        Row: {
-          created_at: string | null
-          email: string | null
-          first_name: string | null
-          hire_date: string | null
-          id: string
-          is_active: boolean | null
-          last_name: string | null
-          legacy_user_id: number | null
-          metadata: Json | null
-          phone: string | null
-          profile_id: string | null
-          specialty: string | null
-          updated_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          email?: string | null
-          first_name?: string | null
-          hire_date?: string | null
-          id?: string
-          is_active?: boolean | null
-          last_name?: string | null
-          legacy_user_id?: number | null
-          metadata?: Json | null
-          phone?: string | null
-          profile_id?: string | null
-          specialty?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          email?: string | null
-          first_name?: string | null
-          hire_date?: string | null
-          id?: string
-          is_active?: boolean | null
-          last_name?: string | null
-          legacy_user_id?: number | null
-          metadata?: Json | null
-          phone?: string | null
-          profile_id?: string | null
-          specialty?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      template_edit_roles: {
-        Row: {
-          id: string
-          role_id: string
-          template_id: string
-        }
-        Insert: {
-          id?: string
-          role_id: string
-          template_id: string
-        }
-        Update: {
-          id?: string
-          role_id?: string
-          template_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "template_edit_roles_role_id_fkey"
-            columns: ["role_id"]
-            isOneToOne: false
-            referencedRelation: "roles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "template_edit_roles_template_id_fkey"
-            columns: ["template_id"]
-            isOneToOne: false
-            referencedRelation: "templates"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      template_predecessors: {
-        Row: {
-          id: string
-          predecessor_id: string
-          template_id: string
-        }
-        Insert: {
-          id?: string
-          predecessor_id: string
-          template_id: string
-        }
-        Update: {
-          id?: string
-          predecessor_id?: string
-          template_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "template_predecessors_predecessor_id_fkey"
-            columns: ["predecessor_id"]
-            isOneToOne: false
-            referencedRelation: "templates"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "template_predecessors_template_id_fkey"
-            columns: ["template_id"]
-            isOneToOne: false
-            referencedRelation: "templates"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      template_products: {
-        Row: {
-          id: string
-          product_id: string
-          quantity: number
-          template_id: string
-        }
-        Insert: {
-          id?: string
-          product_id: string
-          quantity: number
-          template_id: string
-        }
-        Update: {
-          id?: string
-          product_id?: string
-          quantity?: number
-          template_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "template_products_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "template_products_template_id_fkey"
-            columns: ["template_id"]
-            isOneToOne: false
-            referencedRelation: "templates"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      template_view_groups: {
-        Row: {
-          group_name: string
-          id: string
-          template_id: string
-        }
-        Insert: {
-          group_name: string
-          id?: string
-          template_id: string
-        }
-        Update: {
-          group_name?: string
-          id?: string
-          template_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "template_view_groups_template_id_fkey"
-            columns: ["template_id"]
-            isOneToOne: false
-            referencedRelation: "templates"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      template_view_roles: {
-        Row: {
-          id: string
-          role_id: string
-          template_id: string
-        }
-        Insert: {
-          id?: string
-          role_id: string
-          template_id: string
-        }
-        Update: {
-          id?: string
-          role_id?: string
-          template_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "template_view_roles_role_id_fkey"
-            columns: ["role_id"]
-            isOneToOne: false
-            referencedRelation: "roles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "template_view_roles_template_id_fkey"
-            columns: ["template_id"]
-            isOneToOne: false
-            referencedRelation: "templates"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      templates: {
-        Row: {
-          action_name: string | null
-          category_id: string | null
-          created_at: string | null
-          description: string | null
-          estimated_duration_minutes: number | null
-          id: string
-          is_active: boolean | null
-          legacy_template_id: number | null
-          metadata: Json | null
-          name: string
-          updated_at: string | null
-        }
-        Insert: {
-          action_name?: string | null
-          category_id?: string | null
-          created_at?: string | null
-          description?: string | null
-          estimated_duration_minutes?: number | null
-          id?: string
-          is_active?: boolean | null
-          legacy_template_id?: number | null
-          metadata?: Json | null
-          name: string
-          updated_at?: string | null
-        }
-        Update: {
-          action_name?: string | null
-          category_id?: string | null
-          created_at?: string | null
-          description?: string | null
-          estimated_duration_minutes?: number | null
-          id?: string
-          is_active?: boolean | null
-          legacy_template_id?: number | null
-          metadata?: Json | null
-          name?: string
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "templates_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "categories"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      treatment_discussions: {
-        Row: {
-          action_completed: boolean | null
-          author_id: string | null
-          author_role: string | null
-          comment_id: string | null
-          content: string | null
-          created_at: string
-          discussion_type: string | null
-          edited_at: string | null
-          id: string
-          is_visible_to_patient: boolean | null
-          legacy_comment_id: number | null
-          parent_comment_id: string | null
-          project_id: string | null
-          requires_action: boolean | null
-          thread_id: string | null
-          treatment_id: string
-        }
-        Insert: {
-          action_completed?: boolean | null
-          author_id?: string | null
-          author_role?: string | null
-          comment_id?: string | null
-          content?: string | null
-          created_at?: string
-          discussion_type?: string | null
-          edited_at?: string | null
-          id?: string
-          is_visible_to_patient?: boolean | null
-          legacy_comment_id?: number | null
-          parent_comment_id?: string | null
-          project_id?: string | null
-          requires_action?: boolean | null
-          thread_id?: string | null
-          treatment_id: string
-        }
-        Update: {
-          action_completed?: boolean | null
-          author_id?: string | null
-          author_role?: string | null
-          comment_id?: string | null
-          content?: string | null
-          created_at?: string
-          discussion_type?: string | null
-          edited_at?: string | null
-          id?: string
-          is_visible_to_patient?: boolean | null
-          legacy_comment_id?: number | null
-          parent_comment_id?: string | null
-          project_id?: string | null
-          requires_action?: boolean | null
-          thread_id?: string | null
-          treatment_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "fk_treatment_disc_project"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "treatment_discussions_comment_id_fkey"
-            columns: ["comment_id"]
-            isOneToOne: false
-            referencedRelation: "comments"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "treatment_discussions_parent_comment_id_fkey"
-            columns: ["parent_comment_id"]
-            isOneToOne: false
-            referencedRelation: "treatment_discussions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      treatment_plans: {
-        Row: {
-          created_at: string | null
-          doctor_id: string | null
-          id: string
-          is_original: boolean | null
-          legacy_instruction_id: number | null
-          legacy_plan_id: number | null
-          metadata: Json | null
-          order_id: string | null
-          patient_id: string | null
-          plan_name: string | null
-          plan_notes: string | null
-          plan_number: number | null
-          project_id: string
-          revision_count: number | null
-          treatment_type: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          doctor_id?: string | null
-          id?: string
-          is_original?: boolean | null
-          legacy_instruction_id?: number | null
-          legacy_plan_id?: number | null
-          metadata?: Json | null
-          order_id?: string | null
-          patient_id?: string | null
-          plan_name?: string | null
-          plan_notes?: string | null
-          plan_number?: number | null
-          project_id: string
-          revision_count?: number | null
-          treatment_type?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          doctor_id?: string | null
-          id?: string
-          is_original?: boolean | null
-          legacy_instruction_id?: number | null
-          legacy_plan_id?: number | null
-          metadata?: Json | null
-          order_id?: string | null
-          patient_id?: string | null
-          plan_name?: string | null
-          plan_notes?: string | null
-          plan_number?: number | null
-          project_id?: string
-          revision_count?: number | null
-          treatment_type?: string | null
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "treatment_plans_order_id_fkey"
-            columns: ["order_id"]
-            isOneToOne: false
-            referencedRelation: "orders"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "treatment_plans_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      ware: {
-        Row: {
-          created_at: string | null
-          description: string | null
-          id: string
-          legacy_id: number | null
-          name: string
-          sku: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          legacy_id?: number | null
-          name: string
-          sku?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          legacy_id?: number | null
-          name?: string
-          sku?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      batch_enrich_sentiment_with_openai: {
-        Args: { api_key?: string; batch_size?: number }
-        Returns: {
-          api_cost_estimate: number
-          message_id: string
-          processing_status: string
-          sentiment: string
-        }[]
-      }
-      check_vector_extension: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      cleanup_orphaned_embeddings: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
-      deploy_edge_function: {
-        Args: {
-          entrypoint_path?: string
-          function_files: Json[]
-          function_name: string
-          import_map_path?: string
-          verify_jwt?: boolean
-        }
-        Returns: Json
-      }
-      enrich_message_sentiment: {
-        Args: { message_id: string }
-        Returns: Json
-      }
-      enrich_with_openai: {
-        Args: { api_key: string; message_id: string }
-        Returns: Json
-      }
-      exec_ddl: {
-        Args: { sql: string }
-        Returns: string
-      }
-      exec_sql: {
-        Args: { query: string; read_only?: boolean } | { sql: string }
-        Returns: string
-      }
-      get_edge_function_with_files: {
-        Args: { function_name: string }
-        Returns: Json
-      }
-      get_embedding_statistics: {
-        Args: Record<PropertyKey, never>
-        Returns: {
-          avg_content_length: number
-          embeddings_by_content_type: Json
-          embeddings_by_model: Json
-          embeddings_by_source_table: Json
-          newest_embedding: string
-          oldest_embedding: string
-          total_embeddings: number
-        }[]
-      }
-      get_table_schema: {
-        Args: { table_name: string }
-        Returns: {
-          column_name: string
-          data_type: string
-          is_nullable: string
-        }[]
-      }
-      gtrgm_compress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gtrgm_decompress: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gtrgm_in: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      gtrgm_options: {
-        Args: { "": unknown }
-        Returns: undefined
-      }
-      gtrgm_out: {
-        Args: { "": unknown }
-        Returns: unknown
-      }
-      initialize_migration_status: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      list_edge_functions_with_files: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
-      migrate_files_batch: {
-        Args: { batch_files: Json }
-        Returns: {
-          case_files_inserted: number
-          errors: string[]
-          files_inserted: number
-        }[]
-      }
-      populate_patient_events: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
-      process_messages_for_sentiment: {
-        Args: { batch_size?: number }
-        Returns: {
-          http_request_id: number
-          message_id: string
-          processing_status: string
-        }[]
-      }
-      run_sentiment_processing_job: {
-        Args: Record<PropertyKey, never>
-        Returns: {
-          batch_number: number
-          messages_processed: number
-          processing_time: unknown
-          total_cost_estimate: number
-        }[]
-      }
-      set_limit: {
-        Args: { "": number }
-        Returns: number
-      }
-      show_limit: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
-      show_trgm: {
-        Args: { "": string }
-        Returns: string[]
-      }
-      table_exists: {
-        Args: { table_name: string }
-        Returns: boolean
-      }
-      validate_profile_type: {
-        Args: {
-          expected_type: Database["public"]["Enums"]["profile_type"]
-          profile_id: string
-        }
-        Returns: boolean
-      }
-    }
-    Enums: {
-      case_complexity_type:
-        | "simple"
-        | "moderate"
-        | "complex"
-        | "comprehensive"
-        | "extraction"
-        | "surgical"
-        | "interceptive"
-        | "retention_only"
-      case_file_type:
-        | "intraoral_photo"
-        | "extraoral_photo"
-        | "xray"
-        | "cbct"
-        | "stl_upper"
-        | "stl_lower"
-        | "stl_bite"
-        | "impression"
-        | "treatment_plan"
-        | "progress_report"
-        | "patient_form"
-        | "lab_prescription"
-        | "correspondence"
-        | "insurance_document"
-        | "medical_history"
-        | "other"
-      case_message_type:
-        | "clinical_note"
-        | "patient_question"
-        | "doctor_response"
-        | "lab_communication"
-        | "appointment_reminder"
-        | "treatment_update"
-        | "administrative"
-        | "emergency"
-        | "prescription"
-        | "insurance_note"
-        | "billing_note"
-        | "system_message"
-        | "internal_note"
-      case_state_enum:
-        | "submitted"
-        | "under_review"
-        | "planning"
-        | "approved"
-        | "in_production"
-        | "quality_check"
-        | "shipped"
-        | "delivered"
-        | "completed"
-        | "on_hold"
-        | "cancelled"
-      case_state_type:
-        | "new"
-        | "consultation_scheduled"
-        | "consultation_completed"
-        | "diagnosis_in_progress"
-        | "awaiting_approval"
-        | "treatment_approved"
-        | "impressions_needed"
-        | "impressions_received"
-        | "treatment_planning"
-        | "plan_review"
-        | "plan_approved"
-        | "manufacturing"
-        | "quality_check"
-        | "ready_for_delivery"
-        | "delivered"
-        | "treatment_active"
-        | "mid_treatment_review"
-        | "refinement_needed"
-        | "refinement_active"
-        | "retention_phase"
-        | "follow_up"
-        | "case_closed"
-        | "discontinued"
-      case_status_type:
-        | "consultation"
-        | "diagnosis"
-        | "treatment_plan"
-        | "active"
-        | "refinement"
-        | "retention"
-        | "completed"
-        | "cancelled"
-        | "on_hold"
-        | "transferred"
-        | "revision"
-      case_type_enum:
-        | "initial_consultation"
-        | "treatment_planning"
-        | "active_treatment"
-        | "refinement"
-        | "retention"
-        | "emergency"
-        | "follow_up"
-      clinical_communication_type:
-        | "diagnosis_update"
-        | "treatment_modification"
-        | "clinical_observation"
-        | "consultation_request"
-        | "consultation_response"
-        | "clinical_approval"
-        | "clinical_concern"
-      comment_type_enum:
-        | "treatment_discussion"
-        | "doctor_note"
-        | "task_note"
-        | "notification_context"
-        | "record_annotation"
-      communication_status: "sent" | "delivered" | "read" | "archived"
-      course_type:
-        | "main"
-        | "refinement"
-        | "any"
-        | "replacement"
-        | "invoice"
-        | "merchandise"
-      discount_type: "percentage" | "fixed_amount" | "free_shipping" | "bundle"
-      doctor_status_type:
-        | "active"
-        | "pending"
-        | "training"
-        | "on_leave"
-        | "suspended"
-        | "retired"
-        | "transferred"
-        | "inactive"
-        | "locum"
-        | "consultant"
-      embedding_content_type:
-        | "case_summary"
-        | "treatment_plan"
-        | "notes"
-        | "diagnosis"
-      feedback_type:
-        | "complaint"
-        | "suggestion"
-        | "compliment"
-        | "quality_issue"
-        | "service_issue"
-        | "billing_dispute"
-        | "general_feedback"
-      file_type_enum:
-        | "scan"
-        | "photo"
-        | "xray"
-        | "document"
-        | "model"
-        | "simulation"
-        | "other"
-      gender: "male" | "female" | "other" | "unknown"
-      gender_type: "male" | "female" | "other" | "prefer_not_to_say"
-      message_priority: "low" | "normal" | "high" | "urgent"
-      message_type_enum:
-        | "general"
-        | "status_update"
-        | "question"
-        | "instruction"
-        | "approval_request"
-        | "system_notification"
-      migration_run_status: "running" | "completed" | "failed" | "pending"
-      migration_type: "full" | "incremental"
-      order_state_enum:
-        | "pending"
-        | "confirmed"
-        | "in_production"
-        | "quality_check"
-        | "shipped"
-        | "delivered"
-        | "completed"
-        | "cancelled"
-        | "refunded"
-      order_status:
-        | "no_product"
-        | "submitted"
-        | "approved"
-        | "in_production"
-        | "shipped"
-        | "add_plan"
-        | "on_hold"
-        | "cancelled"
-      patient_status_type:
-        | "active"
-        | "consultation"
-        | "treatment_plan"
-        | "in_treatment"
-        | "retention"
-        | "completed"
-        | "on_hold"
-        | "cancelled"
-        | "transferred"
-        | "archived"
-        | "prospect"
-      payment_status:
-        | "pending"
-        | "processing"
-        | "completed"
-        | "failed"
-        | "refunded"
-        | "cancelled"
-      practice_role: "owner" | "doctor" | "technician" | "assistant" | "admin"
-      priority_level: "low" | "medium" | "high" | "urgent"
-      product_category:
-        | "aligners"
-        | "retainers"
-        | "appliances"
-        | "accessories"
-        | "services"
-      profile_type:
-        | "patient"
-        | "doctor"
-        | "technician"
-        | "master"
-        | "sales_person"
-        | "agent"
-        | "client"
-      project_status:
-        | "draft"
-        | "in_review"
-        | "approved"
-        | "in_progress"
-        | "completed"
-        | "archived"
-        | "deleted"
-      project_status_enum:
-        | "draft"
-        | "in_progress"
-        | "review"
-        | "approved"
-        | "archived"
-        | "deleted"
-      project_type:
-        | "treatment_plan"
-        | "stl_upper"
-        | "stl_lower"
-        | "clinical_photo"
-        | "xray"
-        | "cbct_scan"
-        | "simulation"
-        | "aligner_design"
-        | "document"
-        | "other"
-      project_type_enum:
-        | "scan"
-        | "model"
-        | "simulation"
-        | "treatment_plan"
-        | "aligner_design"
-        | "impression"
-        | "xray"
-        | "photo"
-        | "document"
-        | "other"
-      severity: "critical" | "high" | "medium" | "low"
-      task_function_enum:
-        | "submit"
-        | "review"
-        | "approve"
-        | "process"
-        | "notify"
-        | "archive"
-        | "scan"
-        | "model"
-        | "manufacture"
-        | "quality_check"
-        | "ship"
-      task_status:
-        | "pending"
-        | "in_progress"
-        | "completed"
-        | "approved"
-        | "rejected"
-        | "cancelled"
-      team_communication_type:
-        | "status_update"
-        | "approval_request"
-        | "approval_granted"
-        | "approval_denied"
-        | "task_assignment"
-        | "quality_check"
-        | "production_note"
-        | "team_announcement"
-      technician_type:
-        | "sectioning"
-        | "quality_control"
-        | "designing"
-        | "manufacturing"
-        | "master"
-        | "remote"
-      treatment_status: "planning" | "active" | "completed" | "cancelled"
-      urgency_level: "emergency" | "urgent" | "routine" | "informational"
-      user_role: "doctor" | "technician" | "admin" | "support"
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
+/** Temporary mapping table for legacy ID to new UUID migration tracking */
+export interface MigrationMappings {
+  /**
+   * Type of entity (user, patient, instruction, etc.)
+   *
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format text
+   */
+  entity_type: string;
+  /**
+   * Original integer ID from legacy system
+   *
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format integer
+   */
+  legacy_id: number;
+  /**
+   * New UUID in target system
+   * @format uuid
+   */
+  new_id: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  migrated_at?: string;
+  /**
+   * Identifier for migration batch/run
+   * @format text
+   */
+  migration_batch?: string;
+  /** @format text */
+  notes?: string;
 }
 
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
-
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
-
-export type Tables<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+/** Many-to-many relationship between doctors and offices */
+export interface DoctorOffices {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /**
+   * Note:
+   * This is a Foreign Key to `offices.id`.<fk table='offices' column='id'/>
+   * @format uuid
+   */
+  office_id: string;
+  /**
+   * Whether this is the doctor's primary office
+   * @format boolean
+   * @default false
+   */
+  is_primary?: boolean;
+  /**
+   * When the doctor started at this office
+   * @format date
+   * @default "CURRENT_DATE"
+   */
+  start_date?: string;
+  /**
+   * When the doctor stopped working at this office (NULL = active)
+   * @format date
+   */
+  end_date?: string;
+  /**
+   * Role or title at this office
+   * @format text
+   */
+  role?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  created_at?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  updated_at?: string;
+  /** @format uuid */
+  doctor_id: string;
 }
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
-      Row: infer R
-    }
-    ? R
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-        Row: infer R
-      }
-      ? R
-      : never
-    : never
 
-export type TablesInsert<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+/** Financial transactions for orders */
+export interface Payments {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /**
+   * Maps to dispatch_payment.id from legacy system
+   * @format integer
+   */
+  legacy_payment_id?: number;
+  /** @format uuid */
+  order_id: string;
+  /**
+   * Note:
+   * This is a Foreign Key to `profiles.id`.<fk table='profiles' column='id'/>
+   * @format uuid
+   */
+  doctor_id?: string;
+  /**
+   * Note:
+   * This is a Foreign Key to `offices.id`.<fk table='offices' column='id'/>
+   * @format uuid
+   */
+  office_id?: string;
+  /**
+   * Human-readable payment identifier
+   * @format text
+   */
+  payment_number?: string;
+  /** @format numeric */
+  amount: number;
+  /**
+   * @format numeric
+   * @default 0
+   */
+  tax_amount?: number;
+  /** @format numeric */
+  total_amount: number;
+  /**
+   * @format boolean
+   * @default false
+   */
+  is_paid?: boolean;
+  /**
+   * @format boolean
+   * @default false
+   */
+  is_cancelled?: boolean;
+  /**
+   * @format boolean
+   * @default false
+   */
+  is_refunded?: boolean;
+  /** @format text */
+  payment_method?: string;
+  /**
+   * External payment processor transaction ID
+   * @format text
+   */
+  transaction_id?: string;
+  /** @format timestamp with time zone */
+  payment_date?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  created_at?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  updated_at?: string;
+  /** @format jsonb */
+  metadata?: any;
+  /**
+   * Note:
+   * This is a Foreign Key to `profiles.id`.<fk table='profiles' column='id'/>
+   * @format uuid
+   */
+  patient_id?: string;
+  /**
+   * @format character varying
+   * @maxLength 3
+   * @default "USD"
+   */
+  currency?: string;
+  /**
+   * @format public.payment_status
+   * @default "pending"
+   */
+  status?:
+    | "pending"
+    | "processing"
+    | "completed"
+    | "failed"
+    | "refunded"
+    | "cancelled";
+  /** @format text */
+  external_payment_id?: string;
+  /** @format text */
+  transaction_reference?: string;
+  /** @format timestamp with time zone */
+  processed_at?: string;
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Insert: infer I
-    }
-    ? I
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Insert: infer I
-      }
-      ? I
-      : never
-    : never
 
-export type TablesUpdate<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+/** Orthodontic bracket configurations for 3D treatment planning */
+export interface Brackets {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /**
+   * Maps to dispatch_bracket.id from legacy system
+   * @format integer
+   */
+  legacy_bracket_id?: number;
+  /**
+   * Note:
+   * This is a Foreign Key to `projects.id`.<fk table='projects' column='id'/>
+   * @format uuid
+   */
+  project_id?: string;
+  /** @format text */
+  name?: string;
+  /** @format text */
+  bracket_type?: string;
+  /**
+   * JSON configuration for 3D bracket placement
+   * @format jsonb
+   */
+  configuration?: any;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  created_at?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  updated_at?: string;
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Update: infer U
-    }
-    ? U
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Update: infer U
-      }
-      ? U
-      : never
-    : never
 
-export type Enums<
-  DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema["Enums"]
-    | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
-> = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+/** Internal notes about doctors for administrative purposes */
+export interface DoctorNotes {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /**
+   * Maps to dispatch_note.id from legacy system
+   * @format integer
+   */
+  legacy_note_id?: number;
+  /**
+   * Doctor that this note is about
+   *
+   * Note:
+   * This is a Foreign Key to `profiles.id`.<fk table='profiles' column='id'/>
+   * @format uuid
+   */
+  doctor_id: string;
+  /**
+   * User who wrote this note
+   *
+   * Note:
+   * This is a Foreign Key to `profiles.id`.<fk table='profiles' column='id'/>
+   * @format uuid
+   */
+  author_id?: string;
+  /** @format text */
+  text: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  created_at?: string;
+  /** @format jsonb */
+  metadata?: any;
 }
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-    : never
 
-export type CompositeTypes<
-  PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
-> = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
+/** Task template dependencies - defines which tasks must be completed before others */
+export interface TemplatePredecessors {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /**
+   * Template that depends on the predecessor
+   *
+   * Note:
+   * This is a Foreign Key to `templates.id`.<fk table='templates' column='id'/>
+   * @format uuid
+   */
+  template_id: string;
+  /**
+   * Template that must be completed first
+   *
+   * Note:
+   * This is a Foreign Key to `templates.id`.<fk table='templates' column='id'/>
+   * @format uuid
+   */
+  predecessor_id: string;
 }
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-    : never
 
-export const Constants = {
-  public: {
-    Enums: {
-      case_complexity_type: [
-        "simple",
-        "moderate",
-        "complex",
-        "comprehensive",
-        "extraction",
-        "surgical",
-        "interceptive",
-        "retention_only",
-      ],
-      case_file_type: [
-        "intraoral_photo",
-        "extraoral_photo",
-        "xray",
-        "cbct",
-        "stl_upper",
-        "stl_lower",
-        "stl_bite",
-        "impression",
-        "treatment_plan",
-        "progress_report",
-        "patient_form",
-        "lab_prescription",
-        "correspondence",
-        "insurance_document",
-        "medical_history",
-        "other",
-      ],
-      case_message_type: [
-        "clinical_note",
-        "patient_question",
-        "doctor_response",
-        "lab_communication",
-        "appointment_reminder",
-        "treatment_update",
-        "administrative",
-        "emergency",
-        "prescription",
-        "insurance_note",
-        "billing_note",
-        "system_message",
-        "internal_note",
-      ],
-      case_state_enum: [
-        "submitted",
-        "under_review",
-        "planning",
-        "approved",
-        "in_production",
-        "quality_check",
-        "shipped",
-        "delivered",
-        "completed",
-        "on_hold",
-        "cancelled",
-      ],
-      case_state_type: [
-        "new",
-        "consultation_scheduled",
-        "consultation_completed",
-        "diagnosis_in_progress",
-        "awaiting_approval",
-        "treatment_approved",
-        "impressions_needed",
-        "impressions_received",
-        "treatment_planning",
-        "plan_review",
-        "plan_approved",
-        "manufacturing",
-        "quality_check",
-        "ready_for_delivery",
-        "delivered",
-        "treatment_active",
-        "mid_treatment_review",
-        "refinement_needed",
-        "refinement_active",
-        "retention_phase",
-        "follow_up",
-        "case_closed",
-        "discontinued",
-      ],
-      case_status_type: [
-        "consultation",
-        "diagnosis",
-        "treatment_plan",
-        "active",
-        "refinement",
-        "retention",
-        "completed",
-        "cancelled",
-        "on_hold",
-        "transferred",
-        "revision",
-      ],
-      case_type_enum: [
-        "initial_consultation",
-        "treatment_planning",
-        "active_treatment",
-        "refinement",
-        "retention",
-        "emergency",
-        "follow_up",
-      ],
-      clinical_communication_type: [
-        "diagnosis_update",
-        "treatment_modification",
-        "clinical_observation",
-        "consultation_request",
-        "consultation_response",
-        "clinical_approval",
-        "clinical_concern",
-      ],
-      comment_type_enum: [
-        "treatment_discussion",
-        "doctor_note",
-        "task_note",
-        "notification_context",
-        "record_annotation",
-      ],
-      communication_status: ["sent", "delivered", "read", "archived"],
-      course_type: [
-        "main",
-        "refinement",
-        "any",
-        "replacement",
-        "invoice",
-        "merchandise",
-      ],
-      discount_type: ["percentage", "fixed_amount", "free_shipping", "bundle"],
-      doctor_status_type: [
-        "active",
-        "pending",
-        "training",
-        "on_leave",
-        "suspended",
-        "retired",
-        "transferred",
-        "inactive",
-        "locum",
-        "consultant",
-      ],
-      embedding_content_type: [
-        "case_summary",
-        "treatment_plan",
-        "notes",
-        "diagnosis",
-      ],
-      feedback_type: [
-        "complaint",
-        "suggestion",
-        "compliment",
-        "quality_issue",
-        "service_issue",
-        "billing_dispute",
-        "general_feedback",
-      ],
-      file_type_enum: [
-        "scan",
-        "photo",
-        "xray",
-        "document",
-        "model",
-        "simulation",
-        "other",
-      ],
-      gender: ["male", "female", "other", "unknown"],
-      gender_type: ["male", "female", "other", "prefer_not_to_say"],
-      message_priority: ["low", "normal", "high", "urgent"],
-      message_type_enum: [
-        "general",
-        "status_update",
-        "question",
-        "instruction",
-        "approval_request",
-        "system_notification",
-      ],
-      migration_run_status: ["running", "completed", "failed", "pending"],
-      migration_type: ["full", "incremental"],
-      order_state_enum: [
-        "pending",
-        "confirmed",
-        "in_production",
-        "quality_check",
-        "shipped",
-        "delivered",
-        "completed",
-        "cancelled",
-        "refunded",
-      ],
-      order_status: [
-        "no_product",
-        "submitted",
-        "approved",
-        "in_production",
-        "shipped",
-        "add_plan",
-        "on_hold",
-        "cancelled",
-      ],
-      patient_status_type: [
-        "active",
-        "consultation",
-        "treatment_plan",
-        "in_treatment",
-        "retention",
-        "completed",
-        "on_hold",
-        "cancelled",
-        "transferred",
-        "archived",
-        "prospect",
-      ],
-      payment_status: [
-        "pending",
-        "processing",
-        "completed",
-        "failed",
-        "refunded",
-        "cancelled",
-      ],
-      practice_role: ["owner", "doctor", "technician", "assistant", "admin"],
-      priority_level: ["low", "medium", "high", "urgent"],
-      product_category: [
-        "aligners",
-        "retainers",
-        "appliances",
-        "accessories",
-        "services",
-      ],
-      profile_type: [
-        "patient",
-        "doctor",
-        "technician",
-        "master",
-        "sales_person",
-        "agent",
-        "client",
-      ],
-      project_status: [
-        "draft",
-        "in_review",
-        "approved",
-        "in_progress",
-        "completed",
-        "archived",
-        "deleted",
-      ],
-      project_status_enum: [
-        "draft",
-        "in_progress",
-        "review",
-        "approved",
-        "archived",
-        "deleted",
-      ],
-      project_type: [
-        "treatment_plan",
-        "stl_upper",
-        "stl_lower",
-        "clinical_photo",
-        "xray",
-        "cbct_scan",
-        "simulation",
-        "aligner_design",
-        "document",
-        "other",
-      ],
-      project_type_enum: [
-        "scan",
-        "model",
-        "simulation",
-        "treatment_plan",
-        "aligner_design",
-        "impression",
-        "xray",
-        "photo",
-        "document",
-        "other",
-      ],
-      severity: ["critical", "high", "medium", "low"],
-      task_function_enum: [
-        "submit",
-        "review",
-        "approve",
-        "process",
-        "notify",
-        "archive",
-        "scan",
-        "model",
-        "manufacture",
-        "quality_check",
-        "ship",
-      ],
-      task_status: [
-        "pending",
-        "in_progress",
-        "completed",
-        "approved",
-        "rejected",
-        "cancelled",
-      ],
-      team_communication_type: [
-        "status_update",
-        "approval_request",
-        "approval_granted",
-        "approval_denied",
-        "task_assignment",
-        "quality_check",
-        "production_note",
-        "team_announcement",
-      ],
-      technician_type: [
-        "sectioning",
-        "quality_control",
-        "designing",
-        "manufacturing",
-        "master",
-        "remote",
-      ],
-      treatment_status: ["planning", "active", "completed", "cancelled"],
-      urgency_level: ["emergency", "urgent", "routine", "informational"],
-      user_role: ["doctor", "technician", "admin", "support"],
-    },
-  },
-} as const
+/** Line items for payments - detailed breakdown of what was purchased (maps to legacy wares) */
+export interface PaymentItems {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /**
+   * Maps to dispatch_ware.id from legacy system
+   * @format integer
+   */
+  legacy_ware_id?: number;
+  /**
+   * Note:
+   * This is a Foreign Key to `payments.id`.<fk table='payments' column='id'/>
+   * @format uuid
+   */
+  payment_id: string;
+  /**
+   * Note:
+   * This is a Foreign Key to `products.id`.<fk table='products' column='id'/>
+   * @format uuid
+   */
+  product_id?: string;
+  /**
+   * Note:
+   * This is a Foreign Key to `purchases.id`.<fk table='purchases' column='id'/>
+   * @format uuid
+   */
+  purchase_id?: string;
+  /** @format text */
+  name: string;
+  /**
+   * @format integer
+   * @default 1
+   */
+  quantity?: number;
+  /** @format text */
+  description?: string;
+  /**
+   * @format boolean
+   * @default false
+   */
+  is_free?: boolean;
+  /**
+   * Standard global pricing for this item
+   * @format numeric
+   */
+  global_price?: number;
+  /**
+   * Doctor-specific pricing if applicable
+   * @format numeric
+   */
+  doctor_price?: number;
+  /**
+   * Base price before discounts
+   * @format numeric
+   */
+  base_price: number;
+  /** @format integer */
+  discount_percent?: number;
+  /** @format numeric */
+  discount_amount?: number;
+  /** @format numeric */
+  discount_price?: number;
+  /** @format text */
+  discount_reason?: string;
+  /** @format numeric */
+  total_price: number;
+  /** @format jsonb */
+  metadata?: any;
+}
 
+/** Orthodontic treatment orders migrated from legacy dispatch_instruction table */
+export interface Orders {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /**
+   * Maps to dispatch_instruction.id from legacy Django system
+   * @format integer
+   */
+  legacy_instruction_id?: number;
+  /**
+   * Note:
+   * This is a Foreign Key to `profiles.id`.<fk table='profiles' column='id'/>
+   * @format uuid
+   */
+  patient_id?: string;
+  /**
+   * Note:
+   * This is a Foreign Key to `profiles.id`.<fk table='profiles' column='id'/>
+   * @format uuid
+   */
+  doctor_id?: string;
+  /** @format text */
+  order_number: string;
+  /**
+   * @format text
+   * @default ""
+   */
+  notes?: string;
+  /**
+   * @format text
+   * @default ""
+   */
+  complaint?: string;
+  /** @format timestamp with time zone */
+  submitted_at?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  created_at?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  updated_at?: string;
+  /**
+   * @format text
+   * @default ""
+   */
+  exports?: string;
+  /** @format jsonb */
+  metadata?: any;
+  /**
+   * Note:
+   * This is a Foreign Key to `offices.id`.<fk table='offices' column='id'/>
+   * @format uuid
+   */
+  office_id?: string;
+  /** @format public.course_type */
+  course_type?:
+    | "main"
+    | "refinement"
+    | "any"
+    | "replacement"
+    | "invoice"
+    | "merchandise";
+  /**
+   * @format public.order_status
+   * @default "no_product"
+   */
+  status:
+    | "no_product"
+    | "submitted"
+    | "approved"
+    | "in_production"
+    | "shipped"
+    | "add_plan"
+    | "on_hold"
+    | "cancelled";
+  /** @format numeric */
+  amount?: number;
+  /** @format timestamp with time zone */
+  approved_at?: string;
+  /** @format timestamp with time zone */
+  shipped_at?: string;
+  /**
+   * @format boolean
+   * @default false
+   */
+  deleted?: boolean;
+  /** @format timestamp with time zone */
+  deleted_at?: string;
+}
+
+/** Order status history and workflow progression tracking */
+export interface OrderStates {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /**
+   * Note:
+   * This is a Foreign Key to `orders_backup_old.id`.<fk table='orders_backup_old' column='id'/>
+   * @format uuid
+   */
+  order_id: string;
+  /**
+   * User who triggered this status change
+   *
+   * Note:
+   * This is a Foreign Key to `profiles.id`.<fk table='profiles' column='id'/>
+   * @format uuid
+   */
+  actor_id: string;
+  /** @format text */
+  reason?: string;
+  /** @format jsonb */
+  metadata?: any;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  changed_at?: string;
+  /**
+   * Maps to dispatch_state.id from legacy system
+   * @format integer
+   */
+  legacy_state_id?: number;
+  /**
+   * Current order status in unified enum format
+   * @format public.order_status
+   */
+  status?:
+    | "no_product"
+    | "submitted"
+    | "approved"
+    | "in_production"
+    | "shipped"
+    | "add_plan"
+    | "on_hold"
+    | "cancelled";
+  /**
+   * Maps to "on" field in legacy - whether this status is currently active
+   * @format boolean
+   */
+  is_active?: boolean;
+}
+
+export interface LegacyUserMapping {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   */
+  profile_id?: string;
+  /** @format integer */
+  legacy_user_id?: number;
+  /** @format text */
+  username?: string;
+  /** @format text */
+  email?: string;
+  /** @format text */
+  first_name?: string;
+  /** @format text */
+  last_name?: string;
+  /** @format public.profile_type */
+  profile_type?:
+    | "patient"
+    | "doctor"
+    | "technician"
+    | "master"
+    | "sales_person"
+    | "support_agent"
+    | "admin";
+  /** @format text */
+  was_superuser?: string;
+  /** @format text */
+  was_staff?: string;
+  /** @format jsonb */
+  legacy_groups?: any;
+  /** @format text */
+  had_duplicate_email?: string;
+}
+
+/** Technician specializations and roles */
+export interface TechnicianRoles {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /**
+   * Maps to dispatch_role.id from legacy system
+   * @format integer
+   */
+  legacy_role_id?: number;
+  /**
+   * Note:
+   * This is a Foreign Key to `profiles.id`.<fk table='profiles' column='id'/>
+   * @format uuid
+   */
+  technician_id: string;
+  /** @format public.technician_type */
+  role_type:
+    | "sectioning"
+    | "quality_control"
+    | "designing"
+    | "manufacturing"
+    | "master"
+    | "remote";
+  /** @format text */
+  role_name: string;
+  /** @format text */
+  abbreviation?: string;
+  /**
+   * @format boolean
+   * @default true
+   */
+  is_active?: boolean;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  assigned_at?: string;
+}
+
+/** Comprehensive audit trail for all data changes */
+export interface AuditLog {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /**
+   * Name of table that was modified
+   * @format text
+   */
+  table_name: string;
+  /**
+   * UUID of the record that was modified
+   * @format uuid
+   */
+  record_id: string;
+  /**
+   * Type of operation: INSERT, UPDATE, or DELETE
+   * @format text
+   */
+  action: string;
+  /**
+   * Note:
+   * This is a Foreign Key to `profiles.id`.<fk table='profiles' column='id'/>
+   * @format uuid
+   */
+  user_id?: string;
+  /**
+   * New data after the change
+   * @format jsonb
+   */
+  changed_data?: any;
+  /**
+   * Data before the change (for UPDATE and DELETE)
+   * @format jsonb
+   */
+  previous_data?: any;
+  /** @format inet */
+  ip_address?: string;
+  /** @format text */
+  user_agent?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  created_at?: string;
+}
+
+/** Workflow and manufacturing tasks */
+export interface Tasks {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /**
+   * Maps to dispatch_task.id from legacy system
+   * @format integer
+   */
+  legacy_task_id?: number;
+  /** @format uuid */
+  order_id: string;
+  /**
+   * Note:
+   * This is a Foreign Key to `profiles.id`.<fk table='profiles' column='id'/>
+   * @format uuid
+   */
+  assigned_to?: string;
+  /**
+   * Note:
+   * This is a Foreign Key to `profiles.id`.<fk table='profiles' column='id'/>
+   * @format uuid
+   */
+  assigned_by?: string;
+  /**
+   * Task template/type name
+   * @format text
+   */
+  template_name: string;
+  /** @format text */
+  action_name?: string;
+  /** @format text */
+  description?: string;
+  /**
+   * 1=Both, 2=Upper, 3=Lower
+   * @format integer
+   */
+  jaw_specification?: number;
+  /**
+   * @format public.task_status
+   * @default "pending"
+   */
+  status:
+    | "pending"
+    | "in_progress"
+    | "completed"
+    | "approved"
+    | "rejected"
+    | "cancelled";
+  /**
+   * Legacy compatibility field for completion status
+   * @format boolean
+   * @default false
+   */
+  checked?: boolean;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  assigned_at?: string;
+  /** @format timestamp with time zone */
+  started_at?: string;
+  /** @format timestamp with time zone */
+  completed_at?: string;
+  /** @format timestamp with time zone */
+  approved_at?: string;
+  /** @format timestamp with time zone */
+  due_at?: string;
+  /**
+   * Quality assessment score from 0-100
+   * @format integer
+   */
+  quality_score?: number;
+  /** @format text */
+  quality_notes?: string;
+  /** @format jsonb */
+  metadata?: any;
+}
+
+/** Unified table for all users and patients in the BRIUS system - v2.0 schema */
+export interface Profiles {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /** @format text */
+  email?: string;
+  /** @format text */
+  first_name: string;
+  /** @format text */
+  last_name: string;
+  /** @format text */
+  phone?: string;
+  /** @format text */
+  avatar_url?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  created_at?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  updated_at?: string;
+  /**
+   * Maps to auth_user.id from legacy Django system
+   * @format integer
+   */
+  legacy_user_id?: number;
+  /**
+   * Maps to dispatch_patient.id from legacy Django system
+   * @format integer
+   */
+  legacy_patient_id?: number;
+  /**
+   * Determines the role and access level of the profile
+   * @format public.profile_type
+   */
+  profile_type:
+    | "patient"
+    | "doctor"
+    | "technician"
+    | "master"
+    | "sales_person"
+    | "support_agent"
+    | "admin";
+  /** @format date */
+  date_of_birth?: string;
+  /**
+   * @format public.gender
+   * @default "unknown"
+   */
+  gender?: "male" | "female" | "other" | "unknown";
+  /** @format text */
+  username?: string;
+  /** @format text */
+  password_hash?: string;
+  /**
+   * @format boolean
+   * @default true
+   */
+  is_active?: boolean;
+  /**
+   * @format boolean
+   * @default false
+   */
+  is_verified?: boolean;
+  /**
+   * @format boolean
+   * @default false
+   */
+  archived?: boolean;
+  /**
+   * @format boolean
+   * @default false
+   */
+  suspended?: boolean;
+  /** @format timestamp with time zone */
+  last_login_at?: string;
+  /**
+   * Patient identifier suffix like 51Bn from legacy system
+   * @format text
+   */
+  patient_suffix?: string;
+  /**
+   * Patient insurance and payment schemes from legacy
+   * @format jsonb
+   */
+  insurance_info?: any;
+  /**
+   * Patient medical history, conditions, and allergies
+   * @format jsonb
+   */
+  medical_history?: any;
+  /** @format jsonb */
+  metadata?: any;
+}
+
+/** Pricing offers for products, potentially customized per doctor */
+export interface Offers {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /**
+   * Maps to dispatch_offer.id from legacy system
+   * @format integer
+   */
+  legacy_offer_id?: number;
+  /**
+   * Note:
+   * This is a Foreign Key to `products.id`.<fk table='products' column='id'/>
+   * @format uuid
+   */
+  product_id?: string;
+  /**
+   * Note:
+   * This is a Foreign Key to `profiles.id`.<fk table='profiles' column='id'/>
+   * @format uuid
+   */
+  doctor_id?: string;
+  /**
+   * Price for both upper and lower jaws
+   * @format numeric
+   */
+  price_both?: number;
+  /**
+   * Price for upper jaw only
+   * @format numeric
+   */
+  price_upper?: number;
+  /**
+   * Price for lower jaw only
+   * @format numeric
+   */
+  price_lower?: number;
+  /**
+   * @format boolean
+   * @default true
+   */
+  is_active?: boolean;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  created_at?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  updated_at?: string;
+  /** @format jsonb */
+  metadata?: any;
+}
+
+/** Individual payment and refund transactions with external payment processor integration */
+export interface PaymentOperations {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /**
+   * Maps to dispatch_operation.id from legacy system
+   * @format integer
+   */
+  legacy_operation_id?: number;
+  /**
+   * Note:
+   * This is a Foreign Key to `payments.id`.<fk table='payments' column='id'/>
+   * @format uuid
+   */
+  payment_id: string;
+  /**
+   * Type of operation: payment or refund
+   * @format text
+   */
+  operation_type: string;
+  /** @format numeric */
+  amount: number;
+  /**
+   * Square payment processor order ID
+   * @format text
+   */
+  square_order_id?: string;
+  /** @format text */
+  square_payment_id?: string;
+  /** @format text */
+  square_refund_id?: string;
+  /** @format text */
+  card_brand?: string;
+  /** @format text */
+  card_bin?: string;
+  /**
+   * Last 4 digits of card number (masked)
+   * @format text
+   */
+  card_last_four?: string;
+  /**
+   * @format boolean
+   * @default false
+   */
+  is_office_card?: boolean;
+  /**
+   * @format integer
+   * @default 0
+   */
+  attempt_count?: number;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  processed_at?: string;
+  /** @format jsonb */
+  metadata?: any;
+}
+
+/** Task templates for workflow automation and manufacturing processes */
+export interface Templates {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /**
+   * Maps to dispatch_template.id from legacy system
+   * @format integer
+   */
+  legacy_template_id?: number;
+  /**
+   * Name of the task template
+   * @format text
+   */
+  task_name: string;
+  /** @format text */
+  action_name?: string;
+  /** @format text */
+  text_name?: string;
+  /** @format public.course_type */
+  course_type?:
+    | "main"
+    | "refinement"
+    | "any"
+    | "replacement"
+    | "invoice"
+    | "merchandise";
+  /**
+   * @format boolean
+   * @default false
+   */
+  is_separate?: boolean;
+  /**
+   * Type of user interaction required for this task
+   * @format text
+   */
+  function_type?: string;
+  /** @format text */
+  file_extensions?: string;
+  /**
+   * @format integer
+   * @default 0
+   */
+  duration_minutes?: number;
+  /**
+   * Order status that triggers this task
+   * @format public.order_status
+   */
+  status_trigger?:
+    | "no_product"
+    | "submitted"
+    | "approved"
+    | "in_production"
+    | "shipped"
+    | "add_plan"
+    | "on_hold"
+    | "cancelled";
+  /**
+   * Note:
+   * This is a Foreign Key to `categories.id`.<fk table='categories' column='id'/>
+   * @format uuid
+   */
+  category_id?: string;
+  /**
+   * @format boolean
+   * @default false
+   */
+  is_predefined?: boolean;
+  /**
+   * @format boolean
+   * @default false
+   */
+  is_readonly?: boolean;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  created_at?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  updated_at?: string;
+  /** @format jsonb */
+  metadata?: any;
+}
+
+/** System-wide configuration settings and feature flags (singleton table) */
+export interface GlobalSettings {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "00000000-0000-0000-0000-000000000000"
+   */
+  id: string;
+  /**
+   * @format integer
+   * @default 1
+   */
+  version?: number;
+  /**
+   * JSON object containing feature flags and their states
+   * @format jsonb
+   */
+  features?: any;
+  /**
+   * Date when discount counters were last reset
+   * @format date
+   */
+  reset_discount_date?: string;
+  /**
+   * @format boolean
+   * @default false
+   */
+  use_weights?: boolean;
+  /**
+   * @format integer
+   * @default 1
+   */
+  crown_weight?: number;
+  /**
+   * @format integer
+   * @default 1
+   */
+  inner_root_weight?: number;
+  /**
+   * @format integer
+   * @default 4
+   */
+  outer_root_weight?: number;
+  /**
+   * JSON configuration for customer/pricing tiers
+   * @format jsonb
+   */
+  tiers?: any;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  created_at?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  updated_at?: string;
+}
+
+/** Dental and orthodontic practices and offices */
+export interface Offices {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /**
+   * Maps to dispatch_office.id from legacy Django system
+   * @format integer
+   */
+  legacy_office_id?: number;
+  /** @format text */
+  name: string;
+  /** @format text */
+  phone?: string;
+  /** @format text */
+  email?: string;
+  /** @format text */
+  website?: string;
+  /** @format text */
+  address_line1?: string;
+  /** @format text */
+  address_line2?: string;
+  /** @format text */
+  city?: string;
+  /** @format text */
+  state?: string;
+  /** @format text */
+  zip?: string;
+  /**
+   * @format text
+   * @default "'US'::character varying"
+   */
+  country?: string;
+  /** @format numeric */
+  tax_rate?: number;
+  /** @format text */
+  tax_id?: string;
+  /**
+   * Square payment processing customer ID
+   * @format text
+   */
+  square_customer_id?: string;
+  /**
+   * NetSuite ERP integration identifier
+   * @format text
+   */
+  netsuite_id?: string;
+  /**
+   * @format boolean
+   * @default true
+   */
+  is_active?: boolean;
+  /**
+   * @format boolean
+   * @default true
+   */
+  email_notifications?: boolean;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  created_at?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  updated_at?: string;
+  /** @format jsonb */
+  metadata?: any;
+}
+
+export interface MigrationRuns {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /** @format public.migration_type */
+  type: "full" | "incremental";
+  /** @format public.migration_run_status */
+  status: "running" | "completed" | "failed" | "pending";
+  /** @format timestamp with time zone */
+  start_time: string;
+  /** @format timestamp with time zone */
+  end_time?: string;
+  /** @format jsonb */
+  log?: any;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  created_at?: string;
+}
+
+/** Computational processing agents for 3D modeling, simulation, and analysis */
+export interface ComputationalAgents {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /**
+   * Maps to dispatch_agent.id from legacy system
+   * @format integer
+   */
+  legacy_agent_id?: number;
+  /** @format text */
+  name: string;
+  /** @format text */
+  address?: string;
+  /**
+   * @format integer
+   * @default 0
+   */
+  port?: number;
+  /**
+   * @format integer
+   * @default 1
+   */
+  cpu_count?: number;
+  /**
+   * @format integer
+   * @default 1
+   */
+  memory_gb?: number;
+  /**
+   * @format integer
+   * @default 0
+   */
+  memory_used_gb?: number;
+  /**
+   * JSON object describing agent capabilities (ABAQUS, LCP_SERVER, etc.)
+   * @format jsonb
+   */
+  capabilities?: any;
+  /**
+   * @format boolean
+   * @default true
+   */
+  is_active?: boolean;
+  /**
+   * Last time agent reported its status
+   * @format timestamp with time zone
+   */
+  last_heartbeat?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  created_at?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  updated_at?: string;
+}
+
+/** Product catalog for orthodontic treatments */
+export interface Products {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /** @format text */
+  name: string;
+  /** @format text */
+  description?: string;
+  /** @format numeric */
+  base_price: number;
+  /** @format jsonb */
+  customizable_options?: any;
+  /**
+   * @format boolean
+   * @default true
+   */
+  active?: boolean;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  created_at?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  updated_at?: string;
+  /**
+   * Maps to dispatch_product.id from legacy system
+   * @format integer
+   */
+  legacy_product_id?: number;
+  /**
+   * Associated course/treatment type
+   * @format public.course_type
+   */
+  course_type:
+    | "main"
+    | "refinement"
+    | "any"
+    | "replacement"
+    | "invoice"
+    | "merchandise";
+  /**
+   * Type of orthodontic product (brava, aligner, etc.)
+   * @format text
+   */
+  product_type?: string;
+  /** @format text */
+  product_code?: string;
+  /**
+   * Whether this is a free product
+   * @format boolean
+   * @default false
+   */
+  is_free?: boolean;
+  /**
+   * Whether this is a substitute/replacement product
+   * @format boolean
+   * @default false
+   */
+  is_substitute?: boolean;
+  /**
+   * JSON configuration for product customization options
+   * @format jsonb
+   */
+  customization?: any;
+  /**
+   * @format boolean
+   * @default false
+   */
+  deleted?: boolean;
+}
+
+/** Digital assets and treatment plans */
+export interface Projects {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /**
+   * Maps to dispatch_project.id from legacy system
+   * @format integer
+   */
+  legacy_project_id?: number;
+  /**
+   * Maps to dispatch_plan.id from legacy system
+   * @format integer
+   */
+  legacy_plan_id?: number;
+  /** @format uuid */
+  order_id?: string;
+  /**
+   * Note:
+   * This is a Foreign Key to `profiles.id`.<fk table='profiles' column='id'/>
+   * @format uuid
+   */
+  creator_id: string;
+  /** @format text */
+  name: string;
+  /**
+   * Type of digital asset (STL, photos, treatment plans, etc.)
+   * @format public.project_type
+   */
+  project_type:
+    | "treatment_plan"
+    | "stl_upper"
+    | "stl_lower"
+    | "clinical_photo"
+    | "xray"
+    | "cbct_scan"
+    | "simulation"
+    | "aligner_design"
+    | "document"
+    | "other";
+  /**
+   * @format public.project_status
+   * @default "draft"
+   */
+  status:
+    | "draft"
+    | "in_review"
+    | "approved"
+    | "in_progress"
+    | "completed"
+    | "archived"
+    | "deleted";
+  /**
+   * Sequence number for treatment plans
+   * @format integer
+   */
+  plan_number?: number;
+  /**
+   * Whether this is the original plan vs revision
+   * @format boolean
+   * @default false
+   */
+  is_original?: boolean;
+  /** @format text */
+  plan_notes?: string;
+  /**
+   * Original file UUID from legacy system
+   * @format uuid
+   */
+  file_uid?: string;
+  /** @format text */
+  storage_path?: string;
+  /** @format bigint */
+  file_size_bytes?: number;
+  /** @format text */
+  mime_type?: string;
+  /**
+   * @format boolean
+   * @default false
+   */
+  is_public?: boolean;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  created_at?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  updated_at?: string;
+  /** @format jsonb */
+  metadata?: any;
+}
+
+/** Archived orders for historical reference and compliance */
+export interface OrdersArchive {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   */
+  id: string;
+  /** @format integer */
+  legacy_instruction_id?: number;
+  /** @format text */
+  order_number: string;
+  /**
+   * @format integer
+   * @default 0
+   */
+  order_sequence?: number;
+  /** @format uuid */
+  patient_id: string;
+  /** @format uuid */
+  doctor_id: string;
+  /** @format uuid */
+  office_id: string;
+  /** @format uuid */
+  parent_order_id?: string;
+  /** @format public.course_type */
+  course_type:
+    | "main"
+    | "refinement"
+    | "any"
+    | "replacement"
+    | "invoice"
+    | "merchandise";
+  /** @format text */
+  course_name?: string;
+  /** @format public.order_status */
+  status:
+    | "no_product"
+    | "submitted"
+    | "approved"
+    | "in_production"
+    | "shipped"
+    | "add_plan"
+    | "on_hold"
+    | "cancelled";
+  /** @format text */
+  complaint?: string;
+  /** @format text */
+  objective?: string;
+  /** @format text */
+  conditions?: string;
+  /** @format text */
+  clinical_notes?: string;
+  /** @format text */
+  scanner_notes?: string;
+  /**
+   * @format boolean
+   * @default false
+   */
+  comprehensive?: boolean;
+  /**
+   * @format boolean
+   * @default false
+   */
+  cbct_required?: boolean;
+  /**
+   * @format boolean
+   * @default false
+   */
+  accept_extraction?: boolean;
+  /** @format uuid */
+  upper_jaw_model_id?: string;
+  /** @format uuid */
+  lower_jaw_model_id?: string;
+  /** @format numeric */
+  price?: number;
+  /** @format numeric */
+  tax_amount?: number;
+  /** @format numeric */
+  discount_amount?: number;
+  /** @format numeric */
+  total_amount?: number;
+  /** @format timestamp with time zone */
+  submitted_at?: string;
+  /** @format timestamp with time zone */
+  approved_at?: string;
+  /** @format timestamp with time zone */
+  shipped_at?: string;
+  /** @format timestamp with time zone */
+  created_at?: string;
+  /** @format timestamp with time zone */
+  updated_at?: string;
+  /**
+   * When this order was moved to archive
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  archived_at?: string;
+  /**
+   * User who archived this order
+   * @format uuid
+   */
+  archived_by?: string;
+  /**
+   * Reason for archiving
+   * @format text
+   */
+  archive_reason?: string;
+  /**
+   * @format boolean
+   * @default false
+   */
+  deleted?: boolean;
+  /** @format timestamp with time zone */
+  deleted_at?: string;
+  /** @format jsonb */
+  metadata?: any;
+  /** @format jsonb */
+  exports?: any;
+}
+
+/** Track which users have read which messages for notification management */
+export interface MessageReadReceipts {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /**
+   * Maps to dispatch_reading.id from legacy system
+   * @format integer
+   */
+  legacy_reading_id?: number;
+  /**
+   * Note:
+   * This is a Foreign Key to `profiles.id`.<fk table='profiles' column='id'/>
+   * @format uuid
+   */
+  user_id: string;
+  /**
+   * Note:
+   * This is a Foreign Key to `messages.id`.<fk table='messages' column='id'/>
+   * @format uuid
+   */
+  message_id?: string;
+  /** @format public.message_type */
+  message_type:
+    | "plan_comment"
+    | "plan_note"
+    | "doctor_message"
+    | "patient_message"
+    | "system_note"
+    | "status_change"
+    | "quality_note"
+    | "shipping_note";
+  /**
+   * Legacy target ID for backward compatibility during migration
+   * @format integer
+   */
+  target_id?: number;
+  /**
+   * When the message was read (NULL means unread)
+   * @format timestamp with time zone
+   */
+  read_at?: string;
+}
+
+/** Product purchases and usage tracking */
+export interface Purchases {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /**
+   * Maps to dispatch_purchase.id from legacy system
+   * @format integer
+   */
+  legacy_purchase_id?: number;
+  /** @format uuid */
+  order_id?: string;
+  /**
+   * Note:
+   * This is a Foreign Key to `products.id`.<fk table='products' column='id'/>
+   * @format uuid
+   */
+  product_id: string;
+  /**
+   * @format integer
+   * @default 1
+   */
+  quantity?: number;
+  /**
+   * Quantity already used/consumed
+   * @format integer
+   * @default 0
+   */
+  used_quantity?: number;
+  /**
+   * Custom pricing for invoices
+   * @format numeric
+   */
+  custom_price?: number;
+  /** @format text */
+  description?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  purchased_at?: string;
+  /** @format jsonb */
+  metadata?: any;
+}
+
+/** Patient appointments, milestones, and important events */
+export interface PatientEvents {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /**
+   * Maps to dispatch_event.id from legacy system
+   * @format integer
+   */
+  legacy_event_id?: number;
+  /**
+   * Note:
+   * This is a Foreign Key to `profiles.id`.<fk table='profiles' column='id'/>
+   * @format uuid
+   */
+  patient_id: string;
+  /**
+   * Event description or appointment type
+   * @format text
+   */
+  title: string;
+  /**
+   * Scheduled date for the event
+   * @format date
+   */
+  event_date: string;
+  /**
+   * @format boolean
+   * @default false
+   */
+  is_completed?: boolean;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  created_at?: string;
+  /** @format timestamp with time zone */
+  completed_at?: string;
+  /** @format jsonb */
+  metadata?: any;
+}
+
+export interface FullOrdersMigrationLog {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format integer
+   */
+  id: number;
+  /** @format integer */
+  batch_number?: number;
+  /** @format integer */
+  start_legacy_id?: number;
+  /** @format integer */
+  end_legacy_id?: number;
+  /** @format integer */
+  processed_count?: number;
+  /** @format integer */
+  successful_count?: number;
+  /** @format integer */
+  failed_count?: number;
+  /** @format integer */
+  missing_mappings?: number;
+  /** @format text */
+  error_details?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  started_at?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  completed_at?: string;
+  /**
+   * @format text
+   * @default "completed"
+   */
+  status?: string;
+}
+
+/** Links between internal entities and external system references (replaces generic ContentTypes) */
+export interface ExternalLinks {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /**
+   * Maps to dispatch_link.id from legacy system
+   * @format integer
+   */
+  legacy_link_id?: number;
+  /**
+   * Type of entity being linked (office, patient, order, etc.)
+   * @format text
+   */
+  entity_type: string;
+  /**
+   * UUID of the internal entity being linked
+   * @format uuid
+   */
+  entity_id: string;
+  /**
+   * ID in the external system
+   * @format text
+   */
+  external_id: string;
+  /**
+   * Name of external system (netsuite, square, etc.)
+   * @format text
+   */
+  external_system?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  created_at?: string;
+  /** @format timestamp with time zone */
+  modified_at?: string;
+  /** @format jsonb */
+  metadata?: any;
+}
+
+/** Orthodontic jaw specifications */
+export interface Jaws {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /**
+   * Maps to dispatch_jaw.id from legacy system
+   * @format integer
+   */
+  legacy_jaw_id?: number;
+  /** @format uuid */
+  order_id?: string;
+  /**
+   * Note:
+   * This is a Foreign Key to `products.id`.<fk table='products' column='id'/>
+   * @format uuid
+   */
+  product_id?: string;
+  /** @format text */
+  jaw_type: string;
+  /**
+   * @format boolean
+   * @default false
+   */
+  labial?: boolean;
+  /**
+   * Teeth to bond (bit string representation)
+   * @format text
+   * @default "'0000000000000000'::character varying"
+   */
+  bond_teeth?: string;
+  /**
+   * Teeth to extract (bit string representation)
+   * @format text
+   * @default "'0000000000000000'::character varying"
+   */
+  extract_teeth?: string;
+  /** @format text */
+  replacement_reason?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  created_at?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  updated_at?: string;
+  /** @format jsonb */
+  metadata?: any;
+}
+
+export interface MigrationStatus {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format integer
+   */
+  id: number;
+  /** @format text */
+  current_step?: string;
+  /** @format integer */
+  progress_percentage?: number;
+  /** @format text */
+  details?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  updated_at?: string;
+}
+
+/** File management for orders and projects */
+export interface Files {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /**
+   * Maps to dispatch_file.id from legacy system
+   * @format integer
+   */
+  legacy_file_id?: number;
+  /**
+   * Unique file identifier used in URLs
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  file_uid: string;
+  /** @format text */
+  original_name: string;
+  /** @format text */
+  extension?: string;
+  /** @format uuid */
+  order_id?: string;
+  /**
+   * Note:
+   * This is a Foreign Key to `projects.id`.<fk table='projects' column='id'/>
+   * @format uuid
+   */
+  project_id?: string;
+  /**
+   * Note:
+   * This is a Foreign Key to `profiles.id`.<fk table='profiles' column='id'/>
+   * @format uuid
+   */
+  uploaded_by?: string;
+  /**
+   * Type of file (STL, photo, x-ray, etc.)
+   * @format public.project_type
+   */
+  file_type?:
+    | "treatment_plan"
+    | "stl_upper"
+    | "stl_lower"
+    | "clinical_photo"
+    | "xray"
+    | "cbct_scan"
+    | "simulation"
+    | "aligner_design"
+    | "document"
+    | "other";
+  /** @format text */
+  mime_type?: string;
+  /** @format bigint */
+  size_bytes?: number;
+  /** @format text */
+  storage_path: string;
+  /**
+   * @format text
+   * @default "s3"
+   */
+  storage_provider?: string;
+  /**
+   * @format text
+   * @default "uploaded"
+   */
+  status?: string;
+  /** @format timestamp with time zone */
+  processed_at?: string;
+  /**
+   * Image dimensions, EXIF data, etc.
+   * @format jsonb
+   */
+  image_metadata?: any;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  uploaded_at?: string;
+  /** @format jsonb */
+  metadata?: any;
+  /** @format text */
+  filename?: string;
+  /** @format bigint */
+  file_size_bytes?: number;
+  /** @format text */
+  checksum?: string;
+}
+
+/** Active and historical computational processing jobs */
+export interface ComputationalInstances {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /**
+   * Maps to dispatch_instance.id from legacy system
+   * @format integer
+   */
+  legacy_instance_id?: number;
+  /**
+   * Note:
+   * This is a Foreign Key to `projects.id`.<fk table='projects' column='id'/>
+   * @format uuid
+   */
+  project_id: string;
+  /**
+   * Note:
+   * This is a Foreign Key to `computational_agents.id`.<fk table='computational_agents' column='id'/>
+   * @format uuid
+   */
+  agent_id?: string;
+  /**
+   * User who initiated this computation
+   *
+   * Note:
+   * This is a Foreign Key to `profiles.id`.<fk table='profiles' column='id'/>
+   * @format uuid
+   */
+  opener_id?: string;
+  /**
+   * @format integer
+   * @default 0
+   */
+  port?: number;
+  /**
+   * Type of computational process
+   * @format text
+   */
+  instance_type?: string;
+  /**
+   * Position in processing queue
+   * @format integer
+   * @default 0
+   */
+  queue_position?: number;
+  /** @format jsonb */
+  parameters?: any;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  started_at?: string;
+  /** @format timestamp with time zone */
+  completed_at?: string;
+  /** @format jsonb */
+  metadata?: any;
+}
+
+/** All communications replacing legacy ContentTypes dispatch_record */
+export interface Messages {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /**
+   * Maps to dispatch_record.id from legacy system
+   * @format integer
+   */
+  legacy_record_id?: number;
+  /**
+   * Type of message for categorization and routing
+   * @format public.message_type
+   */
+  message_type:
+    | "plan_comment"
+    | "plan_note"
+    | "doctor_message"
+    | "patient_message"
+    | "system_note"
+    | "status_change"
+    | "quality_note"
+    | "shipping_note";
+  /** @format uuid */
+  order_id?: string;
+  /**
+   * Note:
+   * This is a Foreign Key to `projects.id`.<fk table='projects' column='id'/>
+   * @format uuid
+   */
+  project_id?: string;
+  /**
+   * Note:
+   * This is a Foreign Key to `tasks.id`.<fk table='tasks' column='id'/>
+   * @format uuid
+   */
+  task_id?: string;
+  /**
+   * Note:
+   * This is a Foreign Key to `profiles.id`.<fk table='profiles' column='id'/>
+   * @format uuid
+   */
+  patient_id?: string;
+  /**
+   * Note:
+   * This is a Foreign Key to `profiles.id`.<fk table='profiles' column='id'/>
+   * @format uuid
+   */
+  sender_id?: string;
+  /**
+   * Note:
+   * This is a Foreign Key to `profiles.id`.<fk table='profiles' column='id'/>
+   * @format uuid
+   */
+  recipient_id?: string;
+  /** @format text */
+  subject?: string;
+  /** @format text */
+  body: string;
+  /**
+   * Whether message is visible to all parties or private
+   * @format boolean
+   * @default true
+   */
+  is_public?: boolean;
+  /**
+   * @format boolean
+   * @default false
+   */
+  is_read?: boolean;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  created_at?: string;
+  /** @format timestamp with time zone */
+  read_at?: string;
+  /**
+   * Note:
+   * This is a Foreign Key to `messages.id`.<fk table='messages' column='id'/>
+   * @format uuid
+   */
+  parent_message_id?: string;
+  /**
+   * Groups related messages together
+   * @format uuid
+   */
+  thread_id?: string;
+  /** @format jsonb */
+  metadata?: any;
+}
+
+/** Discount rules and promotions for pricing offers */
+export interface Discounts {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /**
+   * Maps to dispatch_discount.id from legacy system
+   * @format integer
+   */
+  legacy_discount_id?: number;
+  /**
+   * Note:
+   * This is a Foreign Key to `offers.id`.<fk table='offers' column='id'/>
+   * @format uuid
+   */
+  offer_id: string;
+  /**
+   * Discount percentage (0-100)
+   * @format integer
+   */
+  percent: number;
+  /** @format text */
+  reason?: string;
+  /**
+   * Maximum number of times this discount can be used
+   * @format integer
+   */
+  max_count?: number;
+  /**
+   * @format integer
+   * @default 0
+   */
+  used_count?: number;
+  /** @format date */
+  start_date?: string;
+  /** @format date */
+  end_date?: string;
+  /**
+   * Whether discount applies to total period or per instance
+   * @format boolean
+   * @default false
+   */
+  is_total?: boolean;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  created_at?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  updated_at?: string;
+}
+
+export interface OrdersBackupOld {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /** @format uuid */
+  case_id: string;
+  /** @format uuid */
+  practice_id: string;
+  /** @format text */
+  order_number: string;
+  /**
+   * @format numeric
+   * @default 0
+   */
+  subtotal: number;
+  /**
+   * @format numeric
+   * @default 0
+   */
+  tax_amount: number;
+  /**
+   * @format numeric
+   * @default 0
+   */
+  total_amount: number;
+  /**
+   * @format text
+   * @default "USD"
+   */
+  currency: string;
+  /** @format text */
+  notes?: string;
+  /** @format jsonb */
+  metadata?: any;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  created_at?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  updated_at?: string;
+}
+
+export interface ProjectsMigrationLog {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format integer
+   */
+  id: number;
+  /** @format integer */
+  batch_number?: number;
+  /** @format integer */
+  start_legacy_id?: number;
+  /** @format integer */
+  end_legacy_id?: number;
+  /** @format integer */
+  processed_count?: number;
+  /** @format integer */
+  successful_count?: number;
+  /** @format integer */
+  failed_count?: number;
+  /** @format integer */
+  missing_creators?: number;
+  /** @format text */
+  error_details?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  started_at?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  completed_at?: string;
+  /**
+   * @format text
+   * @default "completed"
+   */
+  status?: string;
+}
+
+/** Hierarchical task categories for organizing templates and workflows */
+export interface Categories {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /**
+   * Maps to dispatch_category.id from legacy system
+   * @format integer
+   */
+  legacy_category_id?: number;
+  /** @format text */
+  name: string;
+  /**
+   * Self-reference for hierarchical categories
+   *
+   * Note:
+   * This is a Foreign Key to `categories.id`.<fk table='categories' column='id'/>
+   * @format uuid
+   */
+  parent_id?: string;
+  /**
+   * @format integer
+   * @default 0
+   */
+  display_order?: number;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  created_at?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  updated_at?: string;
+}
+
+export interface VMigrationStatus {
+  /** @format text */
+  entity?: string;
+  /** @format bigint */
+  total_count?: number;
+  /** @format bigint */
+  with_legacy_id?: number;
+  /** @format bigint */
+  new_records?: number;
+}
+
+export interface VOrderSummary {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   */
+  id?: string;
+  /** @format text */
+  order_number?: string;
+  /** @format text */
+  patient_name?: string;
+  /** @format text */
+  doctor_name?: string;
+  /** @format text */
+  office_name?: string;
+  /** @format public.order_status */
+  status?:
+    | "no_product"
+    | "submitted"
+    | "approved"
+    | "in_production"
+    | "shipped"
+    | "add_plan"
+    | "on_hold"
+    | "cancelled";
+  /** @format public.course_type */
+  course_type?:
+    | "main"
+    | "refinement"
+    | "any"
+    | "replacement"
+    | "invoice"
+    | "merchandise";
+  /** @format numeric */
+  amount?: number;
+  /** @format timestamp with time zone */
+  submitted_at?: string;
+  /** @format timestamp with time zone */
+  shipped_at?: string;
+  /** @format timestamp with time zone */
+  created_at?: string;
+}
+
+/** User notifications for various system events and updates */
+export interface Notifications {
+  /**
+   * Note:
+   * This is a Primary Key.<pk/>
+   * @format uuid
+   * @default "gen_random_uuid()"
+   */
+  id: string;
+  /**
+   * Maps to dispatch_notification.id from legacy system
+   * @format integer
+   */
+  legacy_notification_id?: number;
+  /**
+   * Note:
+   * This is a Foreign Key to `profiles.id`.<fk table='profiles' column='id'/>
+   * @format uuid
+   */
+  recipient_id: string;
+  /** @format text */
+  sender?: string;
+  /**
+   * Name of notification template used
+   * @format text
+   */
+  template_name?: string;
+  /**
+   * JSON context data for rendering the notification
+   * @format jsonb
+   */
+  template_context?: any;
+  /**
+   * @format boolean
+   * @default false
+   */
+  is_read?: boolean;
+  /**
+   * @format boolean
+   * @default true
+   */
+  should_send_email?: boolean;
+  /** @format boolean */
+  email_sent?: boolean;
+  /**
+   * Type of entity this notification relates to
+   * @format text
+   */
+  entity_type?: string;
+  /** @format uuid */
+  entity_id?: string;
+  /**
+   * @format timestamp with time zone
+   * @default "now()"
+   */
+  created_at?: string;
+  /** @format timestamp with time zone */
+  read_at?: string;
+  /** @format timestamp with time zone */
+  sent_at?: string;
+}
