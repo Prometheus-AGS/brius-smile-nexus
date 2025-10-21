@@ -2,8 +2,8 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@/types/database';
 import { interceptAuthError } from './auth-error-interceptor';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "https://vbcdbpkztpdrxpikzwbj.supabase.co";
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZiY2RicGt6dHBkcnhwaWt6d2JqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUwNjU4OTMsImV4cCI6MjA2MDY0MTg5M30.gYkMlc02xudZNEGLNRSIBAQrIgxVvNA0GJZaqg7Vwqo";
 
 // Debug logging for environment variables
 console.log('🔧 Supabase Debug - Environment Variables:');
