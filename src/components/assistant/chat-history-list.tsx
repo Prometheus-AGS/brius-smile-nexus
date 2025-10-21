@@ -4,7 +4,6 @@
  */
 
 import { memo, useMemo, useCallback, useState, useRef, useEffect } from 'react';
-import { FixedSizeList as List } from 'react-window';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';

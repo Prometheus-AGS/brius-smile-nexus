@@ -198,7 +198,10 @@ function loadEnvironmentConfig(): LangfuseEnvConfig {
     return LangfuseEnvSchema.parse(envConfig);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const missingFields = error.errors
+      const zodError = error as { issues?: Array<{ code: string; received?: string; path: string[]; message: string }> };
+      const issues = zodError.issues || [];
+      
+      const missingFields = issues
         .filter(err => err.code === 'invalid_type' && err.received === 'undefined')
         .map(err => err.path.join('.'));
       
@@ -206,7 +209,7 @@ function loadEnvironmentConfig(): LangfuseEnvConfig {
         throw new MissingEnvironmentVariableError(missingFields.join(', '));
       }
       
-      const invalidFields = error.errors
+      const invalidFields = issues
         .filter(err => err.code !== 'invalid_type' || err.received !== 'undefined')
         .map(err => `${err.path.join('.')}: ${err.message}`)
         .join('; ');

@@ -42,6 +42,11 @@ export const useNavigation = () => {
    */
   const isInPortal = location.pathname.startsWith('/portal');
 
+  /**
+   * Get the current app from the route path
+   */
+  const currentApp = location.pathname.split('/')[2] || 'home';
+
   return {
     // Navigation functions
     navigateTo,
@@ -49,6 +54,7 @@ export const useNavigation = () => {
     
     // Route information
     currentPath,
+    currentApp,
     isInPortal,
     
     // Sidebar state management
