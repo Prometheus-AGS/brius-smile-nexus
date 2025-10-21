@@ -10,29 +10,29 @@ import { Card, CardContent } from '@/components/ui/card';
  */
 const LoginPageSkeleton: React.FC = () => (
   <div className="min-h-screen flex items-center justify-center bg-brius-gradient px-4">
-    <Card className="w-full max-w-md">
-      <CardContent className="p-6">
+    <Card className="w-full max-w-md shadow-lg">
+      <CardContent className="p-8">
         <div className="flex flex-col items-center space-y-6">
           {/* Logo skeleton */}
-          <Skeleton className="h-12 w-32" />
+          <Skeleton className="h-12 w-32 bg-muted/50" />
           
           {/* Title skeleton */}
-          <div className="space-y-2 text-center">
-            <Skeleton className="h-8 w-40" />
-            <Skeleton className="h-4 w-56" />
+          <div className="space-y-2 text-center w-full">
+            <Skeleton className="h-8 w-40 mx-auto bg-muted/50" />
+            <Skeleton className="h-4 w-56 mx-auto bg-muted/50" />
           </div>
           
           {/* Form skeleton */}
           <div className="w-full space-y-4">
             <div className="space-y-2">
-              <Skeleton className="h-4 w-12" />
-              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-4 w-12 bg-muted/50" />
+              <Skeleton className="h-10 w-full bg-muted/50" />
             </div>
             <div className="space-y-2">
-              <Skeleton className="h-4 w-16" />
-              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-4 w-16 bg-muted/50" />
+              <Skeleton className="h-10 w-full bg-muted/50" />
             </div>
-            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full bg-brius-primary/20" />
           </div>
         </div>
       </CardContent>
