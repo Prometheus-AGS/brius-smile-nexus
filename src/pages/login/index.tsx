@@ -63,16 +63,7 @@ const LoginPage: React.FC = () => {
     return <LoginPageSkeleton />;
   }
 
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-      className="min-h-screen bg-brius-gradient"
-    >
-      <LoginForm />
-    </motion.div>
-  );
+  return <LoginForm />;
 };
 
 export default LoginPage;
