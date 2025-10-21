@@ -36,18 +36,19 @@ export const AssistantChat: React.FC<AssistantChatProps> = ({ className }) => {
 
   return (
     <div className={`flex flex-col h-full ${className || ''}`}>
-      {/* Error Display */}
-      {error && (
-        <Alert className="mb-4 mx-4 mt-4">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            {error.message || 'An error occurred while processing your request.'}
-          </AlertDescription>
-        </Alert>
-      )}
+      {/* Messages Area - scrollable content */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
+        {/* Error Display */}
+        {error && (
+          <Alert className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              {error.message || 'An error occurred while processing your request.'}
+            </AlertDescription>
+          </Alert>
+        )}
 
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {/* Messages or Welcome Screen */}
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center space-y-4">
             <Bot className="h-12 w-12 text-muted-foreground" />
@@ -114,8 +115,8 @@ export const AssistantChat: React.FC<AssistantChatProps> = ({ className }) => {
         )}
       </div>
 
-      {/* Input Form */}
-      <div className="border-t p-4">
+      {/* Input Form - pinned to bottom */}
+      <div className="border-t p-4 bg-background flex-shrink-0">
         <form onSubmit={handleSubmit} className="flex gap-2">
           <Input
             value={input}

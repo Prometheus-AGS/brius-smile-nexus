@@ -35,7 +35,7 @@ const queryClient = new QueryClient({
  * Loading fallback component for lazy-loaded routes
  */
 const RouteLoadingFallback: React.FC = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gray-50">
+  <div className="min-h-screen flex items-center justify-center bg-brius-gradient">
     <Card className="w-full max-w-md">
       <CardContent className="p-6">
         <div className="flex flex-col items-center space-y-4">

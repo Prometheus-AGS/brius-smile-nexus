@@ -173,13 +173,8 @@ export const LoginForm: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-brius-gradient px-4">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.3 }}
-      >
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
               <Logo />
             </div>
@@ -300,7 +295,6 @@ export const LoginForm: React.FC = () => {
             </form>
           </CardContent>
         </Card>
-      </motion.div>
     </div>
   );
 };

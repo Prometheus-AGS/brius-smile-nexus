@@ -101,22 +101,22 @@ const AssistantAppInner: React.FC = () => {
   }, [refreshDashboard]);
 
   return (
-    <div className="h-[calc(100vh-12rem)] flex flex-col">
+    <div className="flex flex-col h-full">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="flex-1 flex flex-col"
+        className="flex-1 flex flex-col min-h-0"
       >
-        <div className="flex-1 flex relative">
+        <div className="flex-1 flex relative min-h-0">
           {/* Chat History Sidebar */}
           <ChatHistorySidebar />
           
           {/* Main Content Area */}
-          <div className={`flex-1 flex flex-col transition-all duration-300 ease-in-out ${
+          <div className={`flex-1 flex flex-col transition-all duration-300 ease-in-out min-h-0 ${
             sidebarOpen ? 'ml-80' : 'ml-0'
           }`}>
-            <Card className="flex-1 flex flex-col">
+            <Card className="flex-1 flex flex-col min-h-0">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="font-display font-medium flex items-center gap-2">
@@ -170,7 +170,7 @@ const AssistantAppInner: React.FC = () => {
                 )}
               </CardHeader>
               
-              <CardContent className="flex-1 flex flex-col p-0">
+              <CardContent className="flex-1 flex flex-col p-0 min-h-0">
                 {/* Main Assistant Chat Interface wrapped in its own error boundary */}
                 <ErrorBoundary
                   showErrorDetails={process.env.NODE_ENV === 'development'}

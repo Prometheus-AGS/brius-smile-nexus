@@ -32,7 +32,7 @@
     
     /* Muted: Light Gray #ebeae8 */
     --muted: 40 5% 92%;
-    --muted-foreground: 203 17% 45%;
+    --muted-foreground: 203 17% 35%;
     
     /* Destructive */
     --destructive: 0 84.2% 60.2%;

@@ -11,9 +11,9 @@ import { ChatHistorySidebar } from '@/components/assistant/chat-history-sidebar'
  */
 const AssistantPage: React.FC = () => {
   return (
-    <div className="flex h-screen">
+    <div className="flex h-full">
       <ChatHistorySidebar />
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col min-h-0">
         <AssistantApp />
       </main>
     </div>
