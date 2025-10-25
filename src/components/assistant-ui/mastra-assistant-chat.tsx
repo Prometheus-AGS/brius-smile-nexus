@@ -26,8 +26,9 @@ import {
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import remarkBreaks from 'remark-breaks';
+import rehypePrism from 'rehype-prism-plus';
+import './prism-theme.css';
 
 // Import our custom hook
 import { useMastraChat } from '@/hooks/use-mastra-chat';
@@ -75,30 +76,30 @@ const MessageRenderer: React.FC<{ message: MastraChatMessage }> = ({ message }) 
       <div className="flex-1 min-w-0">
         <div className="bg-white border rounded-lg p-4">
           <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
+            remarkPlugins={[remarkGfm, remarkBreaks]}
+            rehypePlugins={[[rehypePrism, { ignoreMissing: true }]]}
             components={{
-              code({ className, children, ...props }) {
-                const match = /language-(\w+)/.exec(className || '');
-                const isInline = !match;
+              pre: ({ children, ...props }) => (
+                <pre {...props} className="overflow-x-auto rounded-lg border bg-muted p-4 my-4">
+                  {children}
+                </pre>
+              ),
+              code: ({ className, children, ...props }) => {
+                const isInlineCode = !className || !className.startsWith('language-');
                 
-                if (!isInline) {
-                  // Filter out problematic props for SyntaxHighlighter
-                  const { ref, key, ...syntaxProps } = props;
+                if (isInlineCode) {
                   return (
-                    <SyntaxHighlighter
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      style={tomorrow as any}
-                      language={match?.[1] || 'text'}
-                      PreTag="div"
-                      {...syntaxProps}
+                    <code
+                      {...props}
+                      className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold"
                     >
-                      {String(children).replace(/\n$/, '')}
-                    </SyntaxHighlighter>
+                      {children}
+                    </code>
                   );
                 }
                 
                 return (
-                  <code className={className} {...props}>
+                  <code {...props} className={className}>
                     {children}
                   </code>
                 );

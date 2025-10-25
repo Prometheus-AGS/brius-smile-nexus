@@ -1,70 +1,108 @@
 /**
  * Enhanced message component with advanced content rendering
- * Supports code blocks, Mermaid diagrams, and copy functionality
+ * Supports code blocks, Mermaid diagrams, SVG, and copy functionality
  */
 
-import React, { memo, useMemo } from 'react';
+import React, { memo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
+import rehypePrism from 'rehype-prism-plus';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { MessageCopyButton } from './copy-button';
-import { CodeBlock, InlineCode } from './code-block';
 import { MermaidDiagram } from './mermaid-diagram';
 import { SVGRenderer } from './svg-renderer';
 import { useClipboard } from '@/hooks/use-clipboard';
 import type { EnhancedMessageProps } from '@/types/assistant';
 import type { CopyResult } from '@/types/content-types';
 import { cn } from '@/lib/utils';
+import '../prism-theme.css';
 
 /**
  * Custom components for ReactMarkdown
  */
 const MarkdownComponents = {
-  // Code blocks
-  code: ({ inline, className, children, ..._props }: {
-    inline?: boolean;
-    className?: string;
-    children?: React.ReactNode;
-  }) => {
-    const match = /language-(\w+)/.exec(className || '');
-    const language = match ? match[1] : '';
-    const codeContent = String(children).replace(/\n$/, '');
+  // Pre-formatted code blocks with copy button  
+  pre: ({ children, ...props }: { children?: React.ReactNode }) => {
+    // Extract code content and language from children
+    const childArray = React.Children.toArray(children);
+    const codeElement = childArray.find(
+      (child): child is React.ReactElement => 
+        React.isValidElement(child) && child.type === 'code'
+    );
+    
+    if (codeElement && React.isValidElement(codeElement)) {
+      const codeProps = codeElement.props as { className?: string; children?: React.ReactNode };
+      const className = codeProps.className || '';
+      const match = /language-(\w+)/.exec(className);
+      const language = match ? match[1] : '';
+      const codeContent = String(codeProps.children).replace(/\n$/, '');
 
-    // Handle Mermaid diagrams
-    if (language === 'mermaid') {
+      // Handle Mermaid diagrams
+      if (language === 'mermaid') {
+        return (
+          <MermaidDiagram
+            code={codeContent}
+            className="my-4"
+          />
+        );
+      }
+
+      // Handle SVG content
+      if (language === 'svg' || codeContent.trim().startsWith('<svg')) {
+        return (
+          <SVGRenderer
+            code={codeContent}
+            className="my-4"
+          />
+        );
+      }
+
+      // Regular code block with copy button
       return (
-        <MermaidDiagram
-          code={codeContent}
-          className="my-4"
-        />
+        <div className="relative group my-4">
+          <div className="absolute top-2 right-2 z-10">
+            <MessageCopyButton content={codeContent} />
+          </div>
+          <pre {...props} className={cn('overflow-x-auto rounded-lg border bg-muted p-4', className)}>
+            {children}
+          </pre>
+        </div>
       );
     }
 
-    // Handle SVG content
-    if (language === 'svg' || (language === '' && codeContent.trim().startsWith('<svg'))) {
-      return (
-        <SVGRenderer
-          code={codeContent}
-          className="my-4"
-        />
-      );
-    }
-
-    // Handle inline code
-    if (inline) {
-      return <InlineCode code={codeContent} />;
-    }
-
-    // Handle code blocks
+    // Fallback for non-code pre blocks
     return (
-      <CodeBlock
-        code={codeContent}
-        language={language}
-        showLineNumbers={codeContent.split('\n').length > 10}
-        className="my-4"
-      />
+      <pre {...props} className="overflow-x-auto rounded-lg border bg-muted p-4 my-4">
+        {children}
+      </pre>
+    );
+  },
+
+  // Inline code
+  code: ({ className, children, ...props }: { className?: string; children?: React.ReactNode }) => {
+    const isInlineCode = !className || !className.startsWith('language-');
+    
+    if (isInlineCode) {
+      return (
+        <code 
+          {...props}
+          className={cn(
+            'relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold',
+            className
+          )}
+        >
+          {children}
+        </code>
+      );
+    }
+    
+    // For code blocks, render normally (will be wrapped by pre)
+    return (
+      <code {...props} className={className}>
+        {children}
+      </code>
     );
   },
 
@@ -245,7 +283,8 @@ export const EnhancedMessage: React.FC<EnhancedMessageProps> = memo(({
       <div className="p-4">
         <div className="prose prose-sm max-w-none dark:prose-invert">
           <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
+            remarkPlugins={[remarkGfm, remarkBreaks]}
+            rehypePlugins={[[rehypePrism, { ignoreMissing: true, showLineNumbers: true }]]}
             components={MarkdownComponents}
           >
             {message.content}
@@ -266,62 +305,5 @@ export const EnhancedMessage: React.FC<EnhancedMessageProps> = memo(({
 });
 
 EnhancedMessage.displayName = 'EnhancedMessage';
-
-/**
- * Message actions component for additional functionality
- */
-export const MessageActions: React.FC<{
-  content: string;
-  onCopy?: (result: CopyResult) => void;
-  onEdit?: () => void;
-  onDelete?: () => void;
-  className?: string;
-}> = memo(({ content, onCopy, onEdit, onDelete, className }) => {
-  const { copy } = useClipboard();
-
-  const handleCopyResult = async () => {
-    const result = await copy(content, 'text');
-    onCopy?.(result);
-  };
-
-  return (
-    <div className={cn('flex items-center gap-2', className)}>
-      <MessageCopyButton
-        content={content}
-        onCopy={onCopy}
-      />
-      
-      {onEdit && (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onEdit}
-          className="p-1 h-auto w-auto"
-          title="Edit message"
-        >
-          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-          </svg>
-        </Button>
-      )}
-      
-      {onDelete && (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onDelete}
-          className="p-1 h-auto w-auto hover:bg-destructive/10 text-destructive hover:text-destructive"
-          title="Delete message"
-        >
-          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-          </svg>
-        </Button>
-      )}
-    </div>
-  );
-});
-
-MessageActions.displayName = 'MessageActions';
 
 export default EnhancedMessage;

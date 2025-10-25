@@ -36,6 +36,13 @@ export default defineConfig({
     },
   },
   envPrefix: ['VITE_', 'TAURI_ENV_*'],
+  optimizeDeps: {
+    include: [
+      'react-syntax-highlighter',
+      'react-syntax-highlighter/dist/esm/styles/prism',
+      'refractor'
+    ]
+  },
   build: {
     // Tauri uses Chromium on Windows and WebKit on macOS and Linux
     target:
@@ -46,6 +53,10 @@ export default defineConfig({
     minify: !process.env.TAURI_ENV_DEBUG ? 'esbuild' : false,
     // produce sourcemaps for debug builds
     sourcemap: !!process.env.TAURI_ENV_DEBUG,
+    commonjsOptions: {
+      include: [/node_modules/],
+      transformMixedEsModules: true
+    }
   },
   preview: {
     allowedHosts: true, // Allow all hosts
