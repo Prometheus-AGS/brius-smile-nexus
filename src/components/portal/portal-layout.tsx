@@ -1,30 +1,22 @@
+/**
+ * Portal Layout Component (DEPRECATED - NOT USED)
+ * 
+ * This file is kept for reference but is NOT being used.
+ * The actual portal layout is in src/pages/portal/index.tsx
+ * which uses React Router's <Outlet /> pattern.
+ * 
+ * DO NOT USE THIS COMPONENT - IT CONFLICTS WITH REACT ROUTER
+ */
 
 import React from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from './app-sidebar';
 import { PortalHeader } from './portal-header';
 import { MobileNavigation } from './mobile-navigation';
-import { useNavigation } from '@/hooks/use-navigation';
-import { HomeApp } from '@/components/apps/home-app';
-import { AssistantApp } from '@/components/apps/assistant-app';
-import { LibraryApp } from '@/components/apps/library-app';
-import { ReportsApp } from '@/components/apps/reports-app';
-import { ProfileApp } from '@/components/apps/profile-app';
-import { SettingsApp } from '@/components/apps/settings-app';
-
-const appComponents = {
-  home: HomeApp,
-  assistant: AssistantApp,
-  library: LibraryApp,
-  reports: ReportsApp,
-  profile: ProfileApp,
-  settings: SettingsApp,
-};
 
 export const PortalLayout: React.FC = () => {
-  const { currentApp } = useNavigation();
-  const CurrentAppComponent = appComponents[currentApp as keyof typeof appComponents] || HomeApp;
-
+  console.warn('⚠️ DEPRECATED: portal-layout.tsx is being rendered but should not be used!');
+  
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
@@ -32,7 +24,17 @@ export const PortalLayout: React.FC = () => {
         <div className="flex-1 flex flex-col">
           <PortalHeader />
           <main className="flex-1 p-6 pb-20 md:pb-6 overflow-y-auto">
-            <CurrentAppComponent />
+            <div className="w-full h-full flex items-center justify-center">
+              <div className="text-center space-y-4">
+                <h1 className="text-2xl font-bold text-destructive">
+                  Configuration Error
+                </h1>
+                <p className="text-muted-foreground">
+                  Wrong portal layout component is being used.
+                  Please use src/pages/portal/index.tsx instead.
+                </p>
+              </div>
+            </div>
           </main>
         </div>
         <MobileNavigation />

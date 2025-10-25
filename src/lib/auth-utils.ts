@@ -312,7 +312,7 @@ export const createAgentInputContext = async (
     timestamp: new Date(),
     
     // Feature flags and capabilities
-    capabilities: ['chat', 'analysis', 'reports'],
+    capabilities: ['chat', 'analysis'],
     featureFlags: {
       useMastra: true,
       enableUserContext: true,
@@ -396,7 +396,7 @@ export const transformSupabaseUser: UserTransformer = (supabaseUser: SupabaseUse
     email: supabaseUser.email || '',
     name: userMetadata.full_name || userMetadata.name || supabaseUser.email?.split('@')[0] || 'User',
     role: appMetadata.role || 'Operations Manager',
-    permissions: appMetadata.permissions || ['home', 'assistant', 'library', 'orders', 'reports'],
+    permissions: appMetadata.permissions || ['home', 'assistant', 'orders'],
     avatar: userMetadata.avatar_url || undefined,
     email_verified: supabaseUser.email_confirmed_at ? true : false,
     created_at: supabaseUser.created_at,

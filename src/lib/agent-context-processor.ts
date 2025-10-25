@@ -420,7 +420,7 @@ export class AgentContextProcessor {
    */
   private applyAdminPermissions(permissions: PermissionMatrix): void {
     const resources: PermissionResource[] = [
-      'analytics', 'reports', 'dashboards', 'data_sources',
+      'analytics', 'dashboards', 'data_sources',
       'workflows', 'settings', 'users', 'clinical', 'business', 'system'
     ];
     
@@ -449,14 +449,6 @@ export class AgentContextProcessor {
       update: true,
     };
     
-    // Full reports access
-    permissions.reports = {
-      read: true,
-      create: true,
-      update: true,
-      delete: true,
-      export: true,
-    };
     
     // Full dashboards access
     permissions.dashboards = {
@@ -495,7 +487,7 @@ export class AgentContextProcessor {
    */
   private applyViewerPermissions(permissions: PermissionMatrix): void {
     const resources: PermissionResource[] = [
-      'analytics', 'reports', 'dashboards', 'clinical', 'business'
+      'analytics', 'dashboards', 'clinical', 'business'
     ];
     
     for (const resource of resources) {

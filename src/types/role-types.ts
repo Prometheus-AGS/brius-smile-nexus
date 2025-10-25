@@ -84,8 +84,6 @@ export type DataPermission =
 export type UIPermission =
   | 'all_pages'
   | 'admin_panel'
-  | 'library'
-  | 'reports'
   | 'assistant';
 
 /**
@@ -450,7 +448,7 @@ export const DEFAULT_PERMISSIONS: Record<SystemRoleName, PermissionMatrix> = {
     system: ['read'],
     mastra: ['orchestrator', 'business_intelligence'],
     data: ['read'],
-    ui: ['library', 'reports', 'assistant'],
+    ui: ['assistant'],
   },
   service_role: {
     system: ['read', 'write'],

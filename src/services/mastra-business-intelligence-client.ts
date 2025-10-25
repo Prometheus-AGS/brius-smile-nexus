@@ -54,7 +54,7 @@ function loadBusinessIntelligenceConfig(): MastraAgentConfig {
   } catch (error) {
     console.warn('Failed to parse BI agent environment variables, using defaults:', error);
     return {
-      baseUrl: 'http://localhost:3000',
+      baseUrl: 'http://localhost:4111',
       endpoint: '/agents/business-intelligence-agent/generate',
       timeout: 60000,
       maxRetries: 3,

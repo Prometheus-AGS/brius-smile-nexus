@@ -439,7 +439,7 @@ export interface MastraMultiAgentConfig {
  */
 export const MastraMultiAgentEnvSchema = z.object({
   // Base configuration
-  VITE_MASTRA_BASE_URL: z.string().url().default('http://localhost:3000'),
+  VITE_MASTRA_BASE_URL: z.string().url().default('http://localhost:4111'),
   VITE_MASTRA_API_KEY: z.string().optional(),
   VITE_MASTRA_DEBUG: z.coerce.boolean().default(false),
   

@@ -17,8 +17,6 @@ const SVGTestPage = React.lazy(() => import("./pages/svg-test"));
 const PortalLayout = React.lazy(() => import("./pages/portal/index"));
 const HomePage = React.lazy(() => import("./pages/portal/home"));
 const AssistantPage = React.lazy(() => import("./pages/portal/assistant"));
-const LibraryPage = React.lazy(() => import("./pages/portal/library"));
-const ReportsPage = React.lazy(() => import("./pages/portal/reports"));
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 
 
@@ -79,8 +77,6 @@ const App: React.FC = () => (
                 <Route path="/portal" element={<PortalLayout />}>
                   <Route index element={<HomePage />} />
                   <Route path="assistant" element={<AssistantPage />} />
-                  <Route path="library" element={<LibraryPage />} />
-                  <Route path="reports" element={<ReportsPage />} />
                 </Route>
 
                 {/* Future auth routes (to be implemented in Phase 3) */}

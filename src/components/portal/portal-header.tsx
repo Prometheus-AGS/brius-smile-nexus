@@ -7,8 +7,6 @@ import { useAuth } from '@/hooks/use-auth';
 const appTitles = {
   home: 'Dashboard',
   assistant: 'AI Assistant',
-  library: 'Knowledge Library',
-  reports: 'Reports & Analytics',
   profile: 'Profile',
   settings: 'Settings',
 };

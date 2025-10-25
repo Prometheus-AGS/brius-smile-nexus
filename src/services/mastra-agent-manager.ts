@@ -99,21 +99,21 @@ function loadMultiAgentConfig(): MastraMultiAgentConfig {
     console.warn('Failed to parse multi-agent environment variables, using defaults:', error);
     return {
       orchestrator: {
-        baseUrl: 'http://localhost:3000',
+        baseUrl: 'http://localhost:4111',
         endpoint: '/agents/orchestrator-agent/generate',
         timeout: 45000,
         maxRetries: 3,
         debug: false,
       },
       businessIntelligence: {
-        baseUrl: 'http://localhost:3000',
+        baseUrl: 'http://localhost:4111',
         endpoint: '/agents/business-intelligence-agent/generate',
         timeout: 60000,
         maxRetries: 3,
         debug: false,
       },
       default: {
-        baseUrl: 'http://localhost:3000',
+        baseUrl: 'http://localhost:4111',
         endpoint: '/agents/default-agent/generate',
         timeout: 30000,
         maxRetries: 3,

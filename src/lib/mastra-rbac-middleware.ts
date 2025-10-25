@@ -107,11 +107,6 @@ export const AGENT_PERMISSIONS: Record<string, OperationPermission> = {
     action: 'bi:dashboard',
     description: 'Access BI dashboards',
   },
-  BI_REPORT: {
-    category: 'mastra',
-    action: 'bi:report',
-    description: 'Generate BI reports',
-  },
 
   // Default Agent Permissions
   DEFAULT_QUERY: {
@@ -272,11 +267,10 @@ export function validateOrchestratorAccess(context: AgentInputContext): boolean 
 /**
  * Validates business intelligence agent access
  */
-export function validateBIAccess(context: AgentInputContext, operation: 'query' | 'dashboard' | 'report'): boolean {
+export function validateBIAccess(context: AgentInputContext, operation: 'query' | 'dashboard'): boolean {
   const permissionMap = {
     query: AGENT_PERMISSIONS.BI_QUERY,
     dashboard: AGENT_PERMISSIONS.BI_DASHBOARD,
-    report: AGENT_PERMISSIONS.BI_REPORT,
   };
 
   return validatePermission(context, permissionMap[operation]);

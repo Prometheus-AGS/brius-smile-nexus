@@ -48,7 +48,7 @@ export const MastraEnvSchema = z.object({
   VITE_MASTRA_DEBUG: z.coerce.boolean().default(false),
 }).transform((data) => {
   // Prefer VITE_MASTRA_BASE_URL, fall back to VITE_MASTRA_API_URL, then default
-  const baseUrl = data.VITE_MASTRA_BASE_URL || data.VITE_MASTRA_API_URL || 'http://localhost:3000';
+  const baseUrl = data.VITE_MASTRA_BASE_URL || data.VITE_MASTRA_API_URL || 'http://localhost:4111';
   
   return {
     ...data,

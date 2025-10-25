@@ -50,7 +50,7 @@ function loadDefaultAgentConfig(): MastraAgentConfig {
   } catch (error) {
     console.warn('Failed to parse default agent environment variables, using defaults:', error);
     return {
-      baseUrl: 'http://localhost:3000',
+      baseUrl: 'http://localhost:4111',
       endpoint: '/agents/default-agent/generate',
       timeout: 30000,
       maxRetries: 3,

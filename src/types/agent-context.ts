@@ -29,7 +29,6 @@ export type PermissionAction =
  */
 export type PermissionResource =
   | 'analytics'
-  | 'reports'
   | 'dashboards'
   | 'data_sources'
   | 'workflows'
@@ -274,10 +273,6 @@ export const DEFAULT_ANONYMOUS_PERMISSIONS: PermissionMatrix = {
     query: false,
     export: false,
   },
-  reports: {
-    read: true,
-    create: false,
-  },
   dashboards: {
     read: true,
     create: false,
@@ -315,12 +310,6 @@ export const DEFAULT_USER_PERMISSIONS: PermissionMatrix = {
     read: true,
     query: true,
     export: false,
-  },
-  reports: {
-    read: true,
-    create: true,
-    update: true,
-    delete: false,
   },
   dashboards: {
     read: true,

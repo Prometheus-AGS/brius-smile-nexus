@@ -220,6 +220,31 @@ export const MastraAssistantChat: React.FC<MastraAssistantChatProps> = ({
       </CardHeader>
 
       <CardContent className="flex-1 flex flex-col gap-4 min-h-0">
+        {/* Offline Alert - Show prominently when disconnected */}
+        {!isConnected && !error && (
+          <Alert className="bg-yellow-50 border-yellow-200">
+            <AlertCircle className="h-4 w-4 text-yellow-600" />
+            <AlertDescription>
+              <div className="space-y-2">
+                <p className="font-semibold text-yellow-900">Mastra AI Service Offline</p>
+                <p className="text-sm text-yellow-800">
+                  The AI assistant service is currently unavailable.
+                  Please ensure the Mastra service is running at {import.meta.env.VITE_MASTRA_BASE_URL || 'http://localhost:4111'} to use the assistant.
+                </p>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => window.location.reload()}
+                  className="mt-2"
+                >
+                  <RefreshCw className="w-3 h-3 mr-1" />
+                  Retry Connection
+                </Button>
+              </div>
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Error Alert */}
         {error && (
           <Alert variant="destructive">

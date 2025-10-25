@@ -54,7 +54,7 @@ function loadOrchestratorConfig(): MastraAgentConfig {
   } catch (error) {
     console.warn('Failed to parse orchestrator environment variables, using defaults:', error);
     return {
-      baseUrl: 'http://localhost:3000',
+      baseUrl: 'http://localhost:4111',
       endpoint: '/agents/orchestrator-agent/generate',
       timeout: 45000,
       maxRetries: 3,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, MessageSquare, BookOpen, BarChart3, Menu, User, Settings } from 'lucide-react';
+import { Home, MessageSquare, Menu, User, Settings } from 'lucide-react';
 import {
   Sidebar,
   SidebarContent,
@@ -36,18 +36,6 @@ const menuItems = [
     title: 'Assistant',
     icon: MessageSquare,
     url: '/portal/assistant',
-  },
-  {
-    id: 'library',
-    title: 'Library',
-    icon: BookOpen,
-    url: '/portal/library',
-  },
-  {
-    id: 'reports',
-    title: 'Reports',
-    icon: BarChart3,
-    url: '/portal/reports',
   },
 ];
 

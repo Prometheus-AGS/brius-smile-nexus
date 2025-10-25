@@ -9,7 +9,6 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useChatStore } from '@/stores/assistant/chat-store';
-import { usePersistentChatStore } from '@/stores/chat-store';
 import { useMastraOrchestratorStore } from '@/stores/mastra-orchestrator-store';
 
 /**
@@ -17,7 +16,6 @@ import { useMastraOrchestratorStore } from '@/stores/mastra-orchestrator-store';
  */
 export interface StoreInitializationStatus {
   chatStore: 'idle' | 'loading' | 'success' | 'error';
-  persistentChatStore: 'idle' | 'loading' | 'success' | 'error';
   orchestratorStore: 'idle' | 'loading' | 'success' | 'error';
   isInitialized: boolean;
   errors: string[];
@@ -50,7 +48,6 @@ export function useMastraStoreInitialization(
 ) {
   const [status, setStatus] = useState<StoreInitializationStatus>({
     chatStore: 'idle',
-    persistentChatStore: 'idle',
     orchestratorStore: 'idle',
     isInitialized: false,
     errors: [],
@@ -61,7 +58,6 @@ export function useMastraStoreInitialization(
   
   // Get store initialization functions
   const initializeChatStore = useChatStore(state => state.initializeWithMastra);
-  const initializePersistentChatStore = usePersistentChatStore(state => state.initializeWithMastraData);
   const fetchAgentHealth = useMastraOrchestratorStore(state => state.fetchAgentHealthFromServer);
   
   useEffect(() => {
@@ -103,22 +99,6 @@ export function useMastraStoreInitialization(
         console.error('[MastraStoreInit] Chat store initialization failed', error);
       }
       
-      // Initialize persistent chat store (chat-store.ts)
-      try {
-        setStatus(prev => ({ ...prev, persistentChatStore: 'loading' }));
-        console.log('[MastraStoreInit] Initializing persistent chat store');
-        
-        await initializePersistentChatStore(userId);
-        
-        setStatus(prev => ({ ...prev, persistentChatStore: 'success' }));
-        console.log('[MastraStoreInit] Persistent chat store initialized successfully');
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Persistent chat store initialization failed';
-        errors.push(errorMessage);
-        setStatus(prev => ({ ...prev, persistentChatStore: 'error' }));
-        console.error('[MastraStoreInit] Persistent chat store initialization failed', error);
-      }
-      
       // Initialize orchestrator store (fetch agent health)
       try {
         setStatus(prev => ({ ...prev, orchestratorStore: 'loading' }));
@@ -144,8 +124,7 @@ export function useMastraStoreInitialization(
       }));
       
       const finalStatus = {
-        chatStore: errors.length === 3 ? 'error' as const : 'success' as const,
-        persistentChatStore: errors.length >= 2 ? 'error' as const : 'success' as const,
+        chatStore: errors.length === 2 ? 'error' as const : 'success' as const,
         orchestratorStore: errors.length >= 1 ? 'error' as const : 'success' as const,
       };
       
@@ -157,10 +136,7 @@ export function useMastraStoreInitialization(
     };
     
     initializeStores();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    // Intentionally excluding store functions from dependencies to prevent re-initialization loops
-    // Store functions are stable references from Zustand and won't change
-  }, [enabled, userId]);
+  }, [enabled, userId, initializeChatStore, fetchAgentHealth]);
   
   /**
    * Force re-initialization of all stores
@@ -178,7 +154,6 @@ export function useMastraStoreInitialization(
     
     setStatus({
       chatStore: 'idle',
-      persistentChatStore: 'idle',
       orchestratorStore: 'idle',
       isInitialized: false,
       errors: [],
@@ -190,8 +165,7 @@ export function useMastraStoreInitialization(
     reinitialize,
     // Convenience flags
     hasErrors: status.errors.length > 0,
-    allStoresReady: status.chatStore === 'success' && 
-                    status.persistentChatStore === 'success' && 
+    allStoresReady: status.chatStore === 'success' &&
                     status.orchestratorStore === 'success',
   };
 }
@@ -229,11 +203,9 @@ export function useMastraStoresReady(
  */
 export function getMastraStoreInitializationStatus() {
   const chatInitialized = useChatStore.getState().isInitialized;
-  const persistentChatInitialized = usePersistentChatStore.getState().isInitialized;
   
   return {
     chatStoreInitialized: chatInitialized,
-    persistentChatStoreInitialized: persistentChatInitialized,
-    allInitialized: chatInitialized && persistentChatInitialized,
+    allInitialized: chatInitialized,
   };
 }

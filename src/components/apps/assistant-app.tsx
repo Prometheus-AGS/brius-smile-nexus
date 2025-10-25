@@ -1,28 +1,24 @@
 /**
  * AssistantApp component - Main application wrapper for the AI assistant
- * Integrates Mastra-based chat with business intelligence features
- * Enhanced with comprehensive error boundary protection
+ * TEMPORARY STATE: Chat functionality temporarily disabled while rebuilding
  *
- * MASTRA-ONLY ARCHITECTURE:
- * - Uses MastraAssistantChat component exclusively
- * - No OpenAI fallbacks or legacy chat implementations
- * - Real-time streaming from Mastra server at https://mastra.brius.com
+ * NEXT STEPS:
+ * - Rebuild chat with proper Mastra integration
+ * - Align with actual Mastra server at /Users/gqadonis/Projects/prometheus/brius/brius-mastra-final
  */
 
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Bot, BarChart3, RefreshCw } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { BarChart3, RefreshCw, WifiOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { MastraAssistantChat } from '@/components/assistant-ui';
+import { ChatPlaceholder } from '@/components/assistant-ui/chat-placeholder';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { ChatHistorySidebar } from '@/components/assistant/chat-history-sidebar';
 import { ChatHistoryToggle } from '@/components/assistant/chat-history-toggle';
 import { useDashboardActions, useDashboardData } from '@/stores/dashboard-store';
-import { useChatActions } from '@/stores/chat-store';
 import { useChatSidebar } from '@/hooks/use-chat-sidebar';
 import { useAuth } from '@/hooks/use-auth';
-import type { AssistantError, AssistantMessage, AssistantThread } from '@/types/assistant';
 
 /**
  * Inner AssistantApp component (wrapped by error boundary)
@@ -36,11 +32,12 @@ const AssistantAppInner: React.FC = () => {
   const { loadDashboard, refreshDashboard } = useDashboardActions();
   const { currentDashboard, isLoading: dashboardLoading, error: dashboardError } = useDashboardData();
   
-  // Chat store integration
-  const { loadHistory } = useChatActions();
-  
   // Chat sidebar integration with debugging
   const { isOpen: sidebarOpen, toggleSidebar } = useChatSidebar();
+  
+  // Track initialization errors
+  const [initError, setInitError] = useState<string | null>(null);
+  const [isMastraOffline, setIsMastraOffline] = useState(false);
   
   // Debug logging for sidebar state
   useEffect(() => {
@@ -65,33 +62,35 @@ const AssistantAppInner: React.FC = () => {
 
   /**
    * Initialize dashboard and chat data on mount
+   * Handles errors gracefully without blocking render
    */
   useEffect(() => {
     const initializeData = async () => {
       try {
-        // Load main dashboard for business intelligence context
-        await loadDashboard('main-dashboard');
+        setInitError(null);
         
-        // Load chat history
-        await loadHistory();
-      } catch (error) {
-        console.error('Failed to initialize assistant app data:', error);
-        // Re-throw to be caught by error boundary if critical
-        if (error instanceof Error && error.message.includes('critical')) {
-          throw error;
+        // Load main dashboard for business intelligence context
+        // This is non-critical, so we catch and log errors without blocking
+        try {
+          await loadDashboard('main-dashboard');
+        } catch (dashErr) {
+          console.warn('Dashboard load failed (non-critical):', dashErr);
         }
-  
-
+      } catch (error) {
+        // Catch any unexpected errors
+        const errorMessage = error instanceof Error ? error.message : 'Unknown initialization error';
+        console.error('Failed to initialize assistant app data:', error);
+        setInitError(errorMessage);
+        
+        // Check if this is a Mastra connectivity issue
+        if (errorMessage.includes('connection') || errorMessage.includes('fetch') || errorMessage.includes('ERR_CONNECTION_REFUSED')) {
+          setIsMastraOffline(true);
+        }
       }
     };
 
     initializeData();
-  }, [loadDashboard, loadHistory]);
-
-  // Note: Event handlers removed as MastraAssistantChat component is self-contained
-  // User context and event handling are managed internally via useMastraChat hook
-  // This resolves the original user requirement for setting resourceId to user UUID
-  // as the hook automatically handles user identification through createBusinessContext
+  }, [loadDashboard]);
 
   /**
    * Handle dashboard refresh
@@ -122,61 +121,58 @@ const AssistantAppInner: React.FC = () => {
             sidebarOpen ? 'ml-80' : 'ml-0'
           }`}>
             <Card className="flex-1 flex flex-col min-h-0">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="font-display font-medium flex items-center gap-2">
-                    <ChatHistoryToggle
-                      isOpen={sidebarOpen}
-                      onToggle={toggleSidebar}
-                    />
-                    <Bot className="h-5 w-5 text-brius-primary" />
-                    Business Intelligence Assistant
-                  </CardTitle>
-                  
+              <div className="flex items-center justify-between p-4 border-b">
+                <div className="flex items-center gap-2">
+                  <ChatHistoryToggle
+                    isOpen={sidebarOpen}
+                    onToggle={toggleSidebar}
+                  />
                   {/* Dashboard Status and Controls */}
-                  <div className="flex items-center gap-2">
-                    {currentDashboard && (
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <BarChart3 className="h-4 w-4" />
-                        <span>Dashboard: {currentDashboard.title}</span>
-                        {currentDashboard.lastUpdated && (
-                          <span className="text-xs">
-                            Updated: {new Date(currentDashboard.lastUpdated).toLocaleTimeString()}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                    
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleRefreshDashboard}
-                      disabled={dashboardLoading}
-                      className="flex items-center gap-1"
-                    >
-                      <RefreshCw className={`h-3 w-3 ${dashboardLoading ? 'animate-spin' : ''}`} />
-                      Refresh
-                    </Button>
+                  {currentDashboard && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <BarChart3 className="h-4 w-4" />
+                      <span>Dashboard: {currentDashboard.title}</span>
+                      {currentDashboard.lastUpdated && (
+                        <span className="text-xs">
+                          Updated: {new Date(currentDashboard.lastUpdated).toLocaleTimeString()}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRefreshDashboard}
+                  disabled={dashboardLoading}
+                  className="flex items-center gap-1"
+                >
+                  <RefreshCw className={`h-3 w-3 ${dashboardLoading ? 'animate-spin' : ''}`} />
+                  Refresh
+                </Button>
+              </div>
+          
+              {/* Dashboard Error Display */}
+              {dashboardError && (
+                <div className="text-sm text-destructive bg-destructive/10 p-2 rounded m-4">
+                  Dashboard Error: {dashboardError}
+                </div>
+              )}
+              
+              {/* Mastra Offline Warning */}
+              {isMastraOffline && (
+                <div className="text-sm text-yellow-600 bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-md flex items-center gap-2 m-4">
+                  <WifiOff className="h-4 w-4" />
+                  <div>
+                    <strong>Mastra AI Service Offline</strong>
+                    <p className="text-xs mt-1">The AI assistant is currently unavailable. Please check back later.</p>
                   </div>
                 </div>
-            
-                {/* Dashboard Error Display */}
-                {dashboardError && (
-                  <div className="text-sm text-destructive bg-destructive/10 p-2 rounded">
-                    Dashboard Error: {dashboardError}
-                  </div>
-                )}
-                
-                {/* Business Intelligence Context */}
-                {currentDashboard && (
-                  <div className="text-sm text-muted-foreground">
-                    Ask me about your business performance, analytics, and operational insights
-                  </div>
-                )}
-              </CardHeader>
+              )}
               
               <CardContent className="flex-1 flex flex-col p-0 min-h-0">
-                {/* Main Assistant Chat Interface wrapped in its own error boundary */}
+                {/* Placeholder Chat Interface wrapped in error boundary */}
                 <ErrorBoundary
                   showErrorDetails={process.env.NODE_ENV === 'development'}
                   onError={(error, errorInfo) => {
@@ -191,28 +187,23 @@ const AssistantAppInner: React.FC = () => {
                   fallback={
                     <div className="flex-1 flex items-center justify-center p-8">
                       <Card className="w-full max-w-md">
-                        <CardHeader className="text-center">
-                          <CardTitle className="text-lg">Chat Temporarily Unavailable</CardTitle>
-                        </CardHeader>
-                        <CardContent className="text-center space-y-4">
+                        <CardContent className="text-center space-y-4 p-6">
                           <p className="text-muted-foreground">
-                            The assistant chat is experiencing technical difficulties.
-                            Your dashboard data is still available above.
+                            Unable to load assistant interface.
                           </p>
                           <Button
                             onClick={() => window.location.reload()}
                             className="w-full"
                           >
-                            Reload Assistant
+                            <RefreshCw className="h-4 w-4 mr-2" />
+                            Reload Page
                           </Button>
                         </CardContent>
                       </Card>
                     </div>
                   }
                 >
-                  <MastraAssistantChat
-                    className="flex-1"
-                  />
+                  <ChatPlaceholder className="flex-1" />
                 </ErrorBoundary>
               </CardContent>
             </Card>
@@ -270,16 +261,13 @@ export const AssistantApp: React.FC = () => {
       fallback={
         <div className="h-[calc(100vh-12rem)] flex items-center justify-center p-4">
           <Card className="w-full max-w-2xl">
-            <CardHeader className="text-center">
-              <CardTitle className="text-xl flex items-center justify-center gap-2">
-                <Bot className="h-6 w-6 text-brius-primary" />
-                Business Intelligence Assistant Unavailable
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="text-center space-y-4">
+            <CardContent className="text-center space-y-4 p-6">
+              <div className="flex justify-center mb-4">
+                <WifiOff className="h-12 w-12 text-yellow-600" />
+              </div>
+              <h2 className="text-xl font-semibold">Service Temporarily Unavailable</h2>
               <p className="text-muted-foreground">
-                The Business Intelligence Assistant is temporarily unavailable due to a technical issue. 
-                Our team has been notified and is working to resolve this quickly.
+                The assistant service is currently being updated. Please try again later.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Button 
@@ -287,17 +275,17 @@ export const AssistantApp: React.FC = () => {
                   className="flex items-center gap-2"
                 >
                   <RefreshCw className="h-4 w-4" />
-                  Reload Assistant
+                  Retry Connection
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => {
-                    window.location.href = '/dashboard';
+                    window.location.href = '/portal/home';
                   }}
                   className="flex items-center gap-2"
                 >
                   <BarChart3 className="h-4 w-4" />
-                  Go to Dashboard
+                  Go to Home
                 </Button>
               </div>
             </CardContent>

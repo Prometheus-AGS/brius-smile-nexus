@@ -466,7 +466,7 @@ export function useMastraBIAgent(): UseMastraBIAgentReturn {
         },
         businessContext: {
           industry: 'healthcare',
-          keyMetrics: ['orders', 'patients', 'ai_interactions', 'reports'],
+          keyMetrics: ['orders', 'patients', 'ai_interactions'],
           reportingFrequency: 'daily',
           complianceRequirements: ['HIPAA', 'SOC2']
         }
