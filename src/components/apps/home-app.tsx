@@ -1,11 +1,8 @@
-
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { BarChart3, Package, Users, MessageSquare, RefreshCw } from 'lucide-react';
-import { useMastraBIAgent } from '@/hooks/use-mastra-bi-agent';
 
 interface DashboardStats {
   title: string;
@@ -47,72 +44,16 @@ const defaultStats: DashboardStats[] = [
 ];
 
 export const HomeApp: React.FC = () => {
-  const { executeQuery, isLoading, error, clearError, checkHealth, isHealthy } = useMastraBIAgent();
-  const [stats, setStats] = useState<DashboardStats[]>(defaultStats);
-  const [agentResponse, setAgentResponse] = useState<string>('');
+  const [stats] = useState<DashboardStats[]>(defaultStats);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   /**
-   * Initialize home dashboard with agent data
-   */
-  const initializeDashboard = async () => {
-    try {
-      clearError();
-      
-      // First check agent health
-      await checkHealth();
-      
-      if (!isHealthy) {
-        console.warn('Agent is not healthy, using default data');
-        return;
-      }
-
-      // Request dashboard data from the agent
-      const dashboardQuery = {
-        id: `home-dashboard-${Date.now()}`,
-        type: 'dashboard_query' as const,
-        query: 'Provide current business intelligence summary for the home dashboard including active orders, patient counts, AI interactions, and recent reports. Include specific numbers and trends.',
-        parameters: {
-          dashboard_type: 'home_overview',
-          include_metrics: ['orders', 'patients', 'ai_interactions', 'reports'],
-          time_range: '30_days',
-        },
-        timeRange: {
-          start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
-          end: new Date(),
-        },
-        metrics: ['active_orders', 'patient_count', 'ai_interactions', 'reports_generated'],
-        dimensions: ['status', 'department', 'type'],
-      };
-
-      const result = await executeQuery(dashboardQuery);
-      
-      if (result && result.data) {
-        setAgentResponse(typeof result.data === 'string' ? result.data : JSON.stringify(result.data, null, 2));
-        setLastUpdated(new Date());
-        
-        // Try to extract metrics from the response if available
-        if (result.insights?.trends) {
-          console.log('Agent provided insights:', result.insights);
-        }
-      }
-    } catch (error) {
-      console.error('Failed to initialize dashboard with agent data:', error);
-      // Keep using default stats on error
-    }
-  };
-
-  /**
-   * Refresh dashboard data
+   * Refresh dashboard data - currently just updates the timestamp
+   * TODO: Re-implement with working backend integration
    */
   const refreshDashboard = () => {
-    initializeDashboard();
+    setLastUpdated(new Date());
   };
-
-  // Initialize dashboard on component mount
-  useEffect(() => {
-    initializeDashboard();
-  }, []);
 
   return (
     <div className="space-y-6">
@@ -126,51 +67,33 @@ export const HomeApp: React.FC = () => {
             Operations Overview
           </h2>
           <div className="flex items-center space-x-2">
-            <div className={`w-2 h-2 rounded-full ${isHealthy ? 'bg-green-500' : 'bg-red-500'}`} />
+            <div className="w-2 h-2 rounded-full bg-green-500" />
             <span className="text-sm text-brius-gray">
-              Agent: {isHealthy ? 'Connected' : 'Disconnected'}
+              System: Online
             </span>
             <Button
               variant="outline"
               size="sm"
               onClick={refreshDashboard}
-              disabled={isLoading}
             >
-              <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+              <RefreshCw className="h-4 w-4 mr-2" />
               Refresh
             </Button>
           </div>
         </div>
 
-        {/* Error Display */}
-        {error && (
-          <Alert className="mb-6">
-            <AlertDescription>
-              <strong>Agent Error:</strong> {error.message}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={clearError}
-                className="ml-2"
-              >
-                Dismiss
-              </Button>
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {/* Agent Response Display */}
-        {agentResponse && (
+        {/* Last Updated Display */}
+        {lastUpdated && (
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle className="font-display font-medium">AI Business Intelligence Summary</CardTitle>
+              <CardTitle className="font-display font-medium">Dashboard Status</CardTitle>
               <CardDescription className="font-body">
-                {lastUpdated ? `Last updated: ${lastUpdated.toLocaleTimeString()}` : 'Real-time insights from your business intelligence agent'}
+                Last refreshed: {lastUpdated.toLocaleTimeString()}
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-sm font-body whitespace-pre-wrap">
-                {agentResponse}
+              <div className="text-sm font-body text-brius-gray">
+                Dashboard data is currently using static values. Dynamic data integration will be available in a future update.
               </div>
             </CardContent>
           </Card>
@@ -239,15 +162,15 @@ export const HomeApp: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                <button className="w-full text-left p-3 rounded-lg border border-brius-gray/20 hover:bg-brius-gray-light transition-colors">
+                <button type="button" className="w-full text-left p-3 rounded-lg border border-brius-gray/20 hover:bg-brius-gray-light transition-colors">
                   <p className="font-body font-semibold text-brius-black">Check Order Status</p>
                   <p className="text-xs text-brius-gray font-body">Track current manufacturing and shipping</p>
                 </button>
-                <button className="w-full text-left p-3 rounded-lg border border-brius-gray/20 hover:bg-brius-gray-light transition-colors">
+                <button type="button" className="w-full text-left p-3 rounded-lg border border-brius-gray/20 hover:bg-brius-gray-light transition-colors">
                   <p className="font-body font-semibold text-brius-black">Generate Report</p>
                   <p className="text-xs text-brius-gray font-body">Create custom analytics dashboard</p>
                 </button>
-                <button className="w-full text-left p-3 rounded-lg border border-brius-gray/20 hover:bg-brius-gray-light transition-colors">
+                <button type="button" className="w-full text-left p-3 rounded-lg border border-brius-gray/20 hover:bg-brius-gray-light transition-colors">
                   <p className="font-body font-semibold text-brius-black">Ask AI Assistant</p>
                   <p className="text-xs text-brius-gray font-body">Get instant answers to your questions</p>
                 </button>

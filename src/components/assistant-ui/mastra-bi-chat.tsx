@@ -253,7 +253,7 @@ const MessageRenderer: React.FC<{ message: ChatMessage }> = ({ message }) => {
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={{
-              code({ node, className, children, ...props }) {
+              code({ className, children, ...props }) {
                 const match = /language-(\w+)/.exec(className || '');
                 const isInline = !match;
                 
@@ -342,7 +342,7 @@ export const MastraBIChat: React.FC<MastraBIChatProps> = ({
         scrollElement.scrollTop = scrollElement.scrollHeight;
       }
     }
-  }, [messages, streamingContent]);
+  }, []);
 
   // Handle suggestion click
   const handleSuggestionClick = useCallback(async (suggestion: SuggestionCard) => {

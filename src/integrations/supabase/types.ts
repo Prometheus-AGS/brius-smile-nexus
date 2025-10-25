@@ -1785,6 +1785,169 @@ export type Database = {
           },
         ]
       }
+      system_roles: {
+        Row: {
+          id: string
+          name: string
+          description: string | null
+          permissions: Json
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          description?: string | null
+          permissions?: Json
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string | null
+          permissions?: Json
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      knowledge_documents: {
+        Row: {
+          id: string
+          title: string
+          content: string
+          file_path: string | null
+          file_type: string | null
+          file_size: number | null
+          category: string | null
+          tags: string[] | null
+          upload_user_id: string | null
+          processing_status: string | null
+          processed_at: string | null
+          created_at: string | null
+          updated_at: string | null
+          metadata: Json | null
+        }
+        Insert: {
+          id?: string
+          title: string
+          content: string
+          file_path?: string | null
+          file_type?: string | null
+          file_size?: number | null
+          category?: string | null
+          tags?: string[] | null
+          upload_user_id?: string | null
+          processing_status?: string | null
+          processed_at?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+          metadata?: Json | null
+        }
+        Update: {
+          id?: string
+          title?: string
+          content?: string
+          file_path?: string | null
+          file_type?: string | null
+          file_size?: number | null
+          category?: string | null
+          tags?: string[] | null
+          upload_user_id?: string | null
+          processing_status?: string | null
+          processed_at?: string | null
+          created_at?: string | null
+          updated_at?: string | null
+          metadata?: Json | null
+        }
+        Relationships: []
+      }
+      document_chunks: {
+        Row: {
+          id: string
+          document_id: string
+          chunk_index: number
+          content: string
+          embedding: string | null
+          metadata: Json | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          document_id: string
+          chunk_index: number
+          content: string
+          embedding?: string | null
+          metadata?: Json | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          document_id?: string
+          chunk_index?: number
+          content?: string
+          embedding?: string | null
+          metadata?: Json | null
+          created_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_chunks_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "knowledge_documents"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      }
+      user_system_roles: {
+        Row: {
+          id: string
+          user_id: string
+          role_id: string
+          assigned_by: string | null
+          assigned_at: string
+          expires_at: string | null
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          role_id: string
+          assigned_by?: string | null
+          assigned_at?: string
+          expires_at?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          role_id?: string
+          assigned_by?: string | null
+          assigned_at?: string
+          expires_at?: string | null
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_system_roles_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "system_roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

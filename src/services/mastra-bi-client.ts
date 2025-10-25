@@ -1,18 +1,16 @@
 /**
  * Mastra Business Intelligence Client Service
  * 
- * TypeScript service class providing a clean interface for business intelligence
- * agent operations. This implementation provides the expected Mastra v0.21.1 API
- * interface while maintaining compatibility with the existing architecture.
+ * MASTRA-ONLY Implementation - No Fallbacks, No Mocks
+ * Connects exclusively to remote Mastra servers at https://mastra.brius.com
  * 
- * Follows existing service patterns in the codebase and integrates with
- * the current Zustand store architecture.
+ * This service provides a clean interface for business intelligence agent operations
+ * using Mastra v0.21.1 API with strict TypeScript typing and comprehensive error handling.
  */
 
 import { z } from 'zod';
 import type {
   MastraClientConfig,
-  MastraEnvConfig,
   MastraAgentQuery,
   MastraAgentResponse,
   MastraStreamChunk,
@@ -63,7 +61,6 @@ class MastraClientErrorImpl extends Error implements MastraClientError {
     this.cause = options.cause;
     this.timestamp = new Date();
 
-    // Maintain proper stack trace for where our error was thrown (only available on V8)
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, MastraClientErrorImpl);
     }
@@ -76,36 +73,27 @@ class MastraClientErrorImpl extends Error implements MastraClientError {
 
 /**
  * Load and validate environment configuration for Mastra client
+ * STRICT: Throws error if configuration is invalid - no defaults
  */
 function loadMastraConfig(): MastraClientConfig {
-  try {
-    const env = MastraEnvSchema.parse(import.meta.env);
-    return {
-      baseUrl: env.VITE_MASTRA_BASE_URL,
-      apiKey: env.VITE_MASTRA_API_KEY,
-      agentName: env.VITE_MASTRA_AGENT_NAME,
-      timeout: env.VITE_MASTRA_TIMEOUT,
-      maxRetries: env.VITE_MASTRA_MAX_RETRIES,
-      debug: env.VITE_MASTRA_DEBUG,
-      headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': 'brius-smile-nexus/1.0.0',
-      },
-    };
-  } catch (error) {
-    console.warn('Failed to parse Mastra environment variables, using defaults:', error);
-    return {
-      baseUrl: 'http://localhost:3000',
-      agentName: 'business-intelligence',
-      timeout: 30000,
-      maxRetries: 3,
-      debug: false,
-      headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': 'brius-smile-nexus/1.0.0',
-      },
-    };
+  const env = MastraEnvSchema.parse(import.meta.env);
+  
+  if (!env.VITE_MASTRA_BASE_URL) {
+    throw new Error('VITE_MASTRA_BASE_URL is required for Mastra client');
   }
+
+  return {
+    baseUrl: env.VITE_MASTRA_BASE_URL,
+    apiKey: env.VITE_MASTRA_API_KEY,
+    agentName: env.VITE_MASTRA_AGENT_NAME,
+    timeout: env.VITE_MASTRA_TIMEOUT,
+    maxRetries: env.VITE_MASTRA_MAX_RETRIES,
+    debug: env.VITE_MASTRA_DEBUG,
+    headers: {
+      'Content-Type': 'application/json',
+      'User-Agent': 'brius-smile-nexus/1.0.0',
+    },
+  };
 }
 
 // ============================================================================
@@ -115,8 +103,9 @@ function loadMastraConfig(): MastraClientConfig {
 /**
  * Mastra Business Intelligence Client Service
  * 
- * Provides a clean interface for interacting with Mastra v0.21.1 agents,
- * specifically configured for business intelligence operations.
+ * MASTRA-ONLY: Connects exclusively to remote Mastra servers
+ * NO FALLBACKS: Throws errors if Mastra server is unavailable
+ * NO MOCKS: All responses come from real Mastra agents
  */
 export class MastraBIClient {
   private readonly config: MastraClientConfig;
@@ -124,9 +113,11 @@ export class MastraBIClient {
   private lastHealthCheck: Date;
   private isConnected: boolean;
   private agentAvailable: boolean;
+  private jwtToken?: string; // Dynamic JWT token from auth session
 
-  constructor(config?: Partial<MastraClientConfig>) {
+  constructor(config?: Partial<MastraClientConfig>, jwtToken?: string) {
     this.config = { ...loadMastraConfig(), ...config };
+    this.jwtToken = jwtToken;
     this.stats = {
       totalRequests: 0,
       successfulRequests: 0,
@@ -137,41 +128,56 @@ export class MastraBIClient {
     this.isConnected = false;
     this.agentAvailable = false;
 
-    // Initialize connection status
+    // Initialize connection to Mastra server
     this.initializeConnection();
 
     if (this.config.debug) {
       console.log('MastraBIClient initialized with config:', {
         ...this.config,
         apiKey: this.config.apiKey ? '[REDACTED]' : undefined,
+        hasJwtToken: !!this.jwtToken,
       });
     }
   }
 
   /**
+   * Update the JWT token for authentication
+   * Call this when the user's session changes
+   */
+  setJwtToken(token: string | undefined): void {
+    this.jwtToken = token;
+    
+    if (this.config.debug) {
+      console.log('JWT token updated:', { hasToken: !!token });
+    }
+  }
+
+  /**
    * Initialize connection to Mastra service
+   * MASTRA-ONLY: Validates connection using real health endpoint
    */
   private async initializeConnection(): Promise<void> {
     try {
-      // Simulate connection check to the configured endpoint
-      const response = await fetch(`${this.config.baseUrl}/health`, {
-        method: 'GET',
-        headers: this.config.headers,
-        signal: AbortSignal.timeout(5000), // 5 second timeout
-      });
-
-      this.isConnected = response.ok;
-      this.agentAvailable = response.ok;
+      const health = await this.checkHealth();
+      this.isConnected = health.status === 'healthy';
+      this.agentAvailable = health.agent.status === 'available';
 
       if (this.config.debug) {
-        console.log('Mastra connection status:', { connected: this.isConnected });
+        console.log('Mastra connection established:', {
+          connected: this.isConnected,
+          agentAvailable: this.agentAvailable,
+          status: health.status,
+          timestamp: health.timestamp,
+        });
       }
     } catch (error) {
-      if (this.config.debug) {
-        console.warn('Mastra connection failed, using fallback mode:', error);
-      }
+      // Graceful degradation - don't block initialization
       this.isConnected = false;
       this.agentAvailable = false;
+      
+      if (this.config.debug) {
+        console.warn('Mastra health check failed, will retry on first request:', error);
+      }
     }
   }
 
@@ -181,6 +187,7 @@ export class MastraBIClient {
 
   /**
    * Execute a query against the business intelligence agent
+   * MASTRA-ONLY: No fallbacks, throws error if server unavailable
    */
   async executeQuery(
     query: MastraAgentQuery,
@@ -197,24 +204,17 @@ export class MastraBIClient {
       // Validate query input
       this.validateQuery(query);
 
-      // If connected to real Mastra service, make HTTP request
-      if (this.isConnected) {
-        const response = await this.makeHttpRequest(query, options);
-        this.updateStats(startTime, true);
-        this.stats.successfulRequests++;
-        return response;
-      }
-
-      // Fallback to mock implementation for development
-      const mockResponse = await this.generateMockResponse(query);
+      // Make HTTP request to Mastra server
+      const response = await this.makeHttpRequest(query, options);
+      
       this.updateStats(startTime, true);
       this.stats.successfulRequests++;
 
       if (this.config.debug) {
-        console.log('Mastra BI query executed successfully (mock):', mockResponse);
+        console.log('Mastra BI query executed successfully:', response);
       }
 
-      return mockResponse;
+      return response;
     } catch (error) {
       this.stats.failedRequests++;
       this.updateStats(startTime, false);
@@ -223,7 +223,6 @@ export class MastraBIClient {
         throw error;
       }
 
-      // Wrap unknown errors
       throw new MastraClientErrorImpl(
         `Failed to execute query: ${error instanceof Error ? error.message : 'Unknown error'}`,
         MastraErrorType.AGENT_ERROR,
@@ -238,6 +237,7 @@ export class MastraBIClient {
 
   /**
    * Execute a streaming query against the business intelligence agent
+   * MASTRA-ONLY: Real streaming from Mastra server
    */
   async executeStreamingQuery(
     query: MastraAgentQuery,
@@ -255,40 +255,8 @@ export class MastraBIClient {
       // Validate query input
       this.validateQuery(query);
 
-      // Generate response content (mock or real)
-      const response = await this.executeQuery(query, options);
-      const content = response.content;
-
-      // Simulate streaming by chunking the response
-      const chunkSize = streamConfig.chunkSize || 100;
-      let chunkIndex = 0;
-
-      for (let i = 0; i < content.length; i += chunkSize) {
-        const chunk: MastraStreamChunk = {
-          id: `${query.id}-chunk-${chunkIndex}`,
-          content: content.slice(i, i + chunkSize),
-          done: i + chunkSize >= content.length,
-          metadata: {
-            index: chunkIndex,
-            total: Math.ceil(content.length / chunkSize),
-            type: 'text',
-          },
-          timestamp: new Date(),
-        };
-
-        chunkIndex++;
-
-        if (streamConfig.onChunk) {
-          streamConfig.onChunk(chunk);
-        }
-
-        // Simulate streaming delay
-        await new Promise(resolve => setTimeout(resolve, 50));
-      }
-
-      if (streamConfig.onComplete) {
-        streamConfig.onComplete(response);
-      }
+      // Make streaming HTTP request to Mastra server
+      await this.makeStreamingHttpRequest(query, streamConfig, options);
 
       this.updateStats(startTime, true);
       this.stats.successfulRequests++;
@@ -330,25 +298,8 @@ export class MastraBIClient {
     query: MastraBIQuery,
     options: MastraRequestOptions = {}
   ): Promise<MastraBIResponse> {
-    // Enhance query with BI-specific context
-    const enhancedQuery: MastraAgentQuery = {
-      ...query,
-      context: {
-        ...query.context,
-        business: {
-          ...query.context?.business,
-          // Add BI-specific fields to business context
-          biDataSources: query.dataSources,
-          biTimeRange: query.timeRange,
-          biMetrics: query.metrics,
-          biDimensions: query.dimensions,
-          biFilters: query.filters,
-          biAggregations: query.aggregations,
-        },
-      },
-    };
-
-    const response = await this.executeQuery(enhancedQuery, options);
+    // Use the query directly - context is now AgentInputContext with biOptions
+    const response = await this.executeQuery(query, options);
 
     // Transform to BI-specific response
     const biResponse: MastraBIResponse = {
@@ -369,29 +320,50 @@ export class MastraBIClient {
   // ============================================================================
 
   /**
-   * Check the health of the Mastra service and agent
+   * Check the health of the Mastra service using real health endpoint
+   * MASTRA-ONLY: Calls /health endpoint on Mastra server
    */
   async checkHealth(): Promise<MastraHealthResponse> {
     try {
-      if (this.config.debug) {
-        console.log('Checking Mastra service health...');
+      const headers: Record<string, string> = {
+        ...this.config.headers,
+      };
+
+      // Add JWT token if available (preferred) or fall back to API key
+      if (this.jwtToken) {
+        headers['Authorization'] = `Bearer ${this.jwtToken}`;
+      } else if (this.config.apiKey) {
+        headers['Authorization'] = `Bearer ${this.config.apiKey}`;
       }
 
-      // Try to connect to the service
-      await this.initializeConnection();
+      const response = await fetch(`${this.config.baseUrl}/health`, {
+        method: 'GET',
+        headers,
+        signal: AbortSignal.timeout(5000),
+      });
 
       this.lastHealthCheck = new Date();
 
+      if (!response.ok) {
+        throw new Error(`Health check failed: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json() as { healthy: boolean; timestamp: string };
+
+      // Update connection status
+      this.isConnected = data.healthy;
+      this.agentAvailable = data.healthy;
+
       const healthResponse: MastraHealthResponse = {
-        status: this.agentAvailable ? 'healthy' : 'degraded',
+        status: data.healthy ? 'healthy' : 'unhealthy',
         agent: {
           name: this.config.agentName,
-          status: this.agentAvailable ? 'available' : 'offline',
+          status: data.healthy ? 'available' : 'offline',
           version: '0.21.1',
           capabilities: ['analytics', 'reporting', 'dashboard', 'streaming'],
         },
-        uptime: Date.now() - this.lastHealthCheck.getTime(),
-        timestamp: new Date(),
+        uptime: 0,
+        timestamp: new Date(data.timestamp),
         details: {
           baseUrl: this.config.baseUrl,
           totalRequests: this.stats.totalRequests,
@@ -400,13 +372,18 @@ export class MastraBIClient {
       };
 
       if (this.config.debug) {
-        console.log('Mastra health check completed:', healthResponse);
+        console.log('Mastra health check successful:', healthResponse);
       }
 
       return healthResponse;
     } catch (error) {
+      this.lastHealthCheck = new Date();
       this.isConnected = false;
       this.agentAvailable = false;
+
+      if (this.config.debug) {
+        console.error('Mastra health check failed:', error);
+      }
 
       throw new MastraClientErrorImpl(
         `Health check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
@@ -438,27 +415,46 @@ export class MastraBIClient {
 
   /**
    * Make HTTP request to Mastra service
+   * MASTRA-ONLY: Real HTTP request, no mocks
    */
   private async makeHttpRequest(
     query: MastraAgentQuery,
     options: MastraRequestOptions
   ): Promise<MastraAgentResponse> {
+    const endpoint = `${this.config.baseUrl}/api/agents/${this.config.agentName}/generate`;
+
     const requestBody = {
-      query: query.query,
-      type: query.type,
+      messages: [
+        {
+          role: 'user',
+          content: query.query,
+        }
+      ],
       context: query.context,
       parameters: query.parameters,
     };
 
-    const response = await fetch(`${this.config.baseUrl}/agents/${this.config.agentName}/generate`, {
+    if (this.config.debug) {
+      console.log('Making HTTP request to Mastra:', { endpoint, body: requestBody });
+    }
+
+    const headers: Record<string, string> = {
+      ...this.config.headers,
+      ...options.headers,
+    };
+
+    // Add JWT token if available (preferred) or fall back to API key
+    if (this.jwtToken) {
+      headers['Authorization'] = `Bearer ${this.jwtToken}`;
+    } else if (this.config.apiKey) {
+      headers['Authorization'] = `Bearer ${this.config.apiKey}`;
+    }
+
+    const response = await fetch(endpoint, {
       method: 'POST',
-      headers: {
-        ...this.config.headers,
-        ...options.headers,
-        ...(this.config.apiKey && { 'Authorization': `Bearer ${this.config.apiKey}` }),
-      },
+      headers,
       body: JSON.stringify(requestBody),
-      signal: AbortSignal.timeout(options.timeout || this.config.timeout || 30000),
+      signal: AbortSignal.timeout(options.timeout || this.config.timeout || 60000),
     });
 
     if (!response.ok) {
@@ -476,112 +472,177 @@ export class MastraBIClient {
 
     return {
       id: query.id,
-      content: data.text || data.content || '',
+      content: data.text || data.content || data.response || '',
       type: this.determineResponseType(data),
       data: data.data || data,
       metadata: {
         processingTime: data.processingTime || 0,
         confidence: data.confidence || 0.9,
         sources: ['mastra-agent'],
-        context: query.context,
+        context: query.context as Record<string, unknown>,
       },
       timestamp: new Date(),
     };
   }
 
   /**
-   * Generate mock response for development/fallback
+   * Make streaming HTTP request to Mastra service
+   * MASTRA-ONLY: Real streaming from server
    */
-  private async generateMockResponse(query: MastraAgentQuery): Promise<MastraAgentResponse> {
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+  private async makeStreamingHttpRequest(
+    query: MastraAgentQuery,
+    streamConfig: MastraStreamConfig,
+    options: MastraRequestOptions
+  ): Promise<void> {
+    const endpoint = `${this.config.baseUrl}/api/agents/${this.config.agentName}/generate`;
 
-    // Mock response based on query type
-    let mockData: unknown = {};
+    const requestBody = {
+      messages: [
+        {
+          role: 'user',
+          content: query.query,
+        }
+      ],
+      context: query.context,
+      parameters: query.parameters,
+    };
 
-    switch (query.type) {
-      case 'dashboard':
-        mockData = {
-          summary: 'Business intelligence dashboard data retrieved successfully',
-          metrics: {
-            active_orders: 247,
-            patient_count: 1834,
-            ai_interactions: 423,
-            reports_generated: 89
-          },
-          trends: {
-            orders: '+12%',
-            patients: '+5%',
-            ai_usage: '+28%',
-            reports: '+15%'
-          }
-        };
-        break;
-      case 'analytics':
-        mockData = {
-          analysis: 'Data analysis completed',
-          insights: ['Trend analysis shows positive growth', 'Peak usage during business hours']
-        };
-        break;
-      case 'report':
-        mockData = {
-          reportType: 'summary',
-          generatedAt: new Date().toISOString(),
-          data: { totalRecords: 500, summary: 'Report generated successfully' }
-        };
-        break;
-      default:
-        mockData = {
-          message: `Query of type ${query.type} processed successfully`,
-          timestamp: new Date().toISOString()
-        };
+    const headers: Record<string, string> = {
+      ...this.config.headers,
+      ...options.headers,
+      'Accept': 'text/event-stream',
+    };
+
+    // Add JWT token if available (preferred) or fall back to API key
+    if (this.jwtToken) {
+      headers['Authorization'] = `Bearer ${this.jwtToken}`;
+    } else if (this.config.apiKey) {
+      headers['Authorization'] = `Bearer ${this.config.apiKey}`;
     }
 
-    return {
-      id: query.id,
-      content: `Mock response for ${query.type} query: ${query.query}`,
-      type: 'data',
-      data: mockData,
-      metadata: {
-        processingTime: 1000,
-        confidence: 0.9,
-        sources: ['mock-agent'],
-        context: query.context,
-      },
-      timestamp: new Date(),
-    };
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(requestBody),
+      signal: AbortSignal.timeout(options.timeout || this.config.timeout || 60000),
+    });
+
+    if (!response.ok) {
+      throw new MastraClientErrorImpl(
+        `HTTP ${response.status}: ${response.statusText}`,
+        MastraErrorType.CONNECTION_ERROR,
+        {
+          status: response.status,
+          retryable: response.status >= 500,
+        }
+      );
+    }
+
+    if (!response.body) {
+      throw new MastraClientErrorImpl(
+        'No response body for streaming request',
+        MastraErrorType.STREAM_ERROR,
+        { retryable: false }
+      );
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let chunkIndex = 0;
+    let fullContent = '';
+
+    try {
+      while (true) {
+        const { done, value } = await reader.read();
+        
+        if (done) {
+          break;
+        }
+
+        const chunkText = decoder.decode(value, { stream: true });
+        fullContent += chunkText;
+
+        const chunk: MastraStreamChunk = {
+          id: `${query.id}-chunk-${chunkIndex}`,
+          content: chunkText,
+          done: false,
+          metadata: {
+            index: chunkIndex,
+            type: 'text',
+          },
+          timestamp: new Date(),
+        };
+
+        chunkIndex++;
+
+        if (streamConfig.onChunk) {
+          streamConfig.onChunk(chunk);
+        }
+      }
+
+      // Send final chunk
+      const finalChunk: MastraStreamChunk = {
+        id: `${query.id}-chunk-${chunkIndex}`,
+        content: '',
+        done: true,
+        metadata: {
+          index: chunkIndex,
+          total: chunkIndex,
+          type: 'text',
+        },
+        timestamp: new Date(),
+      };
+
+      if (streamConfig.onChunk) {
+        streamConfig.onChunk(finalChunk);
+      }
+
+      if (streamConfig.onComplete) {
+        const completeResponse: MastraAgentResponse = {
+          id: query.id,
+          content: fullContent,
+          type: 'text',
+          data: { text: fullContent },
+          metadata: {
+            processingTime: 0,
+            confidence: 0.9,
+            sources: ['mastra-agent'],
+            context: query.context as Record<string, unknown>,
+          },
+          timestamp: new Date(),
+        };
+        streamConfig.onComplete(completeResponse);
+      }
+    } finally {
+      reader.releaseLock();
+    }
   }
 
   /**
    * Validate query input
    */
   private validateQuery(query: MastraAgentQuery): void {
-    if (!query.id || !query.query) {
+    if (!query.id || !query.query || !query.type) {
       throw new MastraClientErrorImpl(
-        'Query must have id and query fields',
+        'Invalid query: id, query, and type are required',
         MastraErrorType.VALIDATION_ERROR,
-        { retryable: false }
-      );
-    }
-
-    if (query.query.length > 10000) {
-      throw new MastraClientErrorImpl(
-        'Query content too long (max 10000 characters)',
-        MastraErrorType.VALIDATION_ERROR,
-        { retryable: false }
+        {
+          retryable: false,
+          details: { query },
+        }
       );
     }
   }
 
   /**
-   * Determine response type from response data
+   * Determine response type from Mastra response
    */
   private determineResponseType(response: unknown): MastraAgentResponse['type'] {
     if (typeof response === 'object' && response !== null) {
-      if ('error' in response) return 'error';
-      if ('data' in response) return 'data';
-      if ('chart' in response) return 'chart';
-      if ('table' in response) return 'table';
+      const data = response as Record<string, unknown>;
+      if (data.type) return data.type as MastraAgentResponse['type'];
+      if (data.chart) return 'chart';
+      if (data.table) return 'table';
     }
     return 'text';
   }
@@ -591,10 +652,10 @@ export class MastraBIClient {
    */
   private extractResults(data: unknown): unknown[] {
     if (Array.isArray(data)) return data;
-    if (typeof data === 'object' && data !== null && 'results' in data) {
-      return Array.isArray((data as { results: unknown }).results) 
-        ? (data as { results: unknown[] }).results 
-        : [];
+    if (typeof data === 'object' && data !== null) {
+      const obj = data as Record<string, unknown>;
+      if (Array.isArray(obj.results)) return obj.results;
+      if (Array.isArray(obj.data)) return obj.data;
     }
     return [];
   }
@@ -603,22 +664,29 @@ export class MastraBIClient {
    * Extract summary from response data
    */
   private extractSummary(data: unknown): MastraBIResponse['data']['summary'] {
-    if (typeof data === 'object' && data !== null && 'summary' in data) {
-      return (data as { summary: MastraBIResponse['data']['summary'] }).summary;
+    if (typeof data === 'object' && data !== null) {
+      const obj = data as Record<string, unknown>;
+      if (obj.summary && typeof obj.summary === 'object') {
+        const summary = obj.summary as Record<string, unknown>;
+        return {
+          totalRecords: typeof summary.totalRecords === 'number' ? summary.totalRecords : 0,
+          aggregations: summary.aggregations as Record<string, number> | undefined,
+          trends: summary.trends as Record<string, number> | undefined,
+        };
+      }
     }
-    return {
-      totalRecords: 0,
-      aggregations: {},
-      trends: {},
-    };
+    return undefined;
   }
 
   /**
    * Extract chart configuration from response data
    */
   private extractChartConfig(data: unknown): MastraBIResponse['data']['chart'] {
-    if (typeof data === 'object' && data !== null && 'chart' in data) {
-      return (data as { chart: MastraBIResponse['data']['chart'] }).chart;
+    if (typeof data === 'object' && data !== null) {
+      const obj = data as Record<string, unknown>;
+      if (obj.chart && typeof obj.chart === 'object') {
+        return obj.chart as MastraBIResponse['data']['chart'];
+      }
     }
     return undefined;
   }
@@ -627,18 +695,22 @@ export class MastraBIClient {
    * Extract insights from response data
    */
   private extractInsights(data: unknown): MastraBIResponse['data']['insights'] {
-    if (typeof data === 'object' && data !== null && 'insights' in data) {
-      return (data as { insights: MastraBIResponse['data']['insights'] }).insights;
+    if (typeof data === 'object' && data !== null) {
+      const obj = data as Record<string, unknown>;
+      if (obj.insights && typeof obj.insights === 'object') {
+        const insights = obj.insights as Record<string, unknown>;
+        return {
+          trends: Array.isArray(insights.trends) ? insights.trends.map(i => String(i)) : [],
+          anomalies: Array.isArray(insights.anomalies) ? insights.anomalies.map(i => String(i)) : [],
+          recommendations: Array.isArray(insights.recommendations) ? insights.recommendations.map(i => String(i)) : [],
+        };
+      }
     }
-    return {
-      trends: [],
-      anomalies: [],
-      recommendations: [],
-    };
+    return undefined;
   }
 
   /**
-   * Update performance statistics
+   * Update statistics
    */
   private updateStats(startTime: number, success: boolean): void {
     const responseTime = Date.now() - startTime;
@@ -647,42 +719,38 @@ export class MastraBIClient {
   }
 
   /**
-   * Calculate success rate percentage
+   * Calculate success rate
    */
   private calculateSuccessRate(): number {
-    if (this.stats.totalRequests === 0) return 100;
+    if (this.stats.totalRequests === 0) return 0;
     return (this.stats.successfulRequests / this.stats.totalRequests) * 100;
   }
 }
 
 // ============================================================================
-// Singleton Instance and Factory
+// Factory Function
 // ============================================================================
 
-/**
- * Singleton instance of the Mastra BI Client
- */
-let mastraBIClientInstance: MastraBIClient | null = null;
+let clientInstance: MastraBIClient | null = null;
 
 /**
- * Get or create the singleton Mastra BI Client instance
+ * Get or create Mastra BI client instance (singleton pattern)
+ * @param config - Optional configuration overrides
+ * @param jwtToken - Optional JWT token for authentication (from Supabase session)
  */
-export function getMastraBIClient(config?: Partial<MastraClientConfig>): MastraBIClient {
-  if (!mastraBIClientInstance) {
-    mastraBIClientInstance = new MastraBIClient(config);
+export function getMastraBIClient(config?: Partial<MastraClientConfig>, jwtToken?: string): MastraBIClient {
+  if (!clientInstance) {
+    clientInstance = new MastraBIClient(config, jwtToken);
+  } else if (jwtToken) {
+    // Update JWT token if client already exists
+    clientInstance.setJwtToken(jwtToken);
   }
-  return mastraBIClientInstance;
+  return clientInstance;
 }
 
 /**
- * Reset the singleton instance (useful for testing)
+ * Reset client instance (useful for testing)
  */
 export function resetMastraBIClient(): void {
-  mastraBIClientInstance = null;
+  clientInstance = null;
 }
-
-// ============================================================================
-// Default Export
-// ============================================================================
-
-export default MastraBIClient;

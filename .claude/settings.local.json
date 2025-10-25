@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(if [ -f .env ])",
+      "Bash(then echo \"=== .env file exists ===\")",
+      "Bash(else echo \"=== No .env file found ===\")",
+      "Bash(fi)",
+      "Bash(curl -s -o /dev/null -w \"HTTP Status: %{http_code}\\nTotal time: %{time_total}s\\nConnect time: %{time_connect}s\\n\" https://mastra.brius.com/health)",
+      "Bash(curl:*)",
+      "Bash(yarn build)",
+      "Bash(yarn tsc:*)",
+      "Bash(npx tsc:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

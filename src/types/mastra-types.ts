@@ -8,6 +8,7 @@
  */
 
 import { z } from 'zod';
+import type { AgentInputContext, SystemRoleName, PermissionMatrix } from './role-types';
 
 // ============================================================================
 // Core Mastra Configuration Types
@@ -35,14 +36,24 @@ export interface MastraClientConfig {
 
 /**
  * Environment configuration schema for validation
+ * Supports both VITE_MASTRA_BASE_URL (preferred) and VITE_MASTRA_API_URL (legacy) for backward compatibility
  */
 export const MastraEnvSchema = z.object({
-  VITE_MASTRA_BASE_URL: z.string().url().default('http://localhost:3000'),
+  VITE_MASTRA_BASE_URL: z.string().url().optional(),
+  VITE_MASTRA_API_URL: z.string().url().optional(), // Legacy support
   VITE_MASTRA_API_KEY: z.string().optional(),
   VITE_MASTRA_AGENT_NAME: z.string().default('business-intelligence'),
   VITE_MASTRA_TIMEOUT: z.coerce.number().default(30000),
   VITE_MASTRA_MAX_RETRIES: z.coerce.number().default(3),
   VITE_MASTRA_DEBUG: z.coerce.boolean().default(false),
+}).transform((data) => {
+  // Prefer VITE_MASTRA_BASE_URL, fall back to VITE_MASTRA_API_URL, then default
+  const baseUrl = data.VITE_MASTRA_BASE_URL || data.VITE_MASTRA_API_URL || 'http://localhost:3000';
+  
+  return {
+    ...data,
+    VITE_MASTRA_BASE_URL: baseUrl,
+  };
 });
 
 /**
@@ -72,6 +83,7 @@ export interface MastraMessage {
 
 /**
  * Agent query request interface
+ * Updated to use AgentInputContext for role-based authentication
  */
 export interface MastraAgentQuery {
   /** Query identifier */
@@ -80,44 +92,26 @@ export interface MastraAgentQuery {
   query: string;
   /** Query type for routing */
   type: 'analytics' | 'dashboard' | 'report' | 'general';
-  /** Additional context for the query */
-  context?: {
-    /** User context information */
-    user?: {
-      id: string;
-      preferences?: Record<string, unknown>;
-    };
-    /** Session information */
-    session?: {
-      id: string;
-      history?: MastraMessage[];
-    };
-    /** Business context */
-    business?: {
-      industry?: string;
-      metrics?: string[];
-      timeRange?: {
-        start: Date;
-        end: Date;
-      };
-      // BI-specific extensions
-      biDataSources?: string[];
-      biTimeRange?: {
-        start: Date;
-        end: Date;
-        granularity?: 'hour' | 'day' | 'week' | 'month' | 'year';
-      };
-      biMetrics?: string[];
-      biDimensions?: string[];
-      biFilters?: Record<string, unknown>;
-      biAggregations?: Array<{
-        field: string;
-        function: 'sum' | 'avg' | 'count' | 'min' | 'max';
-      }>;
-    };
-  };
+  /** Agent input context with role-based authentication (MANDATORY) */
+  context: AgentInputContext;
   /** Query parameters */
   parameters?: Record<string, unknown>;
+  /** BI-specific extensions */
+  biOptions?: {
+    dataSources?: string[];
+    timeRange?: {
+      start: Date;
+      end: Date;
+      granularity?: 'hour' | 'day' | 'week' | 'month' | 'year';
+    };
+    metrics?: string[];
+    dimensions?: string[];
+    filters?: Record<string, unknown>;
+    aggregations?: Array<{
+      field: string;
+      function: 'sum' | 'avg' | 'count' | 'min' | 'max';
+    }>;
+  };
 }
 
 /**
@@ -264,29 +258,11 @@ export interface MastraHealthResponse {
 
 /**
  * BI query request interface extending base agent query
+ * Inherits AgentInputContext for role-based authentication
  */
-export interface MastraBIQuery extends MastraAgentQuery {
+export interface MastraBIQuery extends Omit<MastraAgentQuery, 'type'> {
   /** BI-specific query type */
   type: 'analytics' | 'dashboard' | 'report';
-  /** Data source specifications */
-  dataSources?: string[];
-  /** Time range for the query */
-  timeRange?: {
-    start: Date;
-    end: Date;
-    granularity?: 'hour' | 'day' | 'week' | 'month' | 'year';
-  };
-  /** Metrics to analyze */
-  metrics?: string[];
-  /** Dimensions to group by */
-  dimensions?: string[];
-  /** Filters to apply */
-  filters?: Record<string, unknown>;
-  /** Aggregation functions */
-  aggregations?: Array<{
-    field: string;
-    function: 'sum' | 'avg' | 'count' | 'min' | 'max';
-  }>;
 }
 
 /**

@@ -1,14 +1,19 @@
 /**
  * Persistent Chat Store for Assistant UI
  * Manages chat history, favorites, and conversation persistence using Zustand
+ * Integrated with Mastra agent server for data synchronization
  */
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { createClient } from '@supabase/supabase-js';
+import { extractAgentContext } from '@/lib/agent-context-processor';
+import { getMastraDataSyncService } from '@/services/mastra-data-sync-service';
 import type {
   PersistentChatStore,
   ChatHistoryEntry
 } from '@/types/business-intelligence';
+import type { UserMemory } from '@/types/memory';
 
 /**
  * Create the persistent chat store with local storage persistence
@@ -22,6 +27,9 @@ export const usePersistentChatStore = create<PersistentChatStore>()(
       searchQuery: '',
       isLoading: false,
       error: null,
+      isInitialized: false,
+      lastSyncTimestamp: null,
+      userMemories: [],
 
       // Actions
       addToHistory: (entry: ChatHistoryEntry) => {
@@ -99,6 +107,73 @@ export const usePersistentChatStore = create<PersistentChatStore>()(
 
       setError: (error: string | null) => {
         set({ error });
+      },
+      
+      // Mastra initialization action
+      initializeWithMastraData: async (userId: string) => {
+        console.log('[DEBUG] PersistentChatStore: Initializing with Mastra data', {
+          userId,
+          timestamp: new Date().toISOString()
+        });
+        
+        try {
+          set({ isLoading: true, error: null });
+          
+          // Get current user and session from Supabase
+          const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+          const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+          
+          if (!supabaseUrl || !supabaseKey) {
+            console.warn('[DEBUG] PersistentChatStore: Supabase config missing, skipping Mastra init');
+            set({ isLoading: false, isInitialized: true });
+            return;
+          }
+          
+          const supabase = createClient(supabaseUrl, supabaseKey);
+          const { data: { user } } = await supabase.auth.getUser();
+          const { data: { session } } = await supabase.auth.getSession();
+          
+          if (!user) {
+            console.warn('[DEBUG] PersistentChatStore: User not authenticated, skipping Mastra init');
+            set({ isLoading: false, isInitialized: true });
+            return;
+          }
+          
+          // Extract agent context
+          const agentContext = await extractAgentContext(user, session);
+          
+          console.log('[DEBUG] PersistentChatStore: Agent context created for Mastra init');
+          
+          // Get Mastra data sync service
+          const syncService = getMastraDataSyncService();
+          
+          // Fetch user memories for potential personalization
+          const userMemories = await syncService.fetchUserMemories(userId, agentContext);
+          
+          console.log('[DEBUG] PersistentChatStore: User memories fetched', {
+            count: userMemories.length
+          });
+          
+          set({
+            userMemories,
+            isInitialized: true,
+            lastSyncTimestamp: new Date(),
+            isLoading: false,
+            error: null,
+          });
+          
+          console.log('[DEBUG] PersistentChatStore: Mastra initialization complete');
+        } catch (error) {
+          console.error('[DEBUG] PersistentChatStore: Mastra initialization failed', error);
+          const errorMessage = error instanceof Error ? error.message : 'Failed to initialize with Mastra';
+          
+          // Fallback to local data on error
+          set({
+            error: errorMessage,
+            isLoading: false,
+            isInitialized: true, // Mark as initialized to prevent retry loops
+          });
+        }
       }
     }),
     {

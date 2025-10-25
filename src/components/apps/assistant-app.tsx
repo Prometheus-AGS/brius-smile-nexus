@@ -1,7 +1,12 @@
 /**
  * AssistantApp component - Main application wrapper for the AI assistant
- * Integrates the new AssistantChat component with Mastra backend and business intelligence features
+ * Integrates Mastra-based chat with business intelligence features
  * Enhanced with comprehensive error boundary protection
+ *
+ * MASTRA-ONLY ARCHITECTURE:
+ * - Uses MastraAssistantChat component exclusively
+ * - No OpenAI fallbacks or legacy chat implementations
+ * - Real-time streaming from Mastra server at https://mastra.brius.com
  */
 
 import React, { useCallback, useEffect } from 'react';
@@ -9,7 +14,7 @@ import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Bot, BarChart3, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { AssistantChat } from '@/components/assistant-ui';
+import { MastraAssistantChat } from '@/components/assistant-ui';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { ChatHistorySidebar } from '@/components/assistant/chat-history-sidebar';
 import { ChatHistoryToggle } from '@/components/assistant/chat-history-toggle';
@@ -83,7 +88,7 @@ const AssistantAppInner: React.FC = () => {
     initializeData();
   }, [loadDashboard, loadHistory]);
 
-  // Note: Event handlers removed as AssistantChat component is self-contained
+  // Note: Event handlers removed as MastraAssistantChat component is self-contained
   // User context and event handling are managed internally via useMastraChat hook
   // This resolves the original user requirement for setting resourceId to user UUID
   // as the hook automatically handles user identification through createBusinessContext
@@ -180,7 +185,7 @@ const AssistantAppInner: React.FC = () => {
                     
                     // Log to error tracking service in production
                     if (process.env.NODE_ENV === 'production') {
-                      // reportErrorToService(error, errorInfo, 'assistant-chat');
+                      // reportErrorToService(error, errorInfo, 'mastra-assistant-chat');
                     }
                   }}
                   fallback={
@@ -205,7 +210,7 @@ const AssistantAppInner: React.FC = () => {
                     </div>
                   }
                 >
-                  <AssistantChat
+                  <MastraAssistantChat
                     className="flex-1"
                   />
                 </ErrorBoundary>
@@ -284,9 +289,11 @@ export const AssistantApp: React.FC = () => {
                   <RefreshCw className="h-4 w-4" />
                   Reload Assistant
                 </Button>
-                <Button 
-                  variant="outline" 
-                  onClick={() => window.location.href = '/dashboard'}
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    window.location.href = '/dashboard';
+                  }}
                   className="flex items-center gap-2"
                 >
                   <BarChart3 className="h-4 w-4" />

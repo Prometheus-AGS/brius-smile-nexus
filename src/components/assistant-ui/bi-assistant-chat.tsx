@@ -1,24 +1,23 @@
 /**
- * Business Intelligence Assistant Chat Component
+ * Business Intelligence Assistant Chat
  * 
- * Updated to use Mastra client while maintaining existing interface
- * This component now delegates to the new MastraBIChat component
+ * Wrapper component for the Mastra BI chat interface
+ * Uses the new MastraAssistantChat component with real Mastra server connections
+ * 
+ * MASTRA-ONLY: No fallbacks, connects exclusively to real Mastra servers
  */
 
 import React from 'react';
-import MastraBIChat from './mastra-bi-chat';
+import { MastraAssistantChat } from './mastra-assistant-chat';
 
 // ============================================================================
 // Component Types
 // ============================================================================
 
-interface BIAssistantChatProps {
+export interface BIAssistantChatProps {
   className?: string;
-  placeholder?: string;
   maxHeight?: string;
-  showSuggestions?: boolean;
-  agentId?: string;
-  resourceId?: string;
+  debug?: boolean;
 }
 
 // ============================================================================
@@ -26,25 +25,22 @@ interface BIAssistantChatProps {
 // ============================================================================
 
 /**
- * BIAssistantChat component that wraps the new MastraBIChat
- * This maintains backward compatibility while using the new Mastra implementation
+ * Business Intelligence Assistant Chat Component
+ * 
+ * Provides a chat interface for business intelligence queries using Mastra agents.
+ * This is a thin wrapper around MastraAssistantChat with BI-specific configuration.
  */
 export const BIAssistantChat: React.FC<BIAssistantChatProps> = ({
   className = '',
-  placeholder = 'Ask me about your business intelligence data...',
   maxHeight = '600px',
-  showSuggestions = true,
-  agentId = 'business-intelligence',
-  resourceId = 'default'
+  debug = false,
 }) => {
   return (
-    <MastraBIChat
+    <MastraAssistantChat
       className={className}
-      placeholder={placeholder}
       maxHeight={maxHeight}
-      showSuggestions={showSuggestions}
-      agentId={agentId}
-      resourceId={resourceId}
+      placeholder="Ask me about your business intelligence data..."
+      debug={debug}
     />
   );
 };

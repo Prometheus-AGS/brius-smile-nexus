@@ -1,18 +1,14 @@
 {
   "mcpServers": {
     "brius_postgres": {
-      "command": "postgres-mcp",
+      "command": "npx",
       "args": [
-        "--access-mode=unrestricted"
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://postgres:P%40n%40m3r%40%21@db.gyyottknjakkagswebwh.supabase.co:5432/postgres"
       ],
-      "env": {
-        "DATABASE_URI": "postgresql://mdw_ai:xGXmckHY@test.brius.com:5432/mdw_db?sslmode=require"
-      },
       "alwaysAllow": [
-        "list_schemas",
-        "list_objects",
-        "get_object_details",
-        "execute_sql"
+        "query"
       ]
     }
   }

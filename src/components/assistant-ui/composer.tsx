@@ -97,7 +97,7 @@ export const Composer: React.FC<ComposerProps> = ({
    */
   useEffect(() => {
     adjustTextareaHeight();
-  }, [message, adjustTextareaHeight]);
+  }, [adjustTextareaHeight]);
 
   const canSend = message.trim().length > 0 && !isLoading && !isStreaming;
   const showLoading = isLoading || isComposing;

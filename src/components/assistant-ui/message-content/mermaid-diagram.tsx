@@ -208,7 +208,7 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = memo(({
     };
 
     renderDiagram();
-  }, [code, isDark]);
+  }, [code]);
 
   /**
    * Handle copy result feedback

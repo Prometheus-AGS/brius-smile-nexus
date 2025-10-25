@@ -207,6 +207,9 @@ export interface PersistentChatState {
   searchQuery: string;
   isLoading: boolean;
   error: string | null;
+  isInitialized: boolean;
+  lastSyncTimestamp: Date | null;
+  userMemories: import('@/types/memory').UserMemory[];
 }
 
 /**
@@ -220,6 +223,7 @@ export interface PersistentChatActions {
   clearHistory: () => void;
   loadHistory: () => Promise<void>;
   setError: (error: string | null) => void;
+  initializeWithMastraData: (userId: string) => Promise<void>;
 }
 
 /**

@@ -8,6 +8,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { MessageCopyButton } from './copy-button';
 import { CodeBlock, InlineCode } from './code-block';
 import { MermaidDiagram } from './mermaid-diagram';
@@ -22,8 +23,7 @@ import { cn } from '@/lib/utils';
  */
 const MarkdownComponents = {
   // Code blocks
-  code: ({ node, inline, className, children, ...props }: {
-    node?: unknown;
+  code: ({ inline, className, children, ..._props }: {
     inline?: boolean;
     className?: string;
     children?: React.ReactNode;
@@ -292,27 +292,31 @@ export const MessageActions: React.FC<{
       />
       
       {onEdit && (
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={onEdit}
-          className="p-1 rounded hover:bg-muted transition-colors"
+          className="p-1 h-auto w-auto"
           title="Edit message"
         >
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
           </svg>
-        </button>
+        </Button>
       )}
       
       {onDelete && (
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={onDelete}
-          className="p-1 rounded hover:bg-destructive/10 text-destructive transition-colors"
+          className="p-1 h-auto w-auto hover:bg-destructive/10 text-destructive hover:text-destructive"
           title="Delete message"
         >
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
           </svg>
-        </button>
+        </Button>
       )}
     </div>
   );

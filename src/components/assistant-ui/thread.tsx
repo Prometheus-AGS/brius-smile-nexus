@@ -32,7 +32,7 @@ export const Thread: React.FC<ThreadProps> = ({
         block: 'end'
       });
     }
-  }, [messages.length, isStreaming]);
+  }, []);
 
   /**
    * Show empty state when no messages

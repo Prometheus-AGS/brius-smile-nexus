@@ -3,10 +3,13 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 
+const host = process.env.TAURI_DEV_HOST;
+
 // https://vitejs.dev/config/
 export default defineConfig({
+  clearScreen: false,
   server: {
-    host: true, // Listen on all addresses
+    host: host || false, 
     port: 8080,
     strictPort: true,
     cors: {
@@ -18,10 +21,31 @@ export default defineConfig({
       allowedHeaders: "*"
     },
     allowedHosts: true, // Allow all hosts
-    hmr: {
+    hmr: host? {
+          protocol: 'ws',
+          host,
+          port: 1421,
+        }
+      : {
       port: 8080, // Use same port as dev server
       host: 'localhost',
     },
+    watch: {
+      // tell vite to ignore watching `src-tauri`
+      ignored: ['**/src-tauri/**'],
+    },
+  },
+  envPrefix: ['VITE_', 'TAURI_ENV_*'],
+  build: {
+    // Tauri uses Chromium on Windows and WebKit on macOS and Linux
+    target:
+      process.env.TAURI_ENV_PLATFORM === 'windows'
+        ? 'chrome105'
+        : 'safari13',
+    // don't minify for debug builds
+    minify: !process.env.TAURI_ENV_DEBUG ? 'esbuild' : false,
+    // produce sourcemaps for debug builds
+    sourcemap: !!process.env.TAURI_ENV_DEBUG,
   },
   preview: {
     allowedHosts: true, // Allow all hosts

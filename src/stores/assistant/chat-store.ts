@@ -3,6 +3,9 @@ import { devtools, persist } from 'zustand/middleware';
 import { createClient } from '@supabase/supabase-js';
 import { getLangfuseConfig } from '@/lib/langfuse-config';
 import { getLangfuseClientService } from '@/services/langfuse-client';
+import { extractAgentContext } from '@/lib/agent-context-processor';
+import { getMastraDataSyncService } from '@/services/mastra-data-sync-service';
+import type { UserMemory } from '@/types/memory';
 
 // Local storage-based interfaces with user_id for multi-user support
 export interface Thread {
@@ -43,6 +46,9 @@ interface ChatStoreState {
   error: string | null;
   openaiClient: boolean;
   currentUser: UserContext | null;
+  userMemories: UserMemory[];
+  isInitialized: boolean;
+  lastSyncTimestamp: Date | null;
   
   // Thread management actions
   setActiveThreadId: (threadId: string | null) => void;
@@ -60,6 +66,10 @@ interface ChatStoreState {
   // OpenAI integration actions
   initializeOpenAI: () => Promise<void>;
   createNewChat: (userId: string) => Promise<string>;
+  
+  // Mastra integration actions
+  initializeWithMastra: (userId: string) => Promise<void>;
+  syncFromMastra: (userId: string, force?: boolean) => Promise<void>;
   
   // User context management
   getUserContextHeaders: () => Record<string, string>;
@@ -103,6 +113,9 @@ export const useChatStore = create<ChatStoreState>()(
         error: null,
         openaiClient: false,
         currentUser: null,
+        userMemories: [],
+        isInitialized: false,
+        lastSyncTimestamp: null,
 
         setActiveThreadId: (threadId) => {
           console.log('[DEBUG] ChatStore: Setting active thread', {
@@ -629,6 +642,165 @@ export const useChatStore = create<ChatStoreState>()(
             'x-user-role': state.currentUser.role || 'user',
             'x-user-tier': state.currentUser.tier || 'standard',
             'x-user-language': state.currentUser.language || 'en',
+        // Mastra integration functions
+        initializeWithMastra: async (userId: string) => {
+          console.log('[DEBUG] ChatStore: Initializing with Mastra server data', {
+            userId,
+            timestamp: new Date().toISOString()
+          });
+          
+          try {
+            set({ isLoading: true, error: null });
+            
+            // Get current user and session from Supabase
+            const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+            const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+            
+            if (!supabaseUrl || !supabaseKey) {
+              throw new Error('Supabase configuration missing');
+            }
+            
+            const supabase = createClient(supabaseUrl, supabaseKey);
+            const { data: { user } } = await supabase.auth.getUser();
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (!user) {
+              throw new Error('User not authenticated');
+            }
+            
+            // Extract agent context using helper function
+            const agentContext = await extractAgentContext(user, session);
+            
+            console.log('[DEBUG] ChatStore: Agent context created', {
+              userId: agentContext.userId,
+              roles: agentContext.roles,
+              isAuthenticated: agentContext.isAuthenticated
+            });
+            
+            // Get Mastra data sync service
+            const syncService = getMastraDataSyncService();
+            
+            // Fetch threads from Mastra server
+            const mastraThreads = await syncService.fetchThreads(userId, agentContext);
+            
+            console.log('[DEBUG] ChatStore: Threads fetched from Mastra', {
+              count: mastraThreads.length
+            });
+            
+            // Fetch user memories for personalization
+            const userMemories = await syncService.fetchUserMemories(userId, agentContext);
+            
+            console.log('[DEBUG] ChatStore: User memories fetched from Mastra', {
+              count: userMemories.length
+            });
+            
+            // Merge with local threads (prioritize server data)
+            const existingThreadIds = get().threads.map(t => t.id);
+            const newThreads = mastraThreads.filter(t => !existingThreadIds.includes(t.id));
+            
+            set((state) => ({
+              threads: [...mastraThreads, ...state.threads.filter(t => !mastraThreads.find(mt => mt.id === t.id))],
+              userMemories,
+              isInitialized: true,
+              lastSyncTimestamp: new Date(),
+              isLoading: false,
+              error: null,
+            }));
+            
+            console.log('[DEBUG] ChatStore: Mastra initialization complete', {
+              totalThreads: get().threads.length,
+              newThreadsFromServer: newThreads.length,
+              userMemoriesCount: userMemories.length
+            });
+          } catch (error) {
+            console.error('[DEBUG] ChatStore: Mastra initialization failed', error);
+            const errorMessage = error instanceof Error ? error.message : 'Failed to initialize with Mastra server';
+            
+            // Fallback to local data on error
+            set({
+              error: errorMessage,
+              isLoading: false,
+              isInitialized: true, // Mark as initialized even on error to prevent retry loops
+            });
+          }
+        },
+        
+        syncFromMastra: async (userId: string, force: boolean = false) => {
+          console.log('[DEBUG] ChatStore: Syncing from Mastra server', {
+            userId,
+            force,
+            timestamp: new Date().toISOString()
+          });
+          
+          const state = get();
+          
+          // Skip if already synced recently (unless forced)
+          if (!force && state.lastSyncTimestamp) {
+            const timeSinceSync = Date.now() - state.lastSyncTimestamp.getTime();
+            const SYNC_COOLDOWN_MS = 60000; // 1 minute
+            
+            if (timeSinceSync < SYNC_COOLDOWN_MS) {
+              console.log('[DEBUG] ChatStore: Skipping sync - too recent', {
+                timeSinceSync,
+                cooldown: SYNC_COOLDOWN_MS
+              });
+              return;
+            }
+          }
+          
+          try {
+            set({ isLoading: true, error: null });
+            
+            // Get current user and session from Supabase
+            const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+            const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+            
+            if (!supabaseUrl || !supabaseKey) {
+              throw new Error('Supabase configuration missing');
+            }
+            
+            const supabase = createClient(supabaseUrl, supabaseKey);
+            const { data: { user } } = await supabase.auth.getUser();
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (!user) {
+              throw new Error('User not authenticated');
+            }
+            
+            // Extract agent context
+            const agentContext = await extractAgentContext(user, session);
+            
+            // Get Mastra data sync service
+            const syncService = getMastraDataSyncService();
+            
+            // Fetch latest threads
+            const mastraThreads = await syncService.fetchThreads(userId, agentContext);
+            
+            console.log('[DEBUG] ChatStore: Sync fetched threads', {
+              count: mastraThreads.length
+            });
+            
+            // Merge with local data (server is source of truth)
+            set((state) => ({
+              threads: [...mastraThreads, ...state.threads.filter(t => !mastraThreads.find(mt => mt.id === t.id))],
+              lastSyncTimestamp: new Date(),
+              isLoading: false,
+              error: null,
+            }));
+            
+            console.log('[DEBUG] ChatStore: Mastra sync complete', {
+              totalThreads: get().threads.length
+            });
+          } catch (error) {
+            console.error('[DEBUG] ChatStore: Mastra sync failed', error);
+            const errorMessage = error instanceof Error ? error.message : 'Failed to sync with Mastra server';
+            
+            set({
+              error: errorMessage,
+              isLoading: false,
+            });
+          }
+        },
             'x-organization': state.currentUser.organization || 'default',
             'x-session-id': state.currentUser.sessionId || `session-${Date.now()}`,
           };
